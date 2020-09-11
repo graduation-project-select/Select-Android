@@ -7,7 +7,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
 
-class ClothesTwoByTwoAdapter(var items:ArrayList<String>): RecyclerView.Adapter<ClothesTwoByTwoAdapter.ImageHolder>() {
+class ClosetClothesVerticalAdapter(var items:ArrayList<String>): RecyclerView.Adapter<ClosetClothesVerticalAdapter.ImageHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
@@ -16,7 +16,7 @@ class ClothesTwoByTwoAdapter(var items:ArrayList<String>): RecyclerView.Adapter<
     }
 
     inner class ImageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var clothesImg: ImageView = itemView.findViewById(R.id.clothesImg_iv)
+        var clothesImg: ImageView = itemView.findViewById(R.id.iv_clothesImg)
         init {
             clothesImg.setOnClickListener {
                 itemClickListener?.OnClickItem(this, it, items[adapterPosition], adapterPosition)
@@ -25,7 +25,7 @@ class ClothesTwoByTwoAdapter(var items:ArrayList<String>): RecyclerView.Adapter<
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
-        var v = LayoutInflater.from(parent.context).inflate(R.layout.item_clothes_twobytwo, parent, false)
+        var v = LayoutInflater.from(parent.context).inflate(R.layout.closet_clothes_rv_item_vertical, parent, false)
         return ImageHolder(v)
     }
 
