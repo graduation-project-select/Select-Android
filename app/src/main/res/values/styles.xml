@@ -1,0 +1,21 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!--  하단 메뉴 (비)활성화 시  -->
+    <style name="navTextInactive">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/colorText</item>
+    </style>
+
+    <style name="navTextActive">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+</resources>
