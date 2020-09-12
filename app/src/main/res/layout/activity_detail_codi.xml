@@ -25,7 +25,6 @@
             android:id="@+id/codiTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="#데이트룩 #데일리룩 #나들이룩"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -34,10 +33,10 @@
             android:id="@+id/codiDetailImg"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/style_roundbox_black"
             android:padding="20dp"
-            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintDimensionRatio="w,1:1.1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.491"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,7 +47,7 @@
             android:id="@+id/codiItem_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:text="이 코디를 사용한 아이템을 확인해보세요"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/codiDetailImg" />
@@ -66,7 +65,6 @@
             android:id="@+id/CombiDoCodi"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:layout_marginBottom="8dp"
             android:background="@drawable/border_more_round"
             android:paddingHorizontal="16dp"
             android:text="이 조합으로 코디하기"
@@ -74,10 +72,11 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/codiItem_rv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toTopOf="@+id/lastWearDate"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/codiItem_tv" />

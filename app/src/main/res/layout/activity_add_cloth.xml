@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.DetailCodiActivity">
+
+    <include
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/colorPrimaryDark"
+        android:paddingHorizontal="@dimen/activity_horizontal_padding"
+        android:paddingVertical="@dimen/activity_vertical_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <TextView
+            android:id="@+id/category_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/border_more_round"
+            android:backgroundTint="@color/colorPrimary"
+            android:paddingHorizontal="18dp"
+            android:paddingVertical="2dp"
+            android:text="상의"
+            android:textColor="@color/colorBackGround"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/categorySub_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="> 반팔"
+            app:layout_constraintBottom_toBottomOf="@+id/category_tv"
+            app:layout_constraintStart_toEndOf="@+id/category_tv"
+            app:layout_constraintTop_toTopOf="@+id/category_tv" />
+
+        <TextView
+            android:id="@+id/colorTag_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="# Color"
+            app:layout_constraintBottom_toBottomOf="@+id/colorCircle"
+            app:layout_constraintEnd_toStartOf="@+id/colorCircle"
+            app:layout_constraintTop_toTopOf="@+id/colorCircle" />
+
+        <View
+            android:id="@+id/colorCircle"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/clothImg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/style_roundbox_black"
+            android:padding="20dp"
+            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/category_tv"
+            app:srcCompat="@drawable/cloth_test" />
+
+        <CheckBox
+            android:id="@+id/checkBox_spring"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="48dp"
+            android:button="@drawable/checkbox_season"
+            android:text="CheckBox"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox_summer"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/clothImg" />
+
+        <CheckBox
+            android:id="@+id/checkBox_summer"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:button="@drawable/checkbox_season"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox_spring"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox_fall"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox_spring"
+            app:layout_constraintTop_toTopOf="@+id/checkBox_spring" />
+
+        <CheckBox
+            android:id="@+id/checkBox_fall"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:button="@drawable/checkbox_season"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox_summer"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox_winter"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox_summer"
+            app:layout_constraintTop_toTopOf="@+id/checkBox_summer" />
+
+        <CheckBox
+            android:id="@+id/checkBox_winter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:button="@drawable/checkbox_season"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox_fall"
+            app:layout_constraintEnd_toStartOf="@+id/all_check_tv"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox_fall"
+            app:layout_constraintTop_toTopOf="@+id/checkBox_fall" />
+
+        <TextView
+            android:id="@+id/all_check_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="모두 선택"
+            android:paddingHorizontal="15dp"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox_winter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox_winter"
+            app:layout_constraintTop_toTopOf="@+id/checkBox_winter" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="추가하기"
+        android:background="@color/colorPrimary"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
