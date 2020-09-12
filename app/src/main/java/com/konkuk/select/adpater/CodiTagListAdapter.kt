@@ -6,13 +6,20 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
+import com.konkuk.select.fragment.CodiTagListFragment
 import com.konkuk.select.model.CodiTag
 
-class CodiTagListAdapter(val item: ArrayList<CodiTag>) : RecyclerView.Adapter<CodiTagListAdapter.ItemHolder>(){
+class CodiTagListAdapter(val item: ArrayList<CodiTag>) : RecyclerView.Adapter<CodiTagListAdapter.ItemHolder>() {
+
+    fun onItemMove(pos1:Int, pos2:Int) {
+        val item1 = item.get(pos1)
+        item.removeAt(pos1)
+        item.add(pos2, item1)
+        notifyItemMoved(pos1, pos2)
+    }
 
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var tag: TextView = itemView.findViewById(R.id.tag)
-        var moveBtn: View = itemView.findViewById(R.id.moveBtn)
     }
 
     override fun onCreateViewHolder(
@@ -30,4 +37,5 @@ class CodiTagListAdapter(val item: ArrayList<CodiTag>) : RecyclerView.Adapter<Co
     override fun onBindViewHolder(holder: CodiTagListAdapter.ItemHolder, position: Int) {
         holder.tag.text = item[position].tag
     }
+
 }

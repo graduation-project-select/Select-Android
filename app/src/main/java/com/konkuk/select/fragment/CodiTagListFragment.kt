@@ -9,7 +9,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagListAdapter
 import com.konkuk.select.model.CodiTag
@@ -33,11 +36,18 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val leftBtn : ImageView = toolbar.findViewById(R.id.left_iv)
-        val title : TextView = toolbar.findViewById(R.id.title_tv)
-        val rightBtn : ImageView = toolbar.findViewById(R.id.right_iv)
+        val leftBtn: ImageView = toolbar.findViewById(R.id.left_iv)
+        val title: TextView = toolbar.findViewById(R.id.title_tv)
+        val rightBtn: ImageView = toolbar.findViewById(R.id.right_iv)
 
         leftBtn.setImageResource(R.drawable.back)
+
+        leftBtn.setOnClickListener {
+            val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
+            val mFrag: Fragment = CodiFragment(ctx)
+            t.replace(R.id.codill, mFrag)
+            t.commit()
+        }
 
         var codiTagList = ArrayList<CodiTag>()
         codiTagList.add(CodiTag("111", "#데이트룩"))
@@ -48,12 +58,19 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
         codiTagAdapter = CodiTagListAdapter(codiTagList)
         codiTag_rv.adapter = codiTagAdapter
 
-        leftBtn.setOnClickListener {
-            val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
-            val mFrag: Fragment = CodiFragment(ctx)
-            t.replace(R.id.codill, mFrag)
-            t.commit()
+        val simpleItemTouchCallback = object:ItemTouchHelper.SimpleCallback(UP or DOWN, 0) {
+            override fun onMove(p0: RecyclerView, p1: RecyclerView.ViewHolder, p2: RecyclerView.ViewHolder): Boolean {
+                codiTagAdapter .onItemMove(p1.adapterPosition,p2.adapterPosition)
+                return true
+            }
+
+            override fun onSwiped(p0: RecyclerView.ViewHolder, p1: Int) {
+            }
         }
+
+        var itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(codiTag_rv)
+
     }
 
 }
