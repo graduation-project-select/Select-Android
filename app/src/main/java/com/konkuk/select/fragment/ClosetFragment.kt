@@ -125,6 +125,17 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         rv_clothes_vertical.layoutManager = GridLayoutManager(ctx, 2)
         closetClothesVerticalAdapter = ClosetClothesVerticalAdapter(clothesListVertical)
         rv_clothes_vertical.adapter = closetClothesVerticalAdapter
+        closetClothesVerticalAdapter.itemClickListener = object:ClosetClothesVerticalAdapter.OnItemClickListener{
+            override fun OnClickItem(
+                holder: ClosetClothesVerticalAdapter.ImageHolder,
+                view: View,
+                data: Clothes,
+                position: Int
+            ) {
+                Toast.makeText(ctx, "${data.id}, ${data.category} click", Toast.LENGTH_SHORT).show()
+            }
+        }
+
 
         rv_clothes_horizontal.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
         closetClothesHorizontalAdapter = ClosetClothesHorizontalAdapter(ctx, categoryList)

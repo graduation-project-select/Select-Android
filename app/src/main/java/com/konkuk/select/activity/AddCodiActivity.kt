@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.DragEvent
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.konkuk.select.R
 import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
@@ -75,10 +78,13 @@ class AddCodiActivity : AppCompatActivity() {
                 Log.d(TAG, "ACTION_DROP")
                 when(v){
                     codi_canvas -> {
-                        Log.d(TAG, "여기는 코디하는 곳!")
+                        dropAtCodiCanvas(v,event)
                     }
                     bottom_view -> {
-                        Log.d(TAG, "여기는 쓰레기통")
+                        dropAtBottomView(v,event)
+                    }
+                    else -> {
+                        v.visibility = View.VISIBLE
                     }
                 }
             }
@@ -90,5 +96,32 @@ class AddCodiActivity : AppCompatActivity() {
             else -> {}
         }
         true
+    }
+
+    fun dropAtCodiCanvas(v:View, event:DragEvent){
+        Log.d(TAG, "여기는 codi_canvas")
+        var view:View = event.localState as View
+        var viewgroup = view.parent as ViewGroup
+        viewgroup.removeView(view)
+        Toast.makeText(this,"이미지가 codi_canvas에 드랍되었습니다.", Toast.LENGTH_SHORT).show()
+
+        var containView:ConstraintLayout = v as ConstraintLayout
+        view.x = 100F
+        view.y = 100F
+        v.addView(view)
+        view.visibility = View.VISIBLE
+    }
+
+    fun dropAtBottomView(v:View, event:DragEvent){
+        Log.d(TAG, "여기는 bottom_view")
+        var view:View = event.localState as View
+        var viewgroup = view.parent as ViewGroup
+        viewgroup.removeView(view)
+        Toast.makeText(this,"이미지가 bottom_view에 드랍되었습니다.", Toast.LENGTH_SHORT).show()
+        view.x = 300F
+        view.y = 100F
+        var containView:ConstraintLayout = v as ConstraintLayout
+        v.addView(view)
+        view.visibility = View.VISIBLE
     }
 }
