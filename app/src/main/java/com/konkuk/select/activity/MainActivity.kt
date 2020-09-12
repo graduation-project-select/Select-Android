@@ -5,12 +5,9 @@ import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.konkuk.select.R
-import com.konkuk.select.fragment.ClosetFragment
-import com.konkuk.select.fragment.CodiFragment
-import com.konkuk.select.fragment.CommunityFragment
-import com.konkuk.select.fragment.MyPageFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import androidx.appcompat.widget.Toolbar
+import com.konkuk.select.fragment.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,44 +18,35 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        val toolbar = findViewById(R.id.toolbar) as Toolbar
-//        toolbar.setTitle(R.string.app_name)
-//        setSupportActionBar(toolbar)
-
         if (savedInstanceState == null) {
             val fragment = ClosetFragment(this)
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
+            supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
                 .commit()
         }
 
-        navigationView.setOnNavigationItemSelectedListener {
+        navigationView.setOnNavigationItemSelectedListener{
             when (it.itemId) {
                 R.id.closetItem -> {
                     val fragment = ClosetFragment(this)
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
                         .commit()
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.codiItem -> {
                     val fragment = CodiFragment()
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
                         .commit()
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.communityItem -> {
                     val fragment = CommunityFragment()
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
                         .commit()
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.MyPageItem -> {
                     val fragment = MyPageFragment()
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
                         .commit()
                     return@setOnNavigationItemSelectedListener true
                 }
@@ -68,9 +56,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         add_iv.setOnClickListener {
-            Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show()
+            showBottomSheetMainBtnDialogFragment()
         }
 
+    }
+
+    fun showBottomSheetMainBtnDialogFragment() {
+        val bottomSheetFragment = BottomSheetMainBtnDialog(this)
+        supportFragmentManager?.let { bottomSheetFragment.show(it, bottomSheetFragment.getTag()) }
     }
 
 }

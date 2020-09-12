@@ -6,13 +6,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
+import com.konkuk.select.model.Clothes
 
-class ClosetClothesVerticalAdapter(var items:ArrayList<String>): RecyclerView.Adapter<ClosetClothesVerticalAdapter.ImageHolder>() {
+class ClosetClothesVerticalAdapter(var items:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesVerticalAdapter.ImageHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
     interface OnItemClickListener {
-        fun OnClickItem(holder: ImageHolder, view: View, data: String, position: Int)
+        fun OnClickItem(holder: ImageHolder, view: View, data: Clothes, position: Int)
     }
 
     inner class ImageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

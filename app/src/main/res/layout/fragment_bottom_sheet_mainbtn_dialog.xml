@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="16dp"
+    android:background="@drawable/bottom_sheet_style">
+
+    <TextView
+        android:id="@+id/tv_addClothesBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="16dp"
+        android:textAlignment="center"
+        android:text="옷 등록"
+        android:textSize="15dp"
+        android:textColor="#000"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorLightGray"/>
+    <TextView
+        android:id="@+id/tv_addCodiBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="16dp"
+        android:textAlignment="center"
+        android:text="코디 등록"
+        android:textSize="15dp"
+        android:textColor="#000"/>
+
+</LinearLayout>
