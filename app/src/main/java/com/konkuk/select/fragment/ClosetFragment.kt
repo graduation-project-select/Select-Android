@@ -31,13 +31,13 @@ class ClosetFragment(val ctx: Context) : Fragment() {
 
     lateinit var closetCategoryListAdapter: ClosetCategoryListAdapter
     var categoryList: ArrayList<Category> =  arrayListOf<Category>(
-            Category(0, "상의", true),
-            Category(3, "아우터", false),
-            Category(1, "하의", false),
-            Category(4, "신발", false),
-            Category(5, "악세서리", false),
-            Category(2, "원피스", false)
-        )
+        Category(0, "상의", true),
+        Category(3, "아우터", false),
+        Category(1, "하의", false),
+        Category(4, "신발", false),
+        Category(5, "악세서리", false),
+        Category(2, "원피스", false)
+    )
     var checkedCount: MutableLiveData<Int> = MutableLiveData(initCheckedCount())
 
     lateinit var closetClothesVerticalAdapter: ClosetClothesVerticalAdapter
