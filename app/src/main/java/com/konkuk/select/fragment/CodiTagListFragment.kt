@@ -13,8 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagListAdapter
 import com.konkuk.select.model.CodiTag
-import kotlinx.android.synthetic.main.activity_detail_cloth.*
-import kotlinx.android.synthetic.main.fragment_codi_tag_list.toolbar
+import kotlinx.android.synthetic.main.fragment_codi_tag_list.*
 
 class CodiTagListFragment(val ctx: Context) : Fragment() {
     lateinit var codiTagAdapter: CodiTagListAdapter
@@ -45,9 +44,9 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
         codiTagList.add(CodiTag("222", "#오피스룩"))
         codiTagList.add(CodiTag("333", "#캠퍼스룩"))
 
-        codi_rv.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
+        codiTag_rv.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
         codiTagAdapter = CodiTagListAdapter(codiTagList)
-        codi_rv.adapter = codiTagAdapter
+        codiTag_rv.adapter = codiTagAdapter
 
         leftBtn.setOnClickListener {
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
