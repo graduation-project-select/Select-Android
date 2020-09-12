@@ -86,23 +86,21 @@ class AddCodiActivity : AppCompatActivity() {
     fun setAdapter(){
         codiBottomCategoryAdapter = CodiBottomCategoryAdapter(categoryList)
         codiBottomRecommendationAdapter = CodiBottomRecommendationAdapter(arrayListOf("상의", "하의", "원피스", "아우터", "신발", "악세서리"))
-        // init temp Data
-        initTempData()
         codiBottomClothesLinearAdapter  = CodiBottomClothesLinearAdapter(clothesList)
         bottom_rv.adapter = codiBottomCategoryAdapter
         switchLayoutManager()
     }
 
     //temp
-    fun initTempData(){
+    fun initTempData(category:String){
         clothesList.clear()
         for(i in 0..Random.nextInt(1, 5)){
-            clothesList.add(Clothes("", "", ""))
+            clothesList.add(Clothes(i.toString(), category, ""))
         }
     }
 
     fun setClickListener(){
-        codiBottomCategoryAdapter.itemClickListener = object :CodiBottomCategoryAdapter.OnItemClickListener{
+        codiBottomCategoryAdapter.itemClickListener = object:CodiBottomCategoryAdapter.OnItemClickListener{
             override fun OnClickItem(
                 holder: CodiBottomCategoryAdapter.ItemHolder,
                 view: View,
@@ -110,10 +108,22 @@ class AddCodiActivity : AppCompatActivity() {
                 position: Int
             ) {
                 toolbar_codi_bottom.tv_titile.text = data.label
-                initTempData() // clothesList 변경 (temp data)
+                initTempData(data.label) // clothesList 변경 (temp data)
                 bottom_rv.adapter = codiBottomClothesLinearAdapter
                 switchLayoutManager()
             }
+        }
+
+        codiBottomClothesLinearAdapter.itemClickListener = object:CodiBottomClothesLinearAdapter.OnItemClickListener{
+            override fun OnClickItem(
+                holder: CodiBottomClothesLinearAdapter.ItemHolder,
+                view: View,
+                data: Clothes,
+                position: Int
+            ) {
+                Toast.makeText(this@AddCodiActivity,  "${data.id} ${data.category} click", Toast.LENGTH_SHORT).show()
+            }
+
         }
 
         toolbar_codi_bottom.randomCodiBtn.setOnClickListener {
