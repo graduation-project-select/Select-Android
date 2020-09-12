@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -40,6 +42,8 @@ class ClosetFragment(val ctx: Context) : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
     }
 
     override fun onCreateView(
@@ -52,6 +56,12 @@ class ClosetFragment(val ctx: Context) : Fragment() {
     @SuppressLint("ResourceType")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        // ToolBar 변경하는 코드
+//        val includeToolBar : View = findViewById(R.id.toolbar)
+        val leftBtn : ImageView = toolbar.findViewById(R.id.left_iv)
+        val title : TextView = toolbar.findViewById(R.id.title_tv)
+        val rightBtn : ImageView = toolbar.findViewById(R.id.right_iv)
 //        for(i in 0..10)
 //            temp_imgs.add("")
 
@@ -64,7 +74,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         }
 
         // setOnClickListener
-        closetmenu_iv.setOnClickListener {
+        leftBtn.setOnClickListener {
             Toast.makeText(ctx, "옷장 메뉴", Toast.LENGTH_SHORT).show()
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
             val mFrag: Fragment = ClosetListFragment(ctx)

@@ -6,13 +6,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import com.konkuk.select.R
 import com.konkuk.select.adpater.ClosetClothesVerticalAdapter
 import com.konkuk.select.adpater.ClosetListBlockAdapter
 import com.konkuk.select.model.Closet
-import kotlinx.android.synthetic.main.fragment_closet.*
 import kotlinx.android.synthetic.main.fragment_closet_list.*
 
 class ClosetListFragment(val ctx: Context) : Fragment() {
@@ -33,6 +34,11 @@ class ClosetListFragment(val ctx: Context) : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        val leftBtn : ImageView = toolbar.findViewById(R.id.left_iv)
+        val title : TextView = toolbar.findViewById(R.id.title_tv)
+        val rightBtn : ImageView = toolbar.findViewById(R.id.right_iv)
+
         for(i in 0..10)
             closetList.add(Closet(i.toString(), "운동 갈 때", "12", ""))
 
@@ -40,7 +46,7 @@ class ClosetListFragment(val ctx: Context) : Fragment() {
         closetListBlockAdapter = ClosetListBlockAdapter(ctx, closetList)
         rv_closet_list.adapter = closetListBlockAdapter
 
-        iv_backbtn.setOnClickListener {
+        leftBtn.setOnClickListener {
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
             val mFrag: Fragment = ClosetFragment(ctx)
             t.replace(R.id.ll, mFrag)
