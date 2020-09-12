@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="false"
+        android:drawable="@drawable/circle"
+        android:width="15dp"
+        android:height="15dp"
+        />
+    <item android:state_checked="true"
+        android:drawable="@drawable/circle_checked"
+        android:width="15dp"
+        android:height="15dp"
+        />
+</selector>

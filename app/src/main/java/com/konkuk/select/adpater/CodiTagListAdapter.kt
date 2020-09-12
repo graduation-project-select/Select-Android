@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
 import com.konkuk.select.model.CodiTag
-import kotlinx.android.synthetic.main.row_codi_tag_list.view.*
 
 class CodiTagListAdapter(val item: ArrayList<CodiTag>) : RecyclerView.Adapter<CodiTagListAdapter.ItemHolder>(){
 

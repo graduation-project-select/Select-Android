@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.codiItem -> {
-                    val fragment = CodiFragment()
+                    val fragment = CodiFragment(this)
                     supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragment.javaClass.getSimpleName())
                         .commit()
                     return@setOnNavigationItemSelectedListener true

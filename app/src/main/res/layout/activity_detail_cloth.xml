@@ -26,7 +26,6 @@
             android:id="@+id/category_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:background="@drawable/border_more_round"
             android:backgroundTint="@color/colorPrimary"
             android:paddingHorizontal="18dp"
@@ -60,7 +59,6 @@
             android:id="@+id/colorCircle"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginTop="8dp"
             android:background="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -78,10 +76,10 @@
             android:id="@+id/clothDetailImg"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/style_roundbox_black"
             android:padding="20dp"
-            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintDimensionRatio="w,1:1.1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.491"
             app:layout_constraintStart_toStartOf="parent"
@@ -89,22 +87,22 @@
             app:srcCompat="@drawable/cloth_test" />
 
         <TextView
-            android:id="@+id/codiItem_tv"
+            android:id="@+id/codi_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:text="이 아이템을 사용한 코디를 확인해보세요"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/clothDetailImg" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/codi_rv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/codiItem_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/codi_tv" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
