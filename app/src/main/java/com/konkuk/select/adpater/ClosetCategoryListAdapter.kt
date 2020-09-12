@@ -17,7 +17,6 @@ import com.konkuk.select.model.Category
 class ClosetCategoryListAdapter(val context:Context, var categoryList: ArrayList<Category>): RecyclerView.Adapter<ClosetCategoryListAdapter.ItemHolder>(){
 
     var itemClickListener:OnItemClickListener?=null
-    var checkedCount: MutableLiveData<Int> = MutableLiveData(initCheckedCount())
 
     interface OnItemClickListener {
         fun OnClickItem(holder: ItemHolder, view: View, data: Category, position: Int)
@@ -45,30 +44,8 @@ class ClosetCategoryListAdapter(val context:Context, var categoryList: ArrayList
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
         holder.cb_category.text = categoryList[position].label
         holder.cb_category.isChecked = categoryList[position].checked
-        holder.cb_category.setOnClickListener {
-            if(categoryList[position].checked){
-                categoryList[position].checked = false
-                checkedCount.value = checkedCount.value?.minus(1)
-                if(checkedCount.value!! <= 0){
-                    categoryList[position].checked = true
-                    checkedCount.value = 1
-                }
-            }else{
-                categoryList[position].checked = true
-                checkedCount.value = checkedCount.value?.plus(1)
-            }
-            holder.cb_category.isChecked = categoryList[position].checked
-
-            Log.d("categoryList", "Adapter_categoryList: $categoryList")
-        }
     }
 
-    fun initCheckedCount():Int{
-        var count = 0;
-        for(c in categoryList){
-            if(c.checked) count++
-        }
-        return count
-    }
+
 
 }

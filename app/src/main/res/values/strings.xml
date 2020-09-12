@@ -5,6 +5,10 @@
     <string name="menu_community">SNS</string>
     <string name="menu_mypage">마이페이지</string>
 
+    <string name="activity_title_addCodi">코디하기</string>
+    <string name="activity_title_addCodiRegister">코디 태그 선택</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

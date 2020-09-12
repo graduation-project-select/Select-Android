@@ -4,7 +4,7 @@
     <dimen name="activity_vertical_padding">24dp</dimen>
     <dimen name="activity_margin">16dp</dimen>
 
-    <dimen name="topbar_height">70dp</dimen>
+    <dimen name="topbar_height">60dp</dimen>
     <dimen name="topbar_title_textsize">20sp</dimen>
     <dimen name="topbar_horizontal_padding">16dp</dimen>
     <dimen name="menu_bottom_height">70dp</dimen>
