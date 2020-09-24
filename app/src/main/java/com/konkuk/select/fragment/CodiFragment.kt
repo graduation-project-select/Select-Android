@@ -3,7 +3,6 @@ package com.konkuk.select.fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +39,7 @@ class CodiFragment(val ctx: Context) : Fragment() {
         toolbar.left_iv.setOnClickListener {
             Toast.makeText(ctx, "코디 태그 메뉴", Toast.LENGTH_SHORT).show()
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
-            val mFrag: Fragment = CodiTagListFragment(ctx)
+            val mFrag: Fragment = CodiListDetailFlagment(ctx)
             t.replace(R.id.codill, mFrag)
             t.commit()
 
