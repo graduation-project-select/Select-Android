@@ -31,6 +31,7 @@ class CodiFragment(val ctx: Context) : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        toolbar.left_iv.setImageResource(R.drawable.hashtag)
         settingOnClickListener()
     }
 
@@ -39,7 +40,7 @@ class CodiFragment(val ctx: Context) : Fragment() {
         toolbar.left_iv.setOnClickListener {
             Toast.makeText(ctx, "코디 태그 메뉴", Toast.LENGTH_SHORT).show()
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
-            val mFrag: Fragment = CodiListDetailFlagment(ctx)
+            val mFrag: Fragment = CodiTagListFragment(ctx)
             t.replace(R.id.codill, mFrag)
             t.commit()
 

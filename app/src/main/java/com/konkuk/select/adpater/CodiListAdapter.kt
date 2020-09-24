@@ -10,8 +10,19 @@ import com.konkuk.select.model.Codi
 
 class CodiListAdapter (val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiListAdapter.ItemHolder>() {
 
+    var itemClickListener: CodiListAdapter.OnItemClickListener ?= null
+
+    interface OnItemClickListener {
+        fun OnClickItem(holder: ItemHolder, view: View, data: Codi, position: Int)
+    }
+
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var img: ImageView = itemView.findViewById(R.id.codi_iv)
+        var codiImg: ImageView = itemView.findViewById(R.id.codi_iv)
+        init {
+            codiImg.setOnClickListener {
+                itemClickListener?.OnClickItem(this, it, item[adapterPosition], adapterPosition)
+            }
+        }
     }
 
     override fun onCreateViewHolder(
@@ -27,7 +38,7 @@ class CodiListAdapter (val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiLis
     }
 
     override fun onBindViewHolder(holder: CodiListAdapter.ItemHolder, position: Int) {
-//        holder.img.setImageResource(item[position].img)
+//        holder.codiImg.setImageResource(android.R.drawable.ic_menu_gallery)
     }
 
 }

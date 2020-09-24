@@ -3,11 +3,9 @@ package com.konkuk.select.activity
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -16,17 +14,16 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.loader.content.CursorLoader
 import com.konkuk.select.R
-import kotlinx.android.synthetic.main.activity_add_cloth.*
+import kotlinx.android.synthetic.main.activity_add_clothes.*
 import java.io.File
 import java.io.IOException
 
-class AddClothActivity : AppCompatActivity() {
-
+class AddClothesActivity : AppCompatActivity() {
     lateinit var imageFile:File
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_cloth)
+        setContentView(R.layout.activity_add_clothes)
         settingToolBar()
         getImgData()
     }

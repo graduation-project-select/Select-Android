@@ -12,10 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.AddClothActivity"></activity>
+        <activity android:name=".activity.AddClothesActivity"></activity>
         <activity android:name=".activity.AddCodiRegisterActivity"></activity>
         <activity android:name=".activity.AddCodiActivity" />
-        <activity android:name=".activity.DetailClothActivity" />
+        <activity android:name=".activity.DetailClothesActivity" />
         <activity android:name=".activity.DetailCodiActivity" />
         <activity android:name=".activity.LoginActivty" />
         <activity android:name=".activity.MainActivity">

@@ -1,22 +1,25 @@
 package com.konkuk.select.fragment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import com.konkuk.select.R
+import com.konkuk.select.activity.DetailCodiActivity
 import com.konkuk.select.adpater.CodiListAdapter
 import com.konkuk.select.model.Codi
+import kotlinx.android.synthetic.main.fragment_codi.*
 import kotlinx.android.synthetic.main.fragment_codi_list_detail_flagment.*
-import kotlinx.android.synthetic.main.fragment_codi_tag_list.*
 import kotlinx.android.synthetic.main.fragment_codi_tag_list.toolbar
+import kotlinx.android.synthetic.main.toolbar.view.*
 
 class CodiListDetailFlagment(val ctx: Context) : Fragment() {
     lateinit var codiListAdapter: CodiListAdapter
@@ -36,13 +39,14 @@ class CodiListDetailFlagment(val ctx: Context) : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val leftBtn: ImageView = toolbar.findViewById(R.id.left_iv)
-        val title: TextView = toolbar.findViewById(R.id.title_tv)
-        val rightBtn: ImageView = toolbar.findViewById(R.id.right_iv)
+        val bundle: Bundle? = arguments
 
-        leftBtn.setImageResource(R.drawable.back)
+        if(bundle != null) {
+            tv_codi_tag.text = bundle.getString("tag")
+        }
 
-        leftBtn.setOnClickListener {
+        toolbar.left_iv.setImageResource(R.drawable.back)
+        toolbar.left_iv.setOnClickListener {
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
             val mFrag: Fragment = CodiTagListFragment(ctx)
             t.replace(R.id.codill, mFrag)
@@ -51,15 +55,27 @@ class CodiListDetailFlagment(val ctx: Context) : Fragment() {
 
         var codiList = ArrayList<Codi>()
         codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
+        codiList.add(Codi("222", "#데이트룩", "0"))
+        codiList.add(Codi("333", "#데이트룩", "0"))
+        codiList.add(Codi("444", "#데이트룩", "0"))
+        codiList.add(Codi("555", "#데이트룩", "0"))
+        codiList.add(Codi("666", "#데이트룩", "0"))
 
 
         codiList_rv.layoutManager = GridLayoutManager(ctx, 2)
         codiListAdapter = CodiListAdapter(codiList)
         codiList_rv.adapter = codiListAdapter
+        codiListAdapter.itemClickListener = object : CodiListAdapter.OnItemClickListener {
+            override fun OnClickItem(
+                holder: CodiListAdapter.ItemHolder,
+                view: View,
+                data: Codi,
+                position: Int
+            ) {
+                Toast.makeText(ctx, "${data.id}, ${data.tag} click", Toast.LENGTH_SHORT).show()
+                val intent = Intent(ctx, DetailCodiActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 }

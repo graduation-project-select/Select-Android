@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,6 +18,7 @@ import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagListAdapter
 import com.konkuk.select.model.CodiTag
 import kotlinx.android.synthetic.main.fragment_codi_tag_list.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 
 class CodiTagListFragment(val ctx: Context) : Fragment() {
     lateinit var codiTagAdapter: CodiTagListAdapter
@@ -36,13 +38,8 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val leftBtn: ImageView = toolbar.findViewById(R.id.left_iv)
-        val title: TextView = toolbar.findViewById(R.id.title_tv)
-        val rightBtn: ImageView = toolbar.findViewById(R.id.right_iv)
-
-        leftBtn.setImageResource(R.drawable.back)
-
-        leftBtn.setOnClickListener {
+        toolbar.left_iv.setImageResource(R.drawable.back)
+        toolbar.left_iv.setOnClickListener {
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
             val mFrag: Fragment = CodiFragment(ctx)
             t.replace(R.id.codill, mFrag)
@@ -57,6 +54,23 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
         codiTag_rv.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
         codiTagAdapter = CodiTagListAdapter(codiTagList)
         codiTag_rv.adapter = codiTagAdapter
+        codiTagAdapter.itemClickListener = object:CodiTagListAdapter.OnItemClickListener {
+            override fun OnClickItem(
+                holder: CodiTagListAdapter.ItemHolder,
+                view: View,
+                data: CodiTag,
+                position: Int
+            ) {
+                Toast.makeText(ctx, "${data.id}, ${data.tag} click", Toast.LENGTH_SHORT).show()
+                val t: FragmentTransaction = fragmentManager!!.beginTransaction()
+                val mFrag: Fragment = CodiListDetailFlagment(ctx)
+                val bundle:Bundle = Bundle()
+                bundle.putString("tag", data.tag)
+                mFrag.setArguments(bundle)
+                t.replace(R.id.codill, mFrag)
+                t.commit()
+            }
+        }
 
         val simpleItemTouchCallback = object:ItemTouchHelper.SimpleCallback(UP or DOWN, 0) {
             override fun onMove(p0: RecyclerView, p1: RecyclerView.ViewHolder, p2: RecyclerView.ViewHolder): Boolean {
