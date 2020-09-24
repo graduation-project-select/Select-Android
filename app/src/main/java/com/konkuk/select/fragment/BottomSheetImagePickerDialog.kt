@@ -24,7 +24,7 @@ import androidx.core.content.FileProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 import com.konkuk.select.R
-import com.konkuk.select.activity.AddClothActivity
+import com.konkuk.select.activity.AddClothesActivity
 import kotlinx.android.synthetic.main.fragment_bottom_sheet_image_picker_dialog.*
 import java.io.File
 import java.io.IOException
@@ -85,7 +85,7 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
                 FROM_GALLERY_CODE -> {
                     if(data != null) {
                         Log.d("TAG", "갤러리에서 이미지 선택")
-                        var nextIntent = Intent(ctx, AddClothActivity::class.java)
+                        var nextIntent = Intent(ctx, AddClothesActivity::class.java)
                         nextIntent.putExtra("type", "GALLERY")
                         nextIntent.putExtra("currentPhotoUri", data?.data.toString())
                         startActivity(nextIntent)
@@ -97,7 +97,7 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
                 FROM_CAMERA_CODE ->{
                     Log.d("TAG", "카메라에서 이미지 선택")
                     Log.d("TAG", "currentPhotoPath: ${currentPhotoPath}")
-                    var nextIntent = Intent(ctx, AddClothActivity::class.java)
+                    var nextIntent = Intent(ctx, AddClothesActivity::class.java)
                     nextIntent.putExtra("type", "CAMERA")
                     nextIntent.putExtra("currentPhotoPath", currentPhotoPath)
                     startActivity(nextIntent)
