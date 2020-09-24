@@ -3,10 +3,14 @@ package com.konkuk.select.activity
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.ImageView
@@ -14,8 +18,19 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.loader.content.CursorLoader
 import com.konkuk.select.R
-import kotlinx.android.synthetic.main.activity_add_clothes.*
+import com.konkuk.select.model.DefaultResponse
+import com.konkuk.select.network.RetrofitClient
+import kotlinx.android.synthetic.main.activity_add_cloth.*
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okio.BufferedSink
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
 
 class AddClothesActivity : AppCompatActivity() {
@@ -48,6 +63,9 @@ class AddClothesActivity : AppCompatActivity() {
         when(type){
             "GALLERY" -> {
                 imageFile = getDataFromGallery()
+//                var requestFile = ProgressRequestBody(imageFile)
+//                var multipartBody = MultipartBody.Part.createFormData("fileToUpload", imageFile.name, requestFile)
+
                 clothImg.setImageBitmap(rotateImageIfRequired(imageFile.path))
                 // 서버 업로드
             }
@@ -71,6 +89,7 @@ class AddClothesActivity : AppCompatActivity() {
         val file = File(getPath(photoUri))
         return file
     }
+
 
     private fun getPath(uri: Uri): String? {
         val proj = arrayOf(MediaStore.Images.Media.DATA)
@@ -99,7 +118,7 @@ class AddClothesActivity : AppCompatActivity() {
 //            val bitmap = ImageDecoder.decodeBitmap(decode)
 //            clothImg.setImageBitmap(bitmap)
 //        }
-        clothImg.setImageBitmap(rotateImageIfRequired(file.path))
+//        clothImg.setImageBitmap(rotateImageIfRequired(file.path))
         return file
     }
 
@@ -140,5 +159,36 @@ class AddClothesActivity : AppCompatActivity() {
         )
 
         return bitmap
+    }
+
+
+    inner class ProgressRequestBody(private val mFile:File): RequestBody() {
+
+        override fun contentType(): MediaType? {
+            return "image/*".toMediaTypeOrNull()
+        }
+
+        @Throws(IOException::class)
+        override fun contentLength(): Long {
+            return mFile.length()
+        }
+
+        @Throws(IOException::class)
+        override fun writeTo(sink: BufferedSink) {
+            val fileLength = mFile.length()
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            val `in` = FileInputStream(mFile)
+            var uploaded:Long = 0
+            try{
+                var read:Int = 0
+                val handler = Handler(Looper.getMainLooper())
+                while(`in`.read(buffer).let { read = it ; it != -1 }){
+                    uploaded += read.toLong()
+                    sink!!.write(buffer, 0, read)
+                }
+            }finally{
+                `in`.close()
+            }
+        }
     }
 }

@@ -23,6 +23,15 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
 }
 
 dependencies {
@@ -38,5 +47,10 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha01'
+    // Retrofit, Gson, RxAdapter
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
+    // okhttp3
+    implementation "com.squareup.okhttp3:okhttp:4.4.0"
 
 }
