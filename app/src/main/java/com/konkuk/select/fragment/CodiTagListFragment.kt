@@ -38,6 +38,12 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        setToolBar()
+        setAdapter()
+        setClickListener()
+    }
+
+    fun setToolBar() {
         toolbar.left_iv.setImageResource(R.drawable.back)
         toolbar.left_iv.setOnClickListener {
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
@@ -45,7 +51,9 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
             t.replace(R.id.codill, mFrag)
             t.commit()
         }
+    }
 
+    fun setAdapter() {
         var codiTagList = ArrayList<CodiTag>()
         codiTagList.add(CodiTag("111", "#데이트룩"))
         codiTagList.add(CodiTag("222", "#오피스룩"))
@@ -54,6 +62,9 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
         codiTag_rv.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
         codiTagAdapter = CodiTagListAdapter(codiTagList)
         codiTag_rv.adapter = codiTagAdapter
+    }
+
+    fun setClickListener() {
         codiTagAdapter.itemClickListener = object:CodiTagListAdapter.OnItemClickListener {
             override fun OnClickItem(
                 holder: CodiTagListAdapter.ItemHolder,
@@ -84,7 +95,6 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
 
         var itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
         itemTouchHelper.attachToRecyclerView(codiTag_rv)
-
     }
 
 }

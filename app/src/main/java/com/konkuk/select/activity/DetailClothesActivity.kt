@@ -13,6 +13,7 @@ import com.konkuk.select.adpater.CodiItemAdapter
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
 import kotlinx.android.synthetic.main.activity_detail_clothes.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 
 class DetailClothesActivity : AppCompatActivity() {
     lateinit var codiItemAdapter: CodiItemAdapter
@@ -21,31 +22,37 @@ class DetailClothesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_clothes)
 
-        // ToolBar 변경하는 코드
-        val includeToolBar : View = findViewById(R.id.toolbar)
-        val leftBtn : ImageView = includeToolBar.findViewById(R.id.left_iv)
-        val title : TextView = includeToolBar.findViewById(R.id.title_tv)
-        val rightBtn : ImageView = includeToolBar.findViewById(R.id.right_iv)
+        setToolBar()
+        setAdapter()
+        setClickListener()
+    }
 
-        leftBtn.setImageResource(0)
-        title.text = "옷 상세보기"
-        rightBtn.setImageResource(R.drawable.x)
+    fun setToolBar() {
+        toolbar.title_tv.text = "옷 상세보기"
+        toolbar.left_iv.setImageResource(0)
+        toolbar.right_iv.setImageResource(R.drawable.x)
 
-        rightBtn.setOnClickListener {
+        toolbar.right_iv.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+            finishAffinity()
         }
+    }
 
+    fun setAdapter() {
         var codiList = ArrayList<Codi>()
-        codiList.add(Codi("111", "#데이트룩", "0"));
-        codiList.add(Codi("111", "#데이트룩", "0"));
-        codiList.add(Codi("111", "#데이트룩", "0"));
-        codiList.add(Codi("111", "#데이트룩", "0"));
-        codiList.add(Codi("111", "#데이트룩", "0"));
+        codiList.add(Codi("111", "#데이트룩", "0"))
+        codiList.add(Codi("111", "#데이트룩", "0"))
+        codiList.add(Codi("111", "#데이트룩", "0"))
+        codiList.add(Codi("111", "#데이트룩", "0"))
+        codiList.add(Codi("111", "#데이트룩", "0"))
 
         codi_rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         codiItemAdapter = CodiItemAdapter(codiList)
         codi_rv.adapter = codiItemAdapter
+    }
+
+    fun setClickListener() {
         codiItemAdapter.itemClickListener = object : CodiItemAdapter.OnItemClickListener {
             override fun OnClickItem(
                 holder: CodiItemAdapter.ItemHolder,
@@ -58,6 +65,5 @@ class DetailClothesActivity : AppCompatActivity() {
             }
 
         }
-
     }
 }
