@@ -11,7 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.konkuk.select.R
 import com.konkuk.select.adpater.ClothesItemAdapter
 import com.konkuk.select.model.Clothes
+import kotlinx.android.synthetic.main.activity_detail_clothes.*
 import kotlinx.android.synthetic.main.activity_detail_codi.*
+import kotlinx.android.synthetic.main.activity_detail_codi.toolbar
+import kotlinx.android.synthetic.main.toolbar.view.*
 
 class DetailCodiActivity : AppCompatActivity() {
     lateinit var clothesItemAdapter: ClothesItemAdapter
@@ -20,21 +23,24 @@ class DetailCodiActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_codi)
 
-        // ToolBar 변경하는 코드
-        val includeToolBar : View = findViewById(R.id.toolbar)
-        val leftBtn : ImageView = includeToolBar.findViewById(R.id.left_iv)
-        val title : TextView = includeToolBar.findViewById(R.id.title_tv)
-        val rightBtn : ImageView = includeToolBar.findViewById(R.id.right_iv)
+        setToolBar()
+        setAdapter()
+        setClickListener()
+    }
 
-        leftBtn.setImageResource(0)
-        title.text = "코디 상세보기"
-        rightBtn.setImageResource(R.drawable.x)
+    fun setToolBar() {
+        toolbar.title_tv.text = "코디 상세보기"
+        toolbar.left_iv.setImageResource(0)
+        toolbar.right_iv.setImageResource(R.drawable.x)
 
-        rightBtn.setOnClickListener {
+        toolbar.right_iv.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+            finishAffinity()
         }
+    }
 
+    fun setAdapter() {
         var codiItemList = ArrayList<Clothes>()
         codiItemList.add(Clothes("111", "top", "0"));
         codiItemList.add(Clothes("111", "top", "0"));
@@ -42,10 +48,12 @@ class DetailCodiActivity : AppCompatActivity() {
         codiItemList.add(Clothes("111", "top", "0"));
         codiItemList.add(Clothes("111", "top", "0"));
 
-
         codiItem_rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         clothesItemAdapter = ClothesItemAdapter(codiItemList)
         codiItem_rv.adapter = clothesItemAdapter
+    }
+
+    fun setClickListener() {
         clothesItemAdapter.itemClickListener = object : ClothesItemAdapter.OnItemClickListener {
             override fun OnClickItem(
                 holder: ClothesItemAdapter.ItemHolder,

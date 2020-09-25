@@ -45,6 +45,12 @@ class CodiListDetailFlagment(val ctx: Context) : Fragment() {
             tv_codi_tag.text = bundle.getString("tag")
         }
 
+        setToolBar()
+        setAdapter()
+        setClickListener()
+    }
+
+    fun setToolBar() {
         toolbar.left_iv.setImageResource(R.drawable.back)
         toolbar.left_iv.setOnClickListener {
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
@@ -52,7 +58,9 @@ class CodiListDetailFlagment(val ctx: Context) : Fragment() {
             t.replace(R.id.codill, mFrag)
             t.commit()
         }
+    }
 
+    fun setAdapter() {
         var codiList = ArrayList<Codi>()
         codiList.add(Codi("111", "#데이트룩", "0"))
         codiList.add(Codi("222", "#데이트룩", "0"))
@@ -61,10 +69,12 @@ class CodiListDetailFlagment(val ctx: Context) : Fragment() {
         codiList.add(Codi("555", "#데이트룩", "0"))
         codiList.add(Codi("666", "#데이트룩", "0"))
 
-
         codiList_rv.layoutManager = GridLayoutManager(ctx, 2)
         codiListAdapter = CodiListAdapter(codiList)
         codiList_rv.adapter = codiListAdapter
+    }
+
+    fun setClickListener() {
         codiListAdapter.itemClickListener = object : CodiListAdapter.OnItemClickListener {
             override fun OnClickItem(
                 holder: CodiListAdapter.ItemHolder,

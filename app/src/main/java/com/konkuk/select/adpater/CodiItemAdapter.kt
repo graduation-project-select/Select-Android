@@ -20,7 +20,7 @@ class CodiItemAdapter(val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiItem
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var codiImg: ImageView = itemView.findViewById(R.id.clothcodi_iv)
         init {
-            codiImg.setOnClickListener{
+            itemView.setOnClickListener{
                 itemClickListener?.OnClickItem(this, it, item[adapterPosition], adapterPosition)
             }
         }
@@ -40,6 +40,5 @@ class CodiItemAdapter(val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiItem
 
     override fun onBindViewHolder(holder: CodiItemAdapter.ItemHolder, position: Int) {
         holder.codiImg.setImageResource(R.drawable.codi_test)
-
     }
 }

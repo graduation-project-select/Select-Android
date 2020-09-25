@@ -19,7 +19,7 @@ class ClothesItemAdapter(val item: ArrayList<Clothes>) : RecyclerView.Adapter<Cl
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var clothesImg: ImageView = itemView.findViewById(R.id.clothcodi_iv)
         init {
-            clothesImg.setOnClickListener{
+            itemView.setOnClickListener{
                 itemClickListener?.OnClickItem(this, it, item[adapterPosition], adapterPosition)
             }
         }

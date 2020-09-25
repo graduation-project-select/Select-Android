@@ -33,6 +33,7 @@ class CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>): Recycl
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
 //        holder.iv_clothes_img 에 src넣어주기
+        holder.iv_clothes_img.setImageResource(R.drawable.cloth_test)
     }
 
     override fun getItemCount(): Int {
