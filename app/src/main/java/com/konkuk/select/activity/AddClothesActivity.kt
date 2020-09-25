@@ -3,9 +3,12 @@ package com.konkuk.select.activity
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.graphics.Matrix
+import android.graphics.drawable.ColorDrawable
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,8 +16,17 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.loader.content.CursorLoader
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.R
 import kotlinx.android.synthetic.main.activity_add_clothes.*
 import okhttp3.MediaType
@@ -24,15 +36,26 @@ import okio.BufferedSink
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AddClothesActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
+    private var db = FirebaseFirestore.getInstance()
+    private var storage = Firebase.storage
+    val TAG = "firebase"
     lateinit var imageFile:File
+    var checkedArr:ArrayList<Boolean> = arrayListOf(false, false, false, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_clothes)
+        auth = Firebase.auth
         settingToolBar()
         getImgData()
+        settingOnClickListener()
+
     }
 
     fun settingToolBar(){
@@ -70,6 +93,28 @@ class AddClothesActivity : AppCompatActivity() {
 
     }
 
+    fun settingOnClickListener(){
+        addBtn.setOnClickListener {
+            Toast.makeText(this, "등록", Toast.LENGTH_SHORT).show()
+            uploadImage(imageFile)
+////            var colorId = (colorCircle.background as ColorDrawable).color
+        }
+
+        checkBox_spring.setOnClickListener {
+            checkedArr[0] = checkBox_spring.isChecked
+        }
+        checkBox_summer.setOnClickListener {
+            checkedArr[1] = checkBox_summer.isChecked
+        }
+        checkBox_fall.setOnClickListener {
+            checkedArr[2] = checkBox_fall.isChecked
+        }
+        checkBox_winter.setOnClickListener {
+            checkedArr[3] = checkBox_winter.isChecked
+        }
+    }
+
+
 
     fun getDataFromGallery():File{
         val currentPhotoUri: String? = intent.getStringExtra("currentPhotoUri")
@@ -78,7 +123,7 @@ class AddClothesActivity : AppCompatActivity() {
         val realPath = getPath(photoUri)
         Log.d("TAG", "realPath: " + realPath)
 
-        val file = File(getPath(photoUri))
+        val file = File(realPath)
         return file
     }
 
@@ -153,7 +198,6 @@ class AddClothesActivity : AppCompatActivity() {
         return bitmap
     }
 
-
     inner class ProgressRequestBody(private val mFile:File): RequestBody() {
 
         override fun contentType(): MediaType? {
@@ -183,4 +227,70 @@ class AddClothesActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun uploadImage(file:File){
+        var storageRef = storage.reference
+        // Create a child reference
+        // imagesRef now points to "images"
+        var imagesRef: StorageReference? =
+            auth.uid?.let { storageRef.child(it).child(Timestamp.now().nanoseconds.toString()+"_"+file.name) }
+
+        // Child references can also take paths
+        // spaceRef now points to "images/space.jpg
+        // imagesRef still points to "images"
+        val stream = FileInputStream(file)
+
+        var uploadTask = imagesRef?.putStream(stream)
+        uploadTask?.addOnFailureListener {
+            // Handle unsuccessful uploads
+        }?.addOnSuccessListener {
+            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
+            // ...
+            Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
+            val imgUrl = it.uploadSessionUri
+
+
+
+            insertClothes(category_tv.text.toString(), categorySub_tv.text.toString(), "red", checkedArr, imgUrl.toString())
+
+        }?.addOnProgressListener { taskSnapshot ->
+            val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
+            println("Upload is $progress% done")
+        }?.addOnPausedListener {
+            println("Upload is paused")
+        }?.addOnFailureListener {
+            // Handle unsuccessful uploads
+        }?.addOnSuccessListener {
+            // Handle successful uploads on complete
+            // ...
+        }
+
+    }
+
+    private fun insertClothes(category:String, subCategory:String, color:String, checkedArr:ArrayList<Boolean>, imgUrl:String){
+
+        // Create a new user with a first and last name
+        val clothes = hashMapOf(
+            "uid" to auth.uid,
+            "category" to category,
+            "subCategory" to subCategory,
+            "color" to color,
+            "checkedArr" to checkedArr,
+            "time" to Timestamp(Date()),
+            "imgUrl" to imgUrl
+        )
+        Log.d(TAG, "insertClothest: ${clothes}")
+
+        // Add a new document with a generated ID
+        db.collection("clothes")
+            .add(clothes)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+//                finish()
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+            }
+    }
+
 }

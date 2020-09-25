@@ -11,11 +11,12 @@
         android:id="@+id/logo"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="70dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/select_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/select_btn" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/signIn_tv"
@@ -38,7 +39,7 @@
         android:backgroundTint="@color/colorBackGround"
         android:ems="10"
         android:hint="Email"
-        android:inputType="textPersonName"
+        android:inputType="textEmailAddress"
         android:paddingLeft="16dp"
         android:textColorHint="@color/colorLightGray"
         android:textSize="16sp"
@@ -58,9 +59,9 @@
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword"
-        android:textSize="16sp"
         android:paddingLeft="16dp"
         android:textColorHint="@color/colorLightGray"
+        android:textSize="16sp"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -81,12 +82,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:text="or"
         android:paddingHorizontal="10dp"
-        app:layout_constraintStart_toEndOf="@id/view"
+        android:text="or"
+        app:layout_constraintBottom_toTopOf="@id/signInGoogleBtn"
         app:layout_constraintEnd_toStartOf="@id/view2"
+        app:layout_constraintStart_toEndOf="@id/view"
         app:layout_constraintTop_toBottomOf="@id/password_et"
-        app:layout_constraintBottom_toTopOf="@id/signInGoogleBtn"/>
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <View
         android:id="@+id/view2"
@@ -98,31 +101,55 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/password_et" />
 
-    <Button
+    <com.google.android.gms.common.SignInButton
         android:id="@+id/signInGoogleBtn"
         android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="40dp"
         android:layout_marginEnd="32dp"
-        android:background="@drawable/border_round"
+        android:layout_marginBottom="8dp"
         android:text="Sign in Google"
+        app:layout_constraintBottom_toTopOf="@+id/signInKakaoBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_et" />
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <Button
         android:id="@+id/signInKakaoBtn"
+        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="45dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/border_round"
         android:text="Sign in Kakao"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/loginBtn"
+        app:layout_constraintEnd_toEndOf="@+id/signInGoogleBtn"
+        app:layout_constraintStart_toStartOf="@+id/signInGoogleBtn"
         app:layout_constraintTop_toBottomOf="@+id/signInGoogleBtn" />
+
+    <Button
+        android:id="@+id/loginBtn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/border_round"
+        android:text="Login"
+        app:layout_constraintBottom_toTopOf="@+id/signinBtn"
+        app:layout_constraintEnd_toEndOf="@+id/signInGoogleBtn"
+        app:layout_constraintStart_toStartOf="@+id/signInGoogleBtn"
+        app:layout_constraintTop_toBottomOf="@+id/signInGoogleBtn"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/signinBtn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:background="@drawable/border_round"
+        android:text="Sign in"
+        app:layout_constraintBottom_toTopOf="@+id/signUp_tv"
+        app:layout_constraintEnd_toEndOf="@+id/loginBtn"
+        app:layout_constraintStart_toStartOf="@+id/loginBtn"
+        app:layout_constraintTop_toBottomOf="@+id/loginBtn" />
 
     <TextView
         android:id="@+id/signUp_tv"

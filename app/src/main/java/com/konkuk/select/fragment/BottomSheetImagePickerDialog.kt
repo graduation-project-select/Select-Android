@@ -21,6 +21,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 import com.konkuk.select.R
@@ -66,6 +67,12 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
         }
     }
 
+    fun finishFragment(){
+        val fragmentManager: FragmentManager = activity!!.supportFragmentManager
+        fragmentManager.beginTransaction().remove(this).commit()
+        fragmentManager.popBackStack()
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -89,6 +96,7 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
                         nextIntent.putExtra("type", "GALLERY")
                         nextIntent.putExtra("currentPhotoUri", data?.data.toString())
                         startActivity(nextIntent)
+//                        finishFragment()    // 흠
 //                    image.setImageURI(data?.data) // handle chosen image
                     }else{
                         Log.d("TAG", "갤러리에서 이미지 선택 x")
@@ -101,6 +109,7 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
                     nextIntent.putExtra("type", "CAMERA")
                     nextIntent.putExtra("currentPhotoPath", currentPhotoPath)
                     startActivity(nextIntent)
+//                    finishFragment()  // 흠
                 }
             }
         }

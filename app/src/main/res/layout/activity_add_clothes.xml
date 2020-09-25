@@ -37,14 +37,24 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tv_token"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text=">"
+            app:layout_constraintBottom_toBottomOf="@+id/category_tv"
+            app:layout_constraintStart_toEndOf="@+id/category_tv"
+            app:layout_constraintTop_toTopOf="@+id/category_tv" />
+
+        <TextView
             android:id="@+id/categorySub_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="> 반팔"
-            app:layout_constraintBottom_toBottomOf="@+id/category_tv"
-            app:layout_constraintStart_toEndOf="@+id/category_tv"
-            app:layout_constraintTop_toTopOf="@+id/category_tv" />
+            android:text="반팔"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_token"
+            app:layout_constraintStart_toEndOf="@+id/tv_token"
+            app:layout_constraintTop_toTopOf="@+id/tv_token" />
 
         <TextView
             android:id="@+id/colorTag_tv"
@@ -83,8 +93,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="48dp"
-            android:button="@drawable/checkbox_season"
-            android:text="CheckBox"
+            android:text="봄"
             app:layout_constraintEnd_toStartOf="@+id/checkBox_summer"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
@@ -94,8 +103,7 @@
             android:id="@+id/checkBox_summer"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:button="@drawable/checkbox_season"
-            android:text="CheckBox"
+            android:text="여름"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_spring"
             app:layout_constraintEnd_toStartOf="@+id/checkBox_fall"
             app:layout_constraintHorizontal_bias="0.5"
@@ -106,8 +114,7 @@
             android:id="@+id/checkBox_fall"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:button="@drawable/checkbox_season"
-            android:text="CheckBox"
+            android:text="가을"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_summer"
             app:layout_constraintEnd_toStartOf="@+id/checkBox_winter"
             app:layout_constraintHorizontal_bias="0.5"
@@ -118,8 +125,7 @@
             android:id="@+id/checkBox_winter"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:button="@drawable/checkbox_season"
-            android:text="CheckBox"
+            android:text="겨울"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_fall"
             app:layout_constraintEnd_toStartOf="@+id/all_check_tv"
             app:layout_constraintHorizontal_bias="0.5"
@@ -141,7 +147,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/addBtn"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="추가하기"
