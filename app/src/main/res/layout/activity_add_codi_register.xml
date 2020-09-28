@@ -30,8 +30,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:text="비공개/공개"
-        app:layout_constraintEnd_toStartOf="@+id/open_switch"
-        app:layout_constraintTop_toBottomOf="@+id/codiDetailImg" />
+        app:layout_constraintEnd_toStartOf="@id/open_switch"
+        app:layout_constraintTop_toBottomOf="@id/codiDetailImg" />
 
     <Switch
         android:id="@+id/open_switch"
@@ -39,9 +39,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:checked="true"
-        app:layout_constraintBottom_toBottomOf="@+id/open_tv"
+        app:layout_constraintBottom_toBottomOf="@id/open_tv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/open_tv" />
+        app:layout_constraintTop_toTopOf="@id/open_tv" />
 
     <!--    <view-->
     <!--        android:id="@+id/line"-->
@@ -62,7 +62,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/open_tv"
+        app:layout_constraintTop_toBottomOf="@id/open_tv"
         app:srcCompat="@drawable/hashtag" />
 
     <TextView
@@ -71,9 +71,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="코디 태그를 선택해주세요"
-        app:layout_constraintBottom_toBottomOf="@+id/hashtag_iv"
-        app:layout_constraintStart_toEndOf="@+id/hashtag_iv"
-        app:layout_constraintTop_toTopOf="@+id/hashtag_iv"
+        app:layout_constraintBottom_toBottomOf="@id/hashtag_iv"
+        app:layout_constraintStart_toEndOf="@id/hashtag_iv"
+        app:layout_constraintTop_toTopOf="@id/hashtag_iv"
         app:layout_constraintVertical_bias="1.0" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -86,7 +86,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hashtag_iv" />
+        app:layout_constraintTop_toBottomOf="@id/hashtag_iv" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

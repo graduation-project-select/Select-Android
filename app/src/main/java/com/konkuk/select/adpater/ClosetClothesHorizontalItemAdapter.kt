@@ -6,10 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Clothes
 
-class ClosetClothesHorizontalItemAdapter(var context:Context, var clothesList:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesHorizontalItemAdapter.ImageHolder>()  {
+class ClosetClothesHorizontalItemAdapter(var ctx:Context, var clothesList:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesHorizontalItemAdapter.ImageHolder>()  {
     var itemClickListener:OnItemClickListener?=null
 
     interface OnItemClickListener {
@@ -35,6 +36,9 @@ class ClosetClothesHorizontalItemAdapter(var context:Context, var clothesList:Ar
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
-        holder.clothesImg.setImageResource(android.R.drawable.ic_menu_gallery)
+//        holder.clothesImg.setImageResource(android.R.drawable.ic_menu_gallery)
+        Glide.with(ctx)
+            .load(clothesList[position].img)
+            .into(holder.clothesImg)
     }
 }

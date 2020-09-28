@@ -15,6 +15,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiBottomCategoryAdapter
 import com.konkuk.select.adpater.CodiBottomClothesLinearAdapter
@@ -24,13 +26,14 @@ import com.konkuk.select.model.Clothes
 import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.*
 import kotlin.random.Random
 
 
 class AddCodiActivity : AppCompatActivity() {
-
+    private var db = FirebaseFirestore.getInstance()
     var categoryList: ArrayList<Category> = arrayListOf<Category>(
         Category(0, "상의", true),
         Category(1, "하의", false),
@@ -80,17 +83,35 @@ class AddCodiActivity : AppCompatActivity() {
         codiBottomCategoryAdapter = CodiBottomCategoryAdapter(categoryList)
         codiBottomRecommendationAdapter =
             CodiBottomRecommendationAdapter(arrayListOf("상의", "하의", "원피스", "아우터", "신발", "악세서리"))
-        codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(clothesList)
+        codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(this, clothesList)
         bottom_rv.adapter = codiBottomCategoryAdapter
         switchLayoutManager()
     }
 
     //temp
     fun initTempData(category: String) {
-        clothesList.clear()
-        for (i in 0..Random.nextInt(1, 5)) {
-            clothesList.add(Clothes(i.toString(), category, "cloth_test"))
-        }
+//        clothesList.clear()
+//        for (i in 0..Random.nextInt(1, 5)) {
+//            clothesList.add(Clothes(i.toString(), category, "cloth_test"))
+//        }
+        val docRef = db.collection("clothes")
+            .whereEqualTo("category", category)   //TODO whereEqualTo("uid", auth.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                clothesList.clear()
+                for (document in documents) {
+                    val jsonObj = JSONObject(document.data)
+                    clothesList.add(Clothes(document.id,category, jsonObj["imgUrl"].toString()))
+//                            clothesListVertical.add(Clothes(document.id, jsonObj["category"].toString(), jsonObj["subCategory"].toString(), jsonObj["checkedArray"], jsonObj["imgUrl"].toString()))
+//                            val id: String, val category: String, val subCategory: String, val checkedArr:ArrayList<Boolean>, val R:Int, val G:Int, val B:Int, val imgUrl:String)
+//                            Log.d("firebase", "${document.id} => ${document.data}")
+//                            Log.d("firebase", "${jsonObj["imgUrl"]}")
+                }
+                codiBottomClothesLinearAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { exception ->
+                Log.w("firebase", "Error getting documents: ", exception)
+            }
     }
 
     fun setClickListener() {
@@ -124,7 +145,10 @@ class AddCodiActivity : AppCompatActivity() {
                     ).show()
                     var addImgView = ImageView(this@AddCodiActivity)
                     addImgView.layoutParams = ConstraintLayout.LayoutParams(450, 450)
-                    addImgView.setImageResource(R.drawable.cloth_test)
+//                    addImgView.setImageResource(R.drawable.cloth_test)
+                    Glide.with(this@AddCodiActivity)
+                        .load(data.img)
+                        .into(addImgView)
                     codi_canvas.addView(addImgView)
                     draganddrop(addImgView)
                 }

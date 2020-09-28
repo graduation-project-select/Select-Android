@@ -1,15 +1,17 @@
 package com.konkuk.select.adpater
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Clothes
 
-class CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>): RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {
+class CodiBottomClothesLinearAdapter(val ctx:Context, val clothesList:ArrayList<Clothes>): RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
@@ -33,7 +35,10 @@ class CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>): Recycl
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
 //        holder.iv_clothes_img 에 src넣어주기
-        holder.iv_clothes_img.setImageResource(R.drawable.cloth_test)
+//        holder.iv_clothes_img.setImageResource(R.drawable.cloth_test)
+        Glide.with(ctx)
+            .load(clothesList[position].img)
+            .into(holder.iv_clothes_img)
     }
 
     override fun getItemCount(): Int {

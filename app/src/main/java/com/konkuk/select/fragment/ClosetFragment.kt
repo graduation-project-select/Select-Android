@@ -14,6 +14,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.JsonObject
 import com.konkuk.select.R
 import com.konkuk.select.adpater.ClosetCategoryListAdapter
 import com.konkuk.select.adpater.ClosetClothesHorizontalAdapter
@@ -22,11 +25,13 @@ import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
 import kotlinx.android.synthetic.main.fragment_closet.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlin.random.Random
+import org.json.JSONObject
+import org.xml.sax.Parser
 
 
 class ClosetFragment(val ctx: Context) : Fragment() {
-
+    private lateinit var auth: FirebaseAuth
+    private var db = FirebaseFirestore.getInstance()
     lateinit var closetCategoryListAdapter: ClosetCategoryListAdapter
     var categoryList: ArrayList<Category> =  arrayListOf<Category>(
         Category(0, "상의", true),
@@ -58,9 +63,9 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         // order로 번호로 정렬
-        categoryList.sortBy({it.order})
+        categoryList.sortBy({ it.order })
         categoryList.forEach {
-            Log.d("categoryList", it.order.toString() + ": " +it.label)
+            Log.d("categoryList", it.order.toString() + ": " + it.label)
         }
 
         settingAdapter()
@@ -74,23 +79,26 @@ class ClosetFragment(val ctx: Context) : Fragment() {
 
         //setting observer
         checkedCount.observe(this, Observer {
-            Log.d("categoryList", "checkedCount: "+it)
-            Log.d("categoryList", "categoryList: "+categoryList.toString())
-            if(it == 1){
+            Log.d("categoryList", "checkedCount: " + it)
+            Log.d("categoryList", "categoryList: " + categoryList.toString())
+            if (it == 1) {
                 // 한개면 한개인 항목의 데이터 fetch
-                var selectedCategory:Category? = null
-                for(cat in categoryList){
-                    if(cat.checked) {
+                var selectedCategory: Category? = null
+                for (cat in categoryList) {
+                    if (cat.checked) {
                         selectedCategory = cat
                         break;
                     }
                 }
                 Toast.makeText(ctx, selectedCategory!!.label + " 선택됨", Toast.LENGTH_SHORT).show()
+
+                fetchData(selectedCategory)
                 // 임시 데이터
-                clothesListVertical.clear()
-                for(i in 0..Random.nextInt(1, 10)){
-                    clothesListVertical.add(Clothes(i.toString(),selectedCategory!!.label, ""))
-                }
+//                clothesListVertical.clear()
+//                for(i in 0..Random.nextInt(1, 10)){
+//                    clothesListVertical.add(Clothes(i.toString(),selectedCategory!!.label, ""))
+//                }
+
             }
             switchClothesListLayout(it)
         })
@@ -121,7 +129,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         }
 
         rv_clothes_vertical.layoutManager = GridLayoutManager(ctx, 2)
-        closetClothesVerticalAdapter = ClosetClothesVerticalAdapter(clothesListVertical)
+        closetClothesVerticalAdapter = ClosetClothesVerticalAdapter(ctx, clothesListVertical)
         rv_clothes_vertical.adapter = closetClothesVerticalAdapter
         closetClothesVerticalAdapter.itemClickListener = object:ClosetClothesVerticalAdapter.OnItemClickListener{
             override fun OnClickItem(
@@ -135,10 +143,35 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         }
 
 
-        rv_clothes_horizontal.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
+        rv_clothes_horizontal.layoutManager = LinearLayoutManager(
+            ctx,
+            LinearLayoutManager.VERTICAL,
+            false
+        )
         closetClothesHorizontalAdapter = ClosetClothesHorizontalAdapter(ctx, categoryList)
         rv_clothes_horizontal.adapter = closetClothesHorizontalAdapter
 
+    }
+
+    fun fetchData(selectedCategory:Category){
+        val docRef = db.collection("clothes")
+            .whereEqualTo("category", selectedCategory.label)   //TODO whereEqualTo("uid", auth.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                clothesListVertical.clear()
+                for (document in documents) {
+                    val jsonObj = JSONObject(document.data)
+                    clothesListVertical.add(Clothes(document.id,selectedCategory!!.label, jsonObj["imgUrl"].toString()))
+//                            clothesListVertical.add(Clothes(document.id, jsonObj["category"].toString(), jsonObj["subCategory"].toString(), jsonObj["checkedArray"], jsonObj["imgUrl"].toString()))
+//                            val id: String, val category: String, val subCategory: String, val checkedArr:ArrayList<Boolean>, val R:Int, val G:Int, val B:Int, val imgUrl:String)
+//                            Log.d("firebase", "${document.id} => ${document.data}")
+//                            Log.d("firebase", "${jsonObj["imgUrl"]}")
+                }
+                closetClothesVerticalAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { exception ->
+                Log.w("firebase", "Error getting documents: ", exception)
+            }
     }
 
     fun initCheckedCount():Int{
@@ -149,7 +182,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         return count
     }
 
-    fun switchClothesListLayout(checkedCount:Int){
+    fun switchClothesListLayout(checkedCount: Int){
         if(checkedCount == 1) {
             layout_clothes_vertical.visibility = View.VISIBLE
             layout_clothes_horizontal.visibility = View.GONE

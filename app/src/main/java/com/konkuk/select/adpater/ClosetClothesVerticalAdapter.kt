@@ -1,14 +1,16 @@
 package com.konkuk.select.adpater
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Clothes
 
-class ClosetClothesVerticalAdapter(var items:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesVerticalAdapter.ImageHolder>() {
+class ClosetClothesVerticalAdapter(var ctx:Context, var items:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesVerticalAdapter.ImageHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
@@ -35,6 +37,9 @@ class ClosetClothesVerticalAdapter(var items:ArrayList<Clothes>): RecyclerView.A
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
-        holder.clothesImg.setImageResource(android.R.drawable.ic_menu_gallery)
+//        holder.clothesImg.setImageResource(android.R.drawable.ic_menu_gallery)
+        Glide.with(ctx)
+            .load(items[position].img)
+            .into(holder.clothesImg)
     }
 }

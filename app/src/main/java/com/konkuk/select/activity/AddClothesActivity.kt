@@ -1,14 +1,13 @@
 package com.konkuk.select.activity
 
+import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
-import android.graphics.drawable.ColorDrawable
 import android.media.ExifInterface
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,9 +16,11 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.loader.content.CursorLoader
+import com.bumptech.glide.Glide
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -45,8 +46,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
 
+@GlideModule
 class AddClothesActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -152,7 +153,8 @@ class AddClothesActivity : AppCompatActivity() {
         addBtn.setOnClickListener {
             Toast.makeText(this, "등록", Toast.LENGTH_SHORT).show()
             uploadImage(imageFile)
-////            var colorId = (colorCircle.background as ColorDrawable).color
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
 
         checkBox_spring.setOnClickListener {
@@ -287,8 +289,9 @@ class AddClothesActivity : AppCompatActivity() {
         var storageRef = storage.reference
         // Create a child reference
         // imagesRef now points to "images"
+        var filename = Timestamp.now().nanoseconds.toString() + "_" + file.name
         var imagesRef: StorageReference? =
-            auth.uid?.let { storageRef.child(it).child(Timestamp.now().nanoseconds.toString() + "_" + file.name) }
+            auth.uid?.let { storageRef.child(it).child(filename) }
 
         // Child references can also take paths
         // spaceRef now points to "images/space.jpg
@@ -302,8 +305,9 @@ class AddClothesActivity : AppCompatActivity() {
             // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
             // ...
             Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
-            val imgUrl = it.uploadSessionUri
-
+//            Log.d(TAG, "imagesRef: ${imagesRef}")
+            val imgUrl = "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/${auth.uid}%2F${filename}?alt=media"
+//            "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/9B4rtDTEWwYU7XKSZozL1o2aB9Z2%2F405000000_309466447.png?alt=media"
             insertClothes(
                 category_tv.text.toString(),
                 categorySub_tv.text.toString(),
