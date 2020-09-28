@@ -15,10 +15,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiBottomCategoryAdapter
 import com.konkuk.select.adpater.CodiBottomClothesLinearAdapter
@@ -34,11 +30,7 @@ import kotlin.random.Random
 
 
 class AddCodiActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
-    private var db = FirebaseFirestore.getInstance()
-    private var storage = Firebase.storage
 
-    private val TAG = "DragClickListener"
     var categoryList: ArrayList<Category> = arrayListOf<Category>(
         Category(0, "상의", true),
         Category(1, "하의", false),
@@ -235,32 +227,8 @@ class AddCodiActivity : AppCompatActivity() {
         val bytes = ByteArrayOutputStream()
         bm.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
 
-        // DB에 저장하면됨!
         return bytes.toByteArray()
-
     }
-
-//    fun insertCodi(){
-//        // Create a new user with a first and last name
-//        val codi = hashMapOf(
-//            "uid" to auth.uid,
-//            "tag" to tag,
-//            "time" to Timestamp(Date()),
-//            "imgUrl" to imgUrl
-//        )
-//        Log.d(TAG, "insertClothest: ${codi}")
-//
-//        // Add a new document with a generated ID
-//        db.collection("clothes")
-//            .add(codi)
-//            .addOnSuccessListener { documentReference ->
-//                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-//                finish()
-//            }
-//            .addOnFailureListener { e ->
-//                Log.w(TAG, "Error adding document", e)
-//            }
-//    }
 
 
 }

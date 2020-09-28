@@ -23,7 +23,9 @@ class CodiTagCheckboxListAdapter (val context: Context, var codiTagList: ArrayLi
         init {
             codi_tag_cb.setOnClickListener {
                 itemClickListener?.OnClickItem(this, it, codiTagList[adapterPosition], adapterPosition)
+
             }
+
         }
     }
 
@@ -40,7 +42,5 @@ class CodiTagCheckboxListAdapter (val context: Context, var codiTagList: ArrayLi
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
         holder.codi_tag_cb.text = codiTagList[position].tag
     }
-
-
 
 }

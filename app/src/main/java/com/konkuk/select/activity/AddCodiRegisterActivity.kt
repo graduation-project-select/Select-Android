@@ -1,22 +1,41 @@
 package com.konkuk.select.activity
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Point
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.CheckBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagCheckboxListAdapter
 import com.konkuk.select.model.CodiTag
 import kotlinx.android.synthetic.main.activity_add_codi_register.*
+import kotlinx.android.synthetic.main.activity_add_codi_register.toolbar
 import kotlinx.android.synthetic.main.toolbar.view.*
+import java.io.File
+import java.io.FileInputStream
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AddCodiRegisterActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
+    private var db = FirebaseFirestore.getInstance()
+    private var storage = Firebase.storage
+    private val TAG = "DragClickListener"
+
     lateinit var codiTagCheckboxListAdapter: CodiTagCheckboxListAdapter
+    var codiTagList = ArrayList<CodiTag>()
+    var checkTagArray = mutableMapOf<String, Boolean>()
+    lateinit var codiImgDecoding:Bitmap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,16 +44,9 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         setCodiImage()
         settingAdapter()
 
-
-        /* 해야할일
-        그리드 리사이클러뷰 화면 가로길이 받아와서 동적 열 구성
-        올리기 눌렀 때 디비에 저장
-        -> 아이디(랜덤수), 이미지, 태그, 공개/비공개
-        */
-
     }
 
-    fun setToolBar(){
+    fun setToolBar() {
         toolbar.title_tv.text = getString(R.string.activity_title_addCodiRegister)
         toolbar.left_iv.setImageResource(R.drawable.back)
         toolbar.right_iv.visibility = View.GONE
@@ -45,19 +57,19 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             finish()
         }
         toolbar.right_tv.setOnClickListener {
+            //uploadImage()
             finish()
             // 방금 올린 코디 상세 페이지로 이동
         }
     }
 
     fun setCodiImage() {
-        val imgByte = intent.getByteArrayExtra("codiImage")
-        val imgDecoding = BitmapFactory.decodeByteArray(imgByte, 0, imgByte!!.size)
-        codiDetailImg.setImageBitmap(imgDecoding)
+        val codiImgByte = intent.getByteArrayExtra("codiImage")
+        codiImgDecoding = BitmapFactory.decodeByteArray(codiImgByte, 0, codiImgByte!!.size)
+        codiDetailImg.setImageBitmap(codiImgDecoding)
     }
 
     fun settingAdapter() {
-        var codiTagList = ArrayList<CodiTag>()
         codiTagList.add(CodiTag("111", "#데이트룩"))
         codiTagList.add(CodiTag("222", "#오피스룩"))
         codiTagList.add(CodiTag("333", "#캠퍼스룩"))
@@ -71,6 +83,91 @@ class AddCodiRegisterActivity : AppCompatActivity() {
 
         val myDisplay = applicationContext.resources.displayMetrics
         val deviceWidth = myDisplay.widthPixels
-        // 코디 태그 뷰마다 길이 가져와서 계산하여 화면 width보다 크면 다음줄 작으면 한 줄에 출력
+        // 코디 태그 뷰마다 길이 가져와서 계산하여 화면 width보다 크면 다음줄 작으면 한 줄에 출력 -> 코드 짜기
+
+        codiTagCheckboxListAdapter.itemClickListener = object : CodiTagCheckboxListAdapter.OnItemClickListener {
+            override fun OnClickItem(
+                holder: CodiTagCheckboxListAdapter.ItemHolder,
+                view: View,
+                data: CodiTag,
+                position: Int
+            ) {
+                val isChecked = (view as CheckBox).isChecked
+                if(isChecked) {
+                    checkTagArray.put(data.tag, isChecked)
+                } else {
+                    checkTagArray.remove(data.tag)
+                }
+            }
+        }
+    }
+
+    fun uploadImage(file: File){
+        var codiTag:String = ""
+        var codiImg = codiDetailImg
+        var openState = open_switch.isChecked
+
+        for(checkStatus in checkTagArray.keys) {
+            codiTag = codiTag + " " +checkStatus
+        }
+
+        var storageRef = storage.reference
+        // Create a child reference
+        // imagesRef now points to "images"
+        var imagesRef: StorageReference? =
+            auth.uid?.let { storageRef.child(it).child(Timestamp.now().nanoseconds.toString()+"_"+file.name) }
+
+        // Child references can also take paths
+        // spaceRef now points to "images/space.jpg
+        // imagesRef still points to "images"
+        val stream = FileInputStream(file)
+
+        var uploadTask = imagesRef?.putStream(stream)
+        uploadTask?.addOnFailureListener {
+            // Handle unsuccessful uploads
+        }?.addOnSuccessListener {
+            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
+            // ...
+            Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
+            val imgUrl = it.uploadSessionUri
+
+            insertCodi(codiTag, imgUrl.toString(), openState)
+
+        }?.addOnProgressListener { taskSnapshot ->
+            val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
+            println("Upload is $progress% done")
+        }?.addOnPausedListener {
+            println("Upload is paused")
+        }?.addOnFailureListener {
+            // Handle unsuccessful uploads
+        }?.addOnSuccessListener {
+            // Handle successful uploads on complete
+            // ...
+        }
+
+    }
+
+    fun insertCodi(tag:String, imgUrl:String, open:Boolean) {
+        // Create a new user with a first and last name
+        val codi = hashMapOf(
+            "uid" to auth.uid,
+            "tag" to tag,
+            "time" to Timestamp(Date()),
+            "imgUrl" to imgUrl
+        )
+        Log.d(TAG, "insertClothest: ${codi}")
+
+        // Add a new document with a generated ID
+        db.collection("clothes")
+            .add(codi)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                finish()
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+            }
+
+
     }
 }

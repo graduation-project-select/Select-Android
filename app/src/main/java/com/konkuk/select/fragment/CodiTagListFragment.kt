@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -74,7 +72,7 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
             ) {
                 Toast.makeText(ctx, "${data.id}, ${data.tag} click", Toast.LENGTH_SHORT).show()
                 val t: FragmentTransaction = fragmentManager!!.beginTransaction()
-                val mFrag: Fragment = CodiListDetailFlagment(ctx)
+                val mFrag: Fragment = CodiListDetailFragment(ctx)
                 val bundle:Bundle = Bundle()
                 bundle.putString("tag", data.tag)
                 mFrag.setArguments(bundle)

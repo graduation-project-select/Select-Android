@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.fragment_codi_list_detail_flagment.*
 import kotlinx.android.synthetic.main.fragment_codi_tag_list.toolbar
 import kotlinx.android.synthetic.main.toolbar.view.*
 
-class CodiListDetailFlagment(val ctx: Context) : Fragment() {
+class CodiListDetailFragment(val ctx: Context) : Fragment() {
     lateinit var codiListAdapter: CodiListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {

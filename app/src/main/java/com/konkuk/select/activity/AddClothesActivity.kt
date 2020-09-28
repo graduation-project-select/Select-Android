@@ -249,8 +249,6 @@ class AddClothesActivity : AppCompatActivity() {
             Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
             val imgUrl = it.uploadSessionUri
 
-
-
             insertClothes(category_tv.text.toString(), categorySub_tv.text.toString(), "red", checkedArr, imgUrl.toString())
 
         }?.addOnProgressListener { taskSnapshot ->
