@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     private val AUTH = "Basic" + Base64.encodeToString("select:123456".toByteArray(), Base64.NO_WRAP)
-    private const val BASE_URL = "https://api.remove.bg/v1.0/"
+    private const val BASE_URL = "http://114.70.23.158:1205/"
 
     var gson = GsonBuilder()
         .setLenient()

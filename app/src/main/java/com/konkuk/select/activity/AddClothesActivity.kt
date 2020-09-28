@@ -3,7 +3,7 @@ package com.konkuk.select.activity
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
+import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.media.ExifInterface
@@ -28,11 +28,19 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.R
+import com.konkuk.select.model.DefaultResponse
+import com.konkuk.select.model.RGBColor
+import com.konkuk.select.network.RetrofitClient
 import kotlinx.android.synthetic.main.activity_add_clothes.*
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okio.BufferedSink
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -78,11 +86,58 @@ class AddClothesActivity : AppCompatActivity() {
         when(type){
             "GALLERY" -> {
                 imageFile = getDataFromGallery()
+                val requestFile: RequestBody =
+                    imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
 //                var requestFile = ProgressRequestBody(imageFile)
-//                var multipartBody = MultipartBody.Part.createFormData("fileToUpload", imageFile.name, requestFile)
+                var multipartBody = MultipartBody.Part.createFormData(
+                    "image",
+                    imageFile.name,
+                    requestFile
+                )
 
                 clothImg.setImageBitmap(rotateImageIfRequired(imageFile.path))
-                // 서버 업로드
+                val hex =
+                    java.lang.String.format("#%02x%02x%02x", 255, 0, 0) // RGB -> #0000 형식으로 변환
+                colorCircle.setBackgroundColor(Color.parseColor(hex));
+                // 서버에서 정보 가져옴
+                RetrofitClient.instance.postImage(imageFile.name, multipartBody).enqueue(object :
+                    Callback<DefaultResponse> {
+                    override fun onResponse(
+                        call: Call<DefaultResponse>,
+                        response: Response<DefaultResponse>
+                    ) {
+//                        Log.d("Retrofit", response.body()!!.toString())
+                        Toast.makeText(
+                            this@AddClothesActivity,
+                            response.body().toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    override fun onFailure(call: Call<DefaultResponse>, t: Throwable) {
+                        Log.d("Retrofit", "Error: " + t.message)
+
+                    }
+
+                })
+//                RetrofitClient.instance.predictClothesProp().enqueue(object :
+//                    Callback<ClothesProp> {
+//                    override fun onFailure(call: Call<ClothesProp>, t: Throwable) {
+//                        t.message?.let { Log.d("Retrofit", it) }
+//                    }
+//
+//                    override fun onResponse(
+//                        call: Call<ClothesProp>,
+//                        response: Response<ClothesProp>
+//                    ) {
+//                        Log.d("Retrofit", "success: " + response.body()!!.success.toString())
+//                        Toast.makeText(
+//                            this@AddClothesActivity,
+//                            response.body().toString(),
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                    }
+//                })
             }
             "CAMERA" -> {
                 imageFile = getDataFromCamera()
@@ -198,7 +253,7 @@ class AddClothesActivity : AppCompatActivity() {
         return bitmap
     }
 
-    inner class ProgressRequestBody(private val mFile:File): RequestBody() {
+    inner class ProgressRequestBody(private val mFile: File): RequestBody() {
 
         override fun contentType(): MediaType? {
             return "image/*".toMediaTypeOrNull()
@@ -228,12 +283,12 @@ class AddClothesActivity : AppCompatActivity() {
         }
     }
 
-    private fun uploadImage(file:File){
+    private fun uploadImage(file: File){
         var storageRef = storage.reference
         // Create a child reference
         // imagesRef now points to "images"
         var imagesRef: StorageReference? =
-            auth.uid?.let { storageRef.child(it).child(Timestamp.now().nanoseconds.toString()+"_"+file.name) }
+            auth.uid?.let { storageRef.child(it).child(Timestamp.now().nanoseconds.toString() + "_" + file.name) }
 
         // Child references can also take paths
         // spaceRef now points to "images/space.jpg
@@ -249,7 +304,13 @@ class AddClothesActivity : AppCompatActivity() {
             Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
             val imgUrl = it.uploadSessionUri
 
-            insertClothes(category_tv.text.toString(), categorySub_tv.text.toString(), "red", checkedArr, imgUrl.toString())
+            insertClothes(
+                category_tv.text.toString(),
+                categorySub_tv.text.toString(),
+                RGBColor(255, 0, 0),
+                checkedArr,
+                imgUrl.toString()
+            )
 
         }?.addOnProgressListener { taskSnapshot ->
             val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
@@ -265,14 +326,22 @@ class AddClothesActivity : AppCompatActivity() {
 
     }
 
-    private fun insertClothes(category:String, subCategory:String, color:String, checkedArr:ArrayList<Boolean>, imgUrl:String){
+    private fun insertClothes(
+        category: String,
+        subCategory: String,
+        color: RGBColor,
+        checkedArr: ArrayList<Boolean>,
+        imgUrl: String
+    ){
 
         // Create a new user with a first and last name
         val clothes = hashMapOf(
             "uid" to auth.uid,
             "category" to category,
             "subCategory" to subCategory,
-            "color" to color,
+            "color.R" to color.R,
+            "color.G" to color.G,
+            "color.B" to color.B,
             "checkedArr" to checkedArr,
             "time" to Timestamp(Date()),
             "imgUrl" to imgUrl
