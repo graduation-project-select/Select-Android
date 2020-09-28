@@ -10,4 +10,85 @@
         layout="@layout/toolbar"
         android:id="@+id/toolbar" />
 
+    <ImageView
+        android:id="@+id/codiDetailImg"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:padding="20dp"
+        app:layout_constraintDimensionRatio="w,1:1.1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:srcCompat="@drawable/codi_test" />
+
+    <TextView
+        android:id="@+id/open_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="공개/비공개"
+        app:layout_constraintEnd_toStartOf="@+id/open_switch"
+        app:layout_constraintTop_toBottomOf="@+id/codiDetailImg" />
+
+    <Switch
+        android:id="@+id/open_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="Switch"
+        app:layout_constraintBottom_toBottomOf="@+id/open_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/open_tv" />
+
+<!--    <view-->
+<!--        android:id="@+id/line"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:background="#aaaaaa"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/open_switch" />-->
+
+    <ImageView
+        android:id="@+id/hashtag_iv"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/open_tv"
+        app:srcCompat="@drawable/hashtag" />
+
+    <TextView
+        android:id="@+id/tag_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="코디 태그를 선택해주세요"
+        app:layout_constraintBottom_toBottomOf="@+id/hashtag_iv"
+        app:layout_constraintStart_toEndOf="@+id/hashtag_iv"
+        app:layout_constraintTop_toTopOf="@+id/hashtag_iv"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/codiTag_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hashtag_iv" />
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

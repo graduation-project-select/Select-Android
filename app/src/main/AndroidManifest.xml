@@ -18,14 +18,16 @@
         <activity android:name=".activity.AddCodiActivity" />
         <activity android:name=".activity.DetailClothesActivity" />
         <activity android:name=".activity.DetailCodiActivity" />
-        <activity android:name=".activity.LoginActivty">
+        <activity android:name=".activity.LoginActivty"/>
+
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity"/>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.konkuk.select.fileprovider"

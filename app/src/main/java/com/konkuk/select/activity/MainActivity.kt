@@ -1,8 +1,6 @@
 package com.konkuk.select.activity
 
 import android.os.Bundle
-import android.view.Menu
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.konkuk.select.R
 import kotlinx.android.synthetic.main.activity_main.*

@@ -41,11 +41,11 @@ class DetailClothesActivity : AppCompatActivity() {
 
     fun setAdapter() {
         var codiList = ArrayList<Codi>()
-        codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
-        codiList.add(Codi("111", "#데이트룩", "0"))
+        codiList.add(Codi("111", "#데이트룩", "0", true))
+        codiList.add(Codi("111", "#데이트룩", "0", true))
+        codiList.add(Codi("111", "#데이트룩", "0", true))
+        codiList.add(Codi("111", "#데이트룩", "0", true))
+        codiList.add(Codi("111", "#데이트룩", "0", true))
 
         codi_rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         codiItemAdapter = CodiItemAdapter(codiList)

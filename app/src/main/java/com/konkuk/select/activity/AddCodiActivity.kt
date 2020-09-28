@@ -1,11 +1,12 @@
 package com.konkuk.select.activity
 
-import android.R.id
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiBottomCategoryAdapter
 import com.konkuk.select.adpater.CodiBottomClothesLinearAdapter
@@ -23,10 +28,15 @@ import com.konkuk.select.model.Clothes
 import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
+import java.io.ByteArrayOutputStream
+import java.util.*
 import kotlin.random.Random
 
 
 class AddCodiActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
+    private var db = FirebaseFirestore.getInstance()
+    private var storage = Firebase.storage
 
     private val TAG = "DragClickListener"
     var categoryList: ArrayList<Category> = arrayListOf<Category>(
@@ -52,6 +62,7 @@ class AddCodiActivity : AppCompatActivity() {
         setToolBar()
         setAdapter()
         setClickListener()
+
     }
 
     fun setToolBar() {
@@ -65,7 +76,9 @@ class AddCodiActivity : AppCompatActivity() {
             finish()
         }
         toolbar.right_tv.setOnClickListener {
+            val imgByte = captureScreen(codi_canvas)
             var nextIntent = Intent(this, AddCodiRegisterActivity::class.java)
+            nextIntent.putExtra("codiImage", imgByte)
             startActivity(nextIntent)
             finish() // 뒤로가기 해야되니깐 finish 하면 안되는데 일단..!
         }
@@ -208,4 +221,46 @@ class AddCodiActivity : AppCompatActivity() {
 
         })
     }
+
+    fun captureScreen(v: View) : ByteArray {
+        val bm = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bm)
+        val bgDrawable: Drawable = v.getBackground()
+        if (bgDrawable != null) {
+            bgDrawable.draw(canvas)
+        } else {
+            canvas.drawColor(Color.WHITE)
+        }
+        v.draw(canvas)
+        val bytes = ByteArrayOutputStream()
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+
+        // DB에 저장하면됨!
+        return bytes.toByteArray()
+
+    }
+
+//    fun insertCodi(){
+//        // Create a new user with a first and last name
+//        val codi = hashMapOf(
+//            "uid" to auth.uid,
+//            "tag" to tag,
+//            "time" to Timestamp(Date()),
+//            "imgUrl" to imgUrl
+//        )
+//        Log.d(TAG, "insertClothest: ${codi}")
+//
+//        // Add a new document with a generated ID
+//        db.collection("clothes")
+//            .add(codi)
+//            .addOnSuccessListener { documentReference ->
+//                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+//                finish()
+//            }
+//            .addOnFailureListener { e ->
+//                Log.w(TAG, "Error adding document", e)
+//            }
+//    }
+
+
 }
