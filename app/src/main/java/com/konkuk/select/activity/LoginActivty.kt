@@ -14,11 +14,13 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.konkuk.select.R
+import com.konkuk.select.storage.SharedPrefManager
 import kotlinx.android.synthetic.main.activity_login_activty.*
 
 
@@ -26,10 +28,14 @@ class LoginActivty : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private var db = FirebaseFirestore.getInstance()
+    lateinit var user:FirebaseUser
+    val loginSharedPrefManager = SharedPrefManager.getInstance((this))
+
     lateinit var email: String
     lateinit var password: String
 
-    val TAG = "firebase"
+    val LOGIN = "login"
+    val SIGNUP = "signup"
     val GOOGLE = "google"
 
     val RC_SIGN_IN = 1
@@ -37,29 +43,17 @@ class LoginActivty : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_activty)
-        init()
+        auth = Firebase.auth // firebase init
         settingOnClickListener()
     }
 
     public override fun onStart() {
         super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        Log.d(TAG, "currentUser: $currentUser")
-
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-        Log.d(TAG, "google account: $account")
-
-    }
-
-    fun init(){
-        // firebase init
-        auth = Firebase.auth
-    }
-
-    fun initLoginField(){
-        email = email_et.text.toString()
-        password = password_et.text.toString()
+        // 자동로그인 확인
+        if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
+            Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MainActivity::class.java))
+        }
     }
 
     fun clearField(){
@@ -68,69 +62,54 @@ class LoginActivty : AppCompatActivity() {
     }
 
     fun settingOnClickListener(){
+        // 로그인 버튼
         loginBtn.setOnClickListener {
             initLoginField()
-            if(email.isNotEmpty() && password.isNotEmpty()){
+            if(email.isEmpty()){
+                Log.d(LOGIN, "email_et is empty")
+            }else if(password.isEmpty()){
+                Log.d(LOGIN, "password_et is empty")
+            }else {
                 login(email, password)
             }
         }
 
+        // 구글 회원가입, 로그인 버튼
         signInGoogleBtn.setOnClickListener {
             socialLogin(GOOGLE)
         }
 
-        signinBtn.setOnClickListener {
+        // 회원가입 버튼
+        signupBtn.setOnClickListener {
             initLoginField()
             if(email.isNotEmpty() && password.isNotEmpty()) {
-                signin(email, password)
-            }
-        }
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                val account = task.getResult(ApiException::class.java)!!
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                firebaseAuthWithGoogle(account.idToken!!)
-                loginSuccess()
-            } catch (e: ApiException) {
-                // Google Sign In failed, update UI appropriately
-                Log.w(TAG, "Google sign in failed", e)
-                // ...
+                signup(email, password)
             }
         }
     }
 
+    fun initLoginField(){
+        email = email_et.text.toString()
+        password = password_et.text.toString()
+    }
+
+    // 일반 로그인 (이메일, 비밀번호)
     fun login(email: String, password: String){
-        // 기존 사용자 로그인
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithEmail:success")
-                    val user = auth.currentUser
-                    Log.d(TAG, "user: $user")
-                    loginSuccess()
+                    // Sign in success
+                    Log.d(LOGIN, "signInWithEmail: success")
+                    user = auth.currentUser!!
+                    loginSuccess(user.uid)
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
-                    Toast.makeText(
-                        baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    Log.d(TAG, "user: null")
-                    // ...
+                    // Sign in fails
+                    Log.w(LOGIN, "signInWithEmail:failure", task.exception)
                 }
-                // ...
             }
     }
 
+    // 소셜 로그인 (구글)
     fun socialLogin(type: String){
         when(type){
             GOOGLE -> {
@@ -147,54 +126,67 @@ class LoginActivty : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) { // 소셜 로그인
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                val account = task.getResult(ApiException::class.java)!!
+                Log.d(LOGIN, "firebaseAuthWithGoogle:" + account.id)
+                firebaseAuthWithGoogle(account.idToken!!)
+            } catch (e: ApiException) {
+                Log.w(LOGIN, "Google sign in failed", e)
+            }
+        }
+    }
+
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithCredential:success")
-                    val user = auth.currentUser
-                    Log.d(TAG, "user: $user")
-
+                    // Sign in success
+                    Log.d(LOGIN, "signInWithCredential:success")
+                    user = auth.currentUser!!
+                    loginSuccess(user.uid)
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
-                    // ...
-                    Snackbar.make(view, "Authentication Failed.", Snackbar.LENGTH_SHORT).show()
-                    Log.d(TAG, "user: null")
+                    // Sign in fails
+                    Log.w(LOGIN, "signInWithCredential:failure", task.exception)
                 }
-
-                // ...
             }
     }
 
-    fun signin(email: String, password: String){
-        // 신규 사용자 가입
+    // 일반 회원가입 (이메일, 비밀번호)
+    fun signup(email: String, password: String){
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d("TAG", "createUserWithEmail:success")
-                    val user = auth.currentUser
-                    Log.d("TAG", "user id: ${user?.uid}")
+                    // Sign in success
+                    Log.d(SIGNUP, "createUserWithEmail:success")
+                    user = auth.currentUser!!
+                    Log.d(SIGNUP, "new user id: ${user.uid}")
                     clearField()
                     Toast.makeText(this, "회원가입 완료, 로그인하세요", Toast.LENGTH_SHORT).show()
-                    user?.uid?.let { addAditionalInfo(it,"고서영", "man", 1998) }
+                    // TODO: 회원가입 후 추가 정보 DB에 저장
+                    // addAditionalInfo(user.uid,"고서영", "man", 1998)
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w("TAG", "createUserWithEmail:failure", task.exception)
-                    Toast.makeText(
-                        baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    Log.d("TAG", "user: null")
+                    // Sign in fails
+                    Log.w(SIGNUP, "createUserWithEmail:failure", task.exception)
                 }
-
-                // ...
             }
     }
 
+    // 로그인 성공
+    fun loginSuccess(uid:String){
+        loginSharedPrefManager.saveUid(uid)
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+    }
+
+    // TODO: 회원가입 후 추가 정보 DB에 저장
     fun addAditionalInfo(uid:String, name:String, gender: String, birthYear: Int){
         // Create a new user with a first and last name
         val user = hashMapOf(
@@ -206,15 +198,13 @@ class LoginActivty : AppCompatActivity() {
         // Add a new document with a generated ID
         db.collection("users").document(uid).set(user)
             .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "DocumentSnapshot successfully written!")
+                Log.d(SIGNUP, "DocumentSnapshot successfully written!")
             }
             .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding document", e)
+                Log.w(SIGNUP, "Error adding document", e)
             }
     }
 
-    fun loginSuccess(){
-        startActivity(Intent(this, MainActivity::class.java))
-    }
+
 
 }
