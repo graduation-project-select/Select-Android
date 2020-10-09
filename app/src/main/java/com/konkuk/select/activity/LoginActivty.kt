@@ -1,41 +1,29 @@
 package com.konkuk.select.activity
 
-import android.R.attr
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
-import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import com.konkuk.select.R
+import com.konkuk.select.network.Fbase
 import com.konkuk.select.storage.SharedPrefManager
 import kotlinx.android.synthetic.main.activity_login_activty.*
 
 
 class LoginActivty : AppCompatActivity() {
-
-    private lateinit var auth: FirebaseAuth
-    private var db = FirebaseFirestore.getInstance()
-    lateinit var user:FirebaseUser
     val loginSharedPrefManager = SharedPrefManager.getInstance((this))
 
     lateinit var email: String
     lateinit var password: String
 
-    val LOGIN = "login"
-    val SIGNUP = "signup"
+    val LOGIN_TAG = "login"
+    val SIGNUP_TAG = "signup"
     val GOOGLE = "google"
 
     val RC_SIGN_IN = 1
@@ -44,7 +32,6 @@ class LoginActivty : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_activty)
         checkLoginStatus()
-        auth = Firebase.auth // firebase init
         settingOnClickListener()
     }
 
@@ -52,9 +39,7 @@ class LoginActivty : AppCompatActivity() {
     private fun checkLoginStatus(){
         if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
             Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
-            var mainPage = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(mainPage)
+            gotoMainPage()
         }
     }
 
@@ -68,9 +53,9 @@ class LoginActivty : AppCompatActivity() {
         loginBtn.setOnClickListener {
             initLoginField()
             if(email.isEmpty()){
-                Log.d(LOGIN, "email_et is empty")
+                Log.d(LOGIN_TAG, "email_et is empty")
             }else if(password.isEmpty()){
-                Log.d(LOGIN, "password_et is empty")
+                Log.d(LOGIN_TAG, "password_et is empty")
             }else {
                 login(email, password)
             }
@@ -97,16 +82,15 @@ class LoginActivty : AppCompatActivity() {
 
     // 일반 로그인 (이메일, 비밀번호)
     private fun login(email: String, password: String){
-        auth.signInWithEmailAndPassword(email, password)
+        Fbase.auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success
-                    Log.d(LOGIN, "signInWithEmail: success")
-                    user = auth.currentUser!!
-                    loginSuccess(user.uid)
+                    Log.d(LOGIN_TAG, "signInWithEmail: success")
+                    Fbase.auth.currentUser?.let { loginSuccess(it) }
                 } else {
                     // Sign in fails
-                    Log.w(LOGIN, "signInWithEmail:failure", task.exception)
+                    Log.w(LOGIN_TAG, "signInWithEmail:failure", task.exception)
                 }
             }
     }
@@ -136,60 +120,63 @@ class LoginActivty : AppCompatActivity() {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
-                Log.d(LOGIN, "firebaseAuthWithGoogle:" + account.id)
+                Log.d(LOGIN_TAG, "firebaseAuthWithGoogle:" + account.id)
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
-                Log.w(LOGIN, "Google sign in failed", e)
+                Log.w(LOGIN_TAG, "Google sign in failed", e)
             }
         }
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
+        Fbase.auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success
-                    Log.d(LOGIN, "signInWithCredential:success")
-                    user = auth.currentUser!!
-                    loginSuccess(user.uid)
+                    Log.d(LOGIN_TAG, "signInWithCredential:success")
+                    Fbase.auth.currentUser?.let { loginSuccess(it) }
                 } else {
                     // Sign in fails
-                    Log.w(LOGIN, "signInWithCredential:failure", task.exception)
+                    Log.w(LOGIN_TAG, "signInWithCredential:failure", task.exception)
                 }
             }
     }
 
     // 일반 회원가입 (이메일, 비밀번호)
     private fun signup(email: String, password: String){
-        auth.createUserWithEmailAndPassword(email, password)
+        Fbase.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success
-                    Log.d(SIGNUP, "createUserWithEmail:success")
-                    user = auth.currentUser!!
-                    Log.d(SIGNUP, "new user id: ${user.uid}")
+                    Log.d(SIGNUP_TAG, "createUserWithEmail:success")
+                    Log.d(SIGNUP_TAG, "new user id: ${Fbase.auth.currentUser?.uid}")
                     clearField()
                     Toast.makeText(this, "회원가입 완료, 로그인하세요", Toast.LENGTH_SHORT).show()
                     // TODO: 회원가입 후 추가 정보 DB에 저장
                     // addAditionalInfo(user.uid,"고서영", "man", 1998)
                 } else {
                     // Sign in fails
-                    Log.w(SIGNUP, "createUserWithEmail:failure", task.exception)
+                    Log.w(SIGNUP_TAG, "createUserWithEmail:failure", task.exception)
                 }
             }
     }
 
     // 로그인 성공
-    private fun loginSuccess(uid:String){
-        loginSharedPrefManager.saveUid(uid)
-        val intent = Intent(this, MainActivity::class.java)
+    private fun loginSuccess(user: FirebaseUser){
+        loginSharedPrefManager.saveUid(user.uid)
+        gotoMainPage()
+    }
+
+    private fun gotoMainPage(){
+        var mainPage = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
+        startActivity(mainPage)
+        finish()
     }
 
     // TODO: 회원가입 후 추가 정보 DB에 저장
-    private fun addAditionalInfo(uid:String, name:String, gender: String, birthYear: Int){
+    private fun addAditionalInfo(uid: String, name: String, gender: String, birthYear: Int){
         // Create a new user with a first and last name
         val user = hashMapOf(
             "name" to name,
@@ -198,12 +185,12 @@ class LoginActivty : AppCompatActivity() {
         )
 
         // Add a new document with a generated ID
-        db.collection("users").document(uid).set(user)
+        Fbase.db.collection("users").document(uid).set(user)
             .addOnSuccessListener { documentReference ->
-                Log.d(SIGNUP, "DocumentSnapshot successfully written!")
+                Log.d(SIGNUP_TAG, "DocumentSnapshot successfully written!")
             }
             .addOnFailureListener { e ->
-                Log.w(SIGNUP, "Error adding document", e)
+                Log.w(SIGNUP_TAG, "Error adding document", e)
             }
     }
 
