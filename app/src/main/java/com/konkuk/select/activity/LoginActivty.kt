@@ -43,25 +43,27 @@ class LoginActivty : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_activty)
+        checkLoginStatus()
         auth = Firebase.auth // firebase init
         settingOnClickListener()
     }
 
-    public override fun onStart() {
-        super.onStart()
-        // 자동로그인 확인
+    // 자동로그인 확인
+    private fun checkLoginStatus(){
         if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
             Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, MainActivity::class.java))
+            var mainPage = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(mainPage)
         }
     }
 
-    fun clearField(){
+    private fun clearField(){
         email_et.text.clear()
         password_et.text.clear()
     }
 
-    fun settingOnClickListener(){
+    private fun settingOnClickListener(){
         // 로그인 버튼
         loginBtn.setOnClickListener {
             initLoginField()
@@ -88,13 +90,13 @@ class LoginActivty : AppCompatActivity() {
         }
     }
 
-    fun initLoginField(){
+    private fun initLoginField(){
         email = email_et.text.toString()
         password = password_et.text.toString()
     }
 
     // 일반 로그인 (이메일, 비밀번호)
-    fun login(email: String, password: String){
+    private fun login(email: String, password: String){
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -110,7 +112,7 @@ class LoginActivty : AppCompatActivity() {
     }
 
     // 소셜 로그인 (구글)
-    fun socialLogin(type: String){
+    private fun socialLogin(type: String){
         when(type){
             GOOGLE -> {
                 // Configure Google Sign In
@@ -159,7 +161,7 @@ class LoginActivty : AppCompatActivity() {
     }
 
     // 일반 회원가입 (이메일, 비밀번호)
-    fun signup(email: String, password: String){
+    private fun signup(email: String, password: String){
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -179,7 +181,7 @@ class LoginActivty : AppCompatActivity() {
     }
 
     // 로그인 성공
-    fun loginSuccess(uid:String){
+    private fun loginSuccess(uid:String){
         loginSharedPrefManager.saveUid(uid)
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -187,7 +189,7 @@ class LoginActivty : AppCompatActivity() {
     }
 
     // TODO: 회원가입 후 추가 정보 DB에 저장
-    fun addAditionalInfo(uid:String, name:String, gender: String, birthYear: Int){
+    private fun addAditionalInfo(uid:String, name:String, gender: String, birthYear: Int){
         // Create a new user with a first and last name
         val user = hashMapOf(
             "name" to name,
@@ -204,7 +206,5 @@ class LoginActivty : AppCompatActivity() {
                 Log.w(SIGNUP, "Error adding document", e)
             }
     }
-
-
 
 }

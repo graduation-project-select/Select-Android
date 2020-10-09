@@ -15,9 +15,7 @@ class SharedPrefManager private constructor(private val mCtx: Context) {
     fun saveUid(uid: String){
         val sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-
         editor.putString("uid", uid)
-
         editor.apply()
     }
 
