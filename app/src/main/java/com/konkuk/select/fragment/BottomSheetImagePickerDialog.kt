@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -22,6 +23,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentManager
+import androidx.loader.content.CursorLoader
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 import com.konkuk.select.R
@@ -41,9 +43,8 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
 
     lateinit var currentPhotoPath:String
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    val PERMISSION_TAG = "permission"
+    val CHOOSEIMG_TAG = "chooseImg"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +60,10 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        settingOnClickListener()
+    }
+
+    private fun settingOnClickListener(){
         tv_galleryBtn.setOnClickListener {
             getPictureFromGallery()
         }
@@ -67,10 +72,34 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
         }
     }
 
-    fun finishFragment(){
-        val fragmentManager: FragmentManager = activity!!.supportFragmentManager
-        fragmentManager.beginTransaction().remove(this).commit()
-        fragmentManager.popBackStack()
+    private fun getPictureFromGallery(){
+        if (!checkPermission()) {
+            requestPermission()
+        } else {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = MediaStore.Images.Media.CONTENT_TYPE
+            startActivityForResult(intent,FROM_GALLERY_CODE)
+        }
+    }
+
+    private fun getPictureFromCamera(){
+        if (!checkPermission()) {
+            requestPermission()
+        } else {
+            dispatchTakePictureIntent()
+        }
+    }
+
+    // 카메라 권한 체크
+    private fun checkPermission(): Boolean {
+        return (ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+    }
+
+    // 카메라 권한 요청
+    private fun requestPermission() {
+        requestPermissions(arrayOf(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, CAMERA), REQUEST_CAMERA_PERMISSION)
     }
 
     override fun onRequestPermissionsResult(
@@ -79,10 +108,15 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == FROM_CAMERA_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.d("TAG", "카메라 허가 ㅇ")
-        }else{
-            Log.d("TAG", "카메라 허가 x")
+        when(requestCode){
+            REQUEST_CAMERA_PERMISSION -> {
+                if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Log.d(PERMISSION_TAG, "카메라 권한이 허용되었습니다.")
+                    Log.d(PERMISSION_TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
+                } else {
+                    Log.d(PERMISSION_TAG, "카메라 권한이 허용되지 않았습니다.")
+                }
+            }
         }
     }
 
@@ -91,57 +125,26 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
             when(requestCode){
                 FROM_GALLERY_CODE -> {
                     if(data != null) {
-                        Log.d("TAG", "갤러리에서 이미지 선택")
+                        Log.d(CHOOSEIMG_TAG, "갤러리에서 이미지 선택")
+                        val photoUri = Uri.parse(data?.data.toString())
+                        currentPhotoPath = getPath(photoUri)
                         var nextIntent = Intent(ctx, AddClothesActivity::class.java)
-                        nextIntent.putExtra("type", "GALLERY")
-                        nextIntent.putExtra("currentPhotoUri", data?.data.toString())
+                        nextIntent.putExtra("currentPhotoPath", currentPhotoPath)
                         startActivity(nextIntent)
-//                        finishFragment()    // 흠
-//                    image.setImageURI(data?.data) // handle chosen image
                     }else{
-                        Log.d("TAG", "갤러리에서 이미지 선택 x")
+                        Log.d(CHOOSEIMG_TAG, "갤러리에서 이미지 선택 x")
                     }
                 }
                 FROM_CAMERA_CODE ->{
-                    Log.d("TAG", "카메라에서 이미지 선택")
-                    Log.d("TAG", "currentPhotoPath: ${currentPhotoPath}")
+                    Log.d(CHOOSEIMG_TAG, "카메라에서 이미지 선택")
+                    Log.d(CHOOSEIMG_TAG, "currentPhotoPath: $currentPhotoPath")
                     var nextIntent = Intent(ctx, AddClothesActivity::class.java)
-                    nextIntent.putExtra("type", "CAMERA")
                     nextIntent.putExtra("currentPhotoPath", currentPhotoPath)
                     startActivity(nextIntent)
-//                    finishFragment()  // 흠
                 }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
-
-    }
-
-    private fun getPictureFromGallery(){
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = MediaStore.Images.Media.CONTENT_TYPE
-        startActivityForResult(intent,FROM_GALLERY_CODE)
-    }
-
-    private fun getPictureFromCamera(){
-        if (checkPersmission()) {
-            dispatchTakePictureIntent()
-        } else {
-            requestPermission()
-        }
-    }
-
-    // 카메라 권한 요청
-    private fun requestPermission() {
-        requestPermissions(arrayOf(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, CAMERA),
-            REQUEST_CAMERA_PERMISSION)
-    }
-
-    // 카메라 권한 체크
-    private fun checkPersmission(): Boolean {
-        return (ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
     }
 
     // 카메라 열기
@@ -153,7 +156,7 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
                     try {
                         createImageFile()
                     } catch (ex: IOException) {
-                        Log.d("TAG", "그림파일 만드는도중 에러생김")
+                        Log.d("TAG", "그림파일 만드는 도중 에러생김")
                         null
                     }
 
@@ -184,8 +187,8 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir: File? = ctx.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        Log.d("TAG", "timeStamp: ${timeStamp}")
-        Log.d("TAG", "storageDir: ${storageDir}")
+        Log.d("TAG", "timeStamp: $timeStamp")
+        Log.d("TAG", "storageDir: $storageDir")
         return File.createTempFile(
             "JPEG_${timeStamp}_", /* prefix */
             ".jpg", /* suffix */
@@ -196,5 +199,16 @@ class BottomSheetImagePickerDialog(var ctx: Context) : BottomSheetDialogFragment
         }
     }
 
+    private fun getPath(uri: Uri): String {
+        val proj = arrayOf(MediaStore.Images.Media.DATA)
+        val loader = CursorLoader(ctx, uri, proj, null, null, null)
+        loader.loadInBackground()?.let {
+            val cursor: Cursor = it
+            val column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor.moveToFirst()
+            return cursor.getString(column_index)
+        }
+        return ""
+    }
 
 }

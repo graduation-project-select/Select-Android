@@ -10,25 +10,15 @@ import retrofit2.http.*
 
 interface ServiceApi {
 
-//    // img upload test
-//    @Multipart
-//    @POST("removebg")
-//    fun saveProfilePicture(
-//        @Part("X-Api-Key") key: String,
-//        @Part file: MultipartBody.Part
-//    ): Call<DefaultResponse>
     @GET("/")
     fun connectionTest(
     ):Call<DefaultResponse>
 
-    @GET("/predict")
-    fun predictClothesProp(
-    ):Call<ClothesProp>
-
     @Multipart
-    @POST("/post_image")
-    fun postImage(
+    @POST("/predict")
+    fun predictClothesProp(
         @Part("filename") filename: String,
         @Part image:MultipartBody.Part
-    ):Call<DefaultResponse>
+    ):Call<ClothesProp>
+
 }

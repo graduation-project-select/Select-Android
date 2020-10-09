@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.konkuk.select.R
 import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
+import com.konkuk.select.network.Fbase
 import org.json.JSONObject
 import kotlin.random.Random
 
@@ -60,7 +61,8 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
 
     private fun fetchClothesData(category:String, index:Int){
         db.collection("clothes")
-            .whereEqualTo("category", category)   //TODO whereEqualTo("uid", auth.uid)
+            .whereEqualTo("category", category)
+            .whereEqualTo("uid", Fbase.uid)
             .get()
             .addOnSuccessListener { documents ->
                 closetClothesHorizontalItemAdapterList[index].clear()

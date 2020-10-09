@@ -183,6 +183,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
     private fun getClothesByCategory(selectedCategory: Category) {
         Fbase.db.collection("clothes")
             .whereEqualTo("category", selectedCategory.label)   //TODO whereEqualTo("uid", auth.uid)
+            .whereEqualTo("uid", Fbase.uid)
             .get()
             .addOnSuccessListener { documents ->
                 clothesListVertical.clear()

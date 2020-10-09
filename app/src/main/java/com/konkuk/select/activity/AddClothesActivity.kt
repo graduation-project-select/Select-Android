@@ -13,6 +13,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -29,8 +30,10 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.R
+import com.konkuk.select.model.ClothesProp
 import com.konkuk.select.model.DefaultResponse
 import com.konkuk.select.model.RGBColor
+import com.konkuk.select.network.Fbase
 import com.konkuk.select.network.RetrofitClient
 import kotlinx.android.synthetic.main.activity_add_clothes.*
 import okhttp3.MediaType
@@ -49,111 +52,86 @@ import java.util.*
 
 @GlideModule
 class AddClothesActivity : AppCompatActivity() {
-
-    private lateinit var auth: FirebaseAuth
-    private var db = FirebaseFirestore.getInstance()
-    private var storage = Firebase.storage
-    val TAG = "firebase"
-    lateinit var imageFile:File
-    var checkedArr:ArrayList<Boolean> = arrayListOf(false, false, false, false)
+    private val TAG = "firebase"
+    private lateinit var imageFile: File
+    var checkedArr: ArrayList<Boolean> = arrayListOf(false, false, false, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_clothes)
-        auth = Firebase.auth
         settingToolBar()
         getImgData()
         settingOnClickListener()
-
     }
 
-    fun settingToolBar(){
-        // ToolBar 변경하는 코드
-        val leftBtn : ImageView = toolbar.findViewById(R.id.left_iv)
-        val title : TextView = toolbar.findViewById(R.id.title_tv)
-        val rightBtn : ImageView = toolbar.findViewById(R.id.right_iv)
+    private fun settingToolBar() {
+        val leftBtn: ImageView = toolbar.findViewById(R.id.left_iv)
+        val title: TextView = toolbar.findViewById(R.id.title_tv)
+        val rightBtn: ImageView = toolbar.findViewById(R.id.right_iv)
 
         leftBtn.setImageResource(R.drawable.back)
         title.text = "옷 추가하기"
         rightBtn.setImageResource(0)
+        rightBtn.visibility = View.INVISIBLE
 
         leftBtn.setOnClickListener {
             finish()
         }
     }
 
-    fun getImgData(){
-        val type: String? = intent.getStringExtra("type")
-        when(type){
-            "GALLERY" -> {
-                imageFile = getDataFromGallery()
-                val requestFile: RequestBody =
-                    imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-//                var requestFile = ProgressRequestBody(imageFile)
-                var multipartBody = MultipartBody.Part.createFormData(
-                    "image",
-                    imageFile.name,
-                    requestFile
-                )
-
-                clothImg.setImageBitmap(rotateImageIfRequired(imageFile.path))
-                val hex =
-                    java.lang.String.format("#%02x%02x%02x", 255, 0, 0) // RGB -> #0000 형식으로 변환
-                colorCircle.setBackgroundColor(Color.parseColor(hex));
-                // 서버에서 정보 가져옴
-                RetrofitClient.instance.postImage(imageFile.name, multipartBody).enqueue(object :
-                    Callback<DefaultResponse> {
-                    override fun onResponse(
-                        call: Call<DefaultResponse>,
-                        response: Response<DefaultResponse>
-                    ) {
-//                        Log.d("Retrofit", response.body()!!.toString())
-                        Toast.makeText(
-                            this@AddClothesActivity,
-                            response.body().toString(),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    override fun onFailure(call: Call<DefaultResponse>, t: Throwable) {
-                        Log.d("Retrofit", "Error: " + t.message)
-
-                    }
-
-                })
-//                RetrofitClient.instance.predictClothesProp().enqueue(object :
-//                    Callback<ClothesProp> {
-//                    override fun onFailure(call: Call<ClothesProp>, t: Throwable) {
-//                        t.message?.let { Log.d("Retrofit", it) }
-//                    }
-//
-//                    override fun onResponse(
-//                        call: Call<ClothesProp>,
-//                        response: Response<ClothesProp>
-//                    ) {
-//                        Log.d("Retrofit", "success: " + response.body()!!.success.toString())
-//                        Toast.makeText(
-//                            this@AddClothesActivity,
-//                            response.body().toString(),
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
-//                })
-            }
-            "CAMERA" -> {
-                imageFile = getDataFromCamera()
-                clothImg.setImageBitmap(rotateImageIfRequired(imageFile.path))
-                // 서버 업로드
-            }
-        }
-
+    private fun getImgData() {
+        val currentPhotoPath: String? = intent.getStringExtra("currentPhotoPath")
+        imageFile = File(currentPhotoPath)
+        clothImg.setImageBitmap(rotateImageIfRequired(imageFile.path))
+        getClothesAttribute()
     }
 
-    fun settingOnClickListener(){
+    private fun getClothesAttribute() {
+        val requestFile: RequestBody =
+            imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+//                var requestFile = ProgressRequestBody(imageFile)
+        var multipartBody = MultipartBody.Part.createFormData(
+            "image",
+            imageFile.name,
+            requestFile
+        )
+
+
+        // 서버에서 정보 가져옴
+        RetrofitClient.instance.predictClothesProp(imageFile.name, multipartBody).enqueue(object :
+            Callback<ClothesProp> {
+            override fun onResponse(
+                call: Call<ClothesProp>,
+                response: Response<ClothesProp>
+            ) {
+                Log.d("Retrofit", response.body().toString())
+                val clothesProp = response.body()
+                clothesProp?.let {
+                    var category_label = it.category
+                    categorySub_tv.text = category_label
+                    val hex = java.lang.String.format("#%02x%02x%02x",  it.R, it.G, it.B) // RGB -> #0000 형식으로 변환
+                    colorCircle.setBackgroundColor(Color.parseColor(hex));
+                }
+                Toast.makeText(
+                    this@AddClothesActivity,
+                    response.body().toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            override fun onFailure(call: Call<ClothesProp>, t: Throwable) {
+                Log.d("Retrofit", "Error: " + t.message)
+            }
+
+        })
+    }
+
+
+    private fun settingOnClickListener() {
         addBtn.setOnClickListener {
-            Toast.makeText(this, "등록", Toast.LENGTH_SHORT).show()
             uploadImage(imageFile)
             startActivity(Intent(this, MainActivity::class.java))
+            // stack 비우기
             finish()
         }
 
@@ -169,51 +147,6 @@ class AddClothesActivity : AppCompatActivity() {
         checkBox_winter.setOnClickListener {
             checkedArr[3] = checkBox_winter.isChecked
         }
-    }
-
-
-
-    fun getDataFromGallery():File{
-        val currentPhotoUri: String? = intent.getStringExtra("currentPhotoUri")
-        val photoUri = Uri.parse(currentPhotoUri)
-        Log.d("TAG", "photoUri.path: " + photoUri.toString())
-        val realPath = getPath(photoUri)
-        Log.d("TAG", "realPath: " + realPath)
-
-        val file = File(realPath)
-        return file
-    }
-
-
-    private fun getPath(uri: Uri): String? {
-        val proj = arrayOf(MediaStore.Images.Media.DATA)
-        val loader = CursorLoader(this, uri, proj, null, null, null)
-        loader.loadInBackground()?.let {
-            val cursor: Cursor = it
-            val column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            return cursor.getString(column_index)
-        }
-        return ""
-    }
-
-    fun getDataFromCamera():File{
-        val currentPhotoPath: String? = intent.getStringExtra("currentPhotoPath")
-        // 카메라로부터 받은 데이터가 있을경우에만
-        val file = File(currentPhotoPath)
-//        if (Build.VERSION.SDK_INT < 28) {
-//            val bitmap = MediaStore.Images.Media
-//                .getBitmap(contentResolver, Uri.fromFile(file))  //Deprecated
-//            clothImg.setImageBitmap(bitmap)
-//        }
-//        else{
-//            val decode = ImageDecoder.createSource(contentResolver,
-//                Uri.fromFile(file))
-//            val bitmap = ImageDecoder.decodeBitmap(decode)
-//            clothImg.setImageBitmap(bitmap)
-//        }
-//        clothImg.setImageBitmap(rotateImageIfRequired(file.path))
-        return file
     }
 
     private fun rotateImageIfRequired(imagePath: String): Bitmap? {
@@ -255,7 +188,7 @@ class AddClothesActivity : AppCompatActivity() {
         return bitmap
     }
 
-    inner class ProgressRequestBody(private val mFile: File): RequestBody() {
+    inner class ProgressRequestBody(private val mFile: File) : RequestBody() {
 
         override fun contentType(): MediaType? {
             return "image/*".toMediaTypeOrNull()
@@ -271,27 +204,27 @@ class AddClothesActivity : AppCompatActivity() {
             val fileLength = mFile.length()
             val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
             val `in` = FileInputStream(mFile)
-            var uploaded:Long = 0
-            try{
-                var read:Int = 0
+            var uploaded: Long = 0
+            try {
+                var read: Int = 0
                 val handler = Handler(Looper.getMainLooper())
-                while(`in`.read(buffer).let { read = it ; it != -1 }){
+                while (`in`.read(buffer).let { read = it; it != -1 }) {
                     uploaded += read.toLong()
                     sink!!.write(buffer, 0, read)
                 }
-            }finally{
+            } finally {
                 `in`.close()
             }
         }
     }
 
-    private fun uploadImage(file: File){
-        var storageRef = storage.reference
+    private fun uploadImage(file: File) {
+        var storageRef = Fbase.storage.reference
         // Create a child reference
         // imagesRef now points to "images"
         var filename = Timestamp.now().nanoseconds.toString() + "_" + file.name
         var imagesRef: StorageReference? =
-            auth.uid?.let { storageRef.child(it).child(filename) }
+            Fbase.uid?.let { storageRef.child(it).child(filename) }
 
         // Child references can also take paths
         // spaceRef now points to "images/space.jpg
@@ -306,7 +239,8 @@ class AddClothesActivity : AppCompatActivity() {
             // ...
             Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
 //            Log.d(TAG, "imagesRef: ${imagesRef}")
-            val imgUrl = "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/${auth.uid}%2F${filename}?alt=media"
+            val imgUrl =
+                "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/${Fbase.uid}%2F${filename}?alt=media"
 //            "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/9B4rtDTEWwYU7XKSZozL1o2aB9Z2%2F405000000_309466447.png?alt=media"
             insertClothes(
                 category_tv.text.toString(),
@@ -336,11 +270,11 @@ class AddClothesActivity : AppCompatActivity() {
         color: RGBColor,
         checkedArr: ArrayList<Boolean>,
         imgUrl: String
-    ){
+    ) {
 
         // Create a new user with a first and last name
         val clothes = hashMapOf(
-            "uid" to auth.uid,
+            "uid" to Fbase.uid,
             "category" to category,
             "subCategory" to subCategory,
             "color.R" to color.R,
@@ -353,7 +287,7 @@ class AddClothesActivity : AppCompatActivity() {
         Log.d(TAG, "insertClothest: ${clothes}")
 
         // Add a new document with a generated ID
-        db.collection("clothes")
+        Fbase.db.collection("clothes")
             .add(clothes)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
