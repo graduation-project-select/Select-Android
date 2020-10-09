@@ -8,4 +8,5 @@ import com.google.firebase.ktx.Firebase
 object Fbase {
     val auth: FirebaseAuth = Firebase.auth
     val db = FirebaseFirestore.getInstance()
+
 }

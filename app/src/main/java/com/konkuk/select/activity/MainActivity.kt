@@ -14,13 +14,10 @@ import com.konkuk.select.fragment.*
 class MainActivity : AppCompatActivity() {
 
     private var currentFragment = 1 // 뒤로가기 위해 필요
-//    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        auth = Firebase.auth
-//        Toast.makeText(this, auth.uid, Toast.LENGTH_SHORT).show()
 
         if (savedInstanceState == null) {
             val fragment = ClosetFragment(this)

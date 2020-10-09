@@ -234,7 +234,6 @@ class AddCodiActivity : AppCompatActivity() {
                 v.bringToFront()
                 return true
             }
-
         })
     }
 

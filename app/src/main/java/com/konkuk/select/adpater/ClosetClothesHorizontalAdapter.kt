@@ -27,13 +27,11 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
         var underLine:View = itemView.findViewById(R.id.underLine)
     }
 
-    fun initAdapter(){
-        var index = 0
-        for(c in categoryList){
+    private fun initAdapter(){
+        for((index, c) in categoryList.withIndex()){
             closetClothesHorizontalItemAdapterList.add(arrayListOf())
             closetClothesHorizontalItemAdapter.add(ClosetClothesHorizontalItemAdapter(ctx, closetClothesHorizontalItemAdapterList[index]))
             fetchClothesData(c.label, index)
-            index++
         }
     }
 
@@ -60,17 +58,8 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
         return categoryList.size
     }
 
-    // temp (data fetch 필요)
-    fun makeClothesData(category:String):ArrayList<Clothes>{
-        var c_arr:ArrayList<Clothes> = arrayListOf()
-        for(n in 0..Random.nextInt(1,10)){
-            c_arr.add(Clothes(n.toString(), category, ""))
-        }
-        return c_arr
-    }
-
-    fun fetchClothesData(category:String, index:Int){
-        val docRef = db.collection("clothes")
+    private fun fetchClothesData(category:String, index:Int){
+        db.collection("clothes")
             .whereEqualTo("category", category)   //TODO whereEqualTo("uid", auth.uid)
             .get()
             .addOnSuccessListener { documents ->
