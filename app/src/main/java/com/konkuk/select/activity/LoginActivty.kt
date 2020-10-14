@@ -36,6 +36,8 @@ class LoginActivty : AppCompatActivity() {
     }
 
     // 자동로그인 확인
+    // TODO id, 비번 저장되어있으면 로그인하기로 변경
+    // TODO 로그아웃: 로그아웃 + sharedPref 정보 clear
     private fun checkLoginStatus(){
         if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
             Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()

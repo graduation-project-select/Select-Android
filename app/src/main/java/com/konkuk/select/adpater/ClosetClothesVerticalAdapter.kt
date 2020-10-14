@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.konkuk.select.R
@@ -20,6 +21,7 @@ class ClosetClothesVerticalAdapter(var ctx:Context, var items:ArrayList<Clothes>
 
     inner class ImageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var clothesImg: ImageView = itemView.findViewById(R.id.iv_clothesImg)
+        var checkMark:  TextView = itemView.findViewById(R.id.checkMark)
         init {
             clothesImg.setOnClickListener {
                 itemClickListener?.OnClickItem(this, it, items[adapterPosition], adapterPosition)

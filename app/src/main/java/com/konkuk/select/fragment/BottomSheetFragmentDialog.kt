@@ -36,7 +36,7 @@ class BottomSheetFragmentDialog(var ctx: Context) : BottomSheetDialogFragment() 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         for(i in 0..10)
-            closetList.add(Closet(i.toString(), "운동 갈 때", "12", ""))
+            closetList.add(Closet(i.toString(), "운동 갈 때", 12, ""))
 
         rv_closet_list.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
         bottomSheetClosetListAdapter = BottomSheetClosetListAdapter(closetList)

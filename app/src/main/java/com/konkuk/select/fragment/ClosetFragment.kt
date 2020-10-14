@@ -37,6 +37,8 @@ class ClosetFragment(val ctx: Context) : Fragment() {
     var categoryList: ArrayList<Category> = arrayListOf()
     lateinit var checkedCount: MutableLiveData<Int>
 //    var categoryCheckedList = mutableMapOf<String, Boolean>()
+    var closetId:String  = ""
+    var closetTitle:String  = ""
 
     // 세로 모드
     lateinit var closetClothesVerticalAdapter: ClosetClothesVerticalAdapter
@@ -46,6 +48,17 @@ class ClosetFragment(val ctx: Context) : Fragment() {
 
     val CLOSET_TAG = "closet"
     val FIREBASE_TAG = "firebase"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // 옷장(ClosetListFragment)에서 넘어온 경우
+        arguments?.getString("closetId")?.let {
+            closetId = it
+        }
+        arguments?.getString("closetTitle")?.let {
+            closetTitle = it
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,6 +77,8 @@ class ClosetFragment(val ctx: Context) : Fragment() {
     }
 
     private fun init(){
+        // init view text
+        tv_closet_name.text = if(closetTitle == "") "# 전체 옷장" else "# $closetTitle"
         // categoryList 초기화
         categoryList.addAll(
             arrayListOf<Category>(
@@ -94,10 +109,11 @@ class ClosetFragment(val ctx: Context) : Fragment() {
     private fun settingToolBar(){
         toolbar.left_iv.setImageResource(R.drawable.closet_btn)
         toolbar.left_iv.setOnClickListener {
-            val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
-            val mFrag: Fragment = ClosetListFragment(ctx)
-            t.replace(R.id.container, mFrag)
-            t.commit()
+            fragmentManager?.let {
+                it.beginTransaction()
+                    .replace(R.id.container, ClosetListFragment(ctx))
+                    .commit()
+            }
         }
         toolbar.right_tv.visibility = View.GONE
         toolbar.right_iv.setImageResource(R.drawable.alarm)
@@ -174,17 +190,19 @@ class ClosetFragment(val ctx: Context) : Fragment() {
             }
 
         rv_clothes_horizontal.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
-        closetClothesHorizontalAdapter = ClosetClothesHorizontalAdapter(ctx, categoryList)
+        closetClothesHorizontalAdapter = ClosetClothesHorizontalAdapter(ctx, categoryList, closetId)
         rv_clothes_horizontal.adapter = closetClothesHorizontalAdapter
 
     }
 
     // 카테고리에 해당하는 data fetch
     private fun getClothesByCategory(selectedCategory: Category) {
-        Fbase.db.collection("clothes")
-            .whereEqualTo("category", selectedCategory.label)   //TODO whereEqualTo("uid", auth.uid)
+        var clothesRef = Fbase.db.collection("clothes")
+            .whereEqualTo("category", selectedCategory.label)
             .whereEqualTo("uid", Fbase.uid)
-            .get()
+        // 옷장이 선택된 경우
+        if(closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
+        clothesRef.get()
             .addOnSuccessListener { documents ->
                 clothesListVertical.clear()
                 for (document in documents) {
@@ -216,7 +234,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         }
     }
 
-    fun settingOnClickListener() {
+    private fun settingOnClickListener() {
         tv_closet_name.setOnClickListener {
             // 아래에서 셀렉리스트 나오기
             Toast.makeText(ctx, "클릭!!", Toast.LENGTH_SHORT).show()
@@ -224,7 +242,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         }
     }
 
-    fun showBottomSheetDialogFragment() {
+    private fun showBottomSheetDialogFragment() {
         val bottomSheetFragment = BottomSheetFragmentDialog(ctx)
         fragmentManager?.let { bottomSheetFragment.show(it, bottomSheetFragment.getTag()) }
     }

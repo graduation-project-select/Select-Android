@@ -16,10 +16,9 @@ import com.konkuk.select.network.Fbase
 import org.json.JSONObject
 import kotlin.random.Random
 
-class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayList<Category>):
+class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayList<Category>, private val closetId:String = ""):
     RecyclerView.Adapter<ClosetClothesHorizontalAdapter.RVHolder>() {
 
-    private var db = FirebaseFirestore.getInstance()
     var closetClothesHorizontalItemAdapter: ArrayList<ClosetClothesHorizontalItemAdapter> = arrayListOf()
     var closetClothesHorizontalItemAdapterList: ArrayList<ArrayList<Clothes>> = arrayListOf()
 
@@ -60,10 +59,12 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
     }
 
     private fun fetchClothesData(category:String, index:Int){
-        db.collection("clothes")
+        var clothesRef = Fbase.db.collection("clothes")
             .whereEqualTo("category", category)
             .whereEqualTo("uid", Fbase.uid)
-            .get()
+        // 옷장이 선택된 경우
+        if(closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
+        clothesRef.get()
             .addOnSuccessListener { documents ->
                 closetClothesHorizontalItemAdapterList[index].clear()
                 for (document in documents) {

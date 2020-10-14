@@ -13,8 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.AddClothesActivity"></activity>
-        <activity android:name=".activity.AddCodiRegisterActivity"></activity>
+        <activity android:name=".activity.ClothesCheckListActivity"></activity>
+        <activity android:name=".activity.AddClosetActivity">
+        </activity>
+        <activity android:name=".activity.AddClothesActivity" />
+        <activity android:name=".activity.AddCodiRegisterActivity" />
         <activity android:name=".activity.AddCodiActivity" />
         <activity android:name=".activity.DetailClothesActivity" />
         <activity android:name=".activity.DetailCodiActivity" />
@@ -25,7 +28,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity"/>
+        <activity android:name=".activity.MainActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -34,7 +37,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
     </application>
 

@@ -41,7 +41,7 @@ class ClosetListBlockAdapter(var context: Context, val closetList:ArrayList<Clos
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
 //        holder.iv_img 에 closetList[position].imgUrl 넣기
         holder.tv_title.text = closetList[position].title
-        holder.tv_count.text = closetList[position].count
+        holder.tv_count.text = closetList[position].count.toString()
     }
 
     override fun getItemCount(): Int {
