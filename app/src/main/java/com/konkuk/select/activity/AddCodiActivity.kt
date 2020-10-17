@@ -25,6 +25,7 @@ import com.konkuk.select.adpater.CodiBottomRecommendationAdapter
 import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.network.Fbase
+import com.konkuk.select.utils.StaticValues
 import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
@@ -36,15 +37,7 @@ import kotlin.random.Random
 
 
 class AddCodiActivity : AppCompatActivity() {
-    var categoryList: ArrayList<Category> = arrayListOf<Category>(
-        Category(0, "상의", true),
-        Category(1, "하의", false),
-        Category(2, "원피스", false),
-        Category(3, "아우터", false),
-        Category(4, "신발", false),
-        Category(5, "악세서리", false)
-    )
-    val categorySelectList: ArrayList<String> = arrayListOf("상의", "하의", "원피스", "아우터", "신발", "악세서리")
+    var categoryList: ArrayList<String> = StaticValues.categoryList
 
     lateinit var codiBottomCategoryAdapter: CodiBottomCategoryAdapter   // 카테고리 목록
     lateinit var codiBottomClothesLinearAdapter: CodiBottomClothesLinearAdapter // 옷 목록
@@ -88,7 +81,7 @@ class AddCodiActivity : AppCompatActivity() {
     private fun settingAdapter() {
         codiBottomCategoryAdapter = CodiBottomCategoryAdapter(categoryList)
         codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(this, codiBottomClothesList)
-        codiBottomRecommendationAdapter = CodiBottomRecommendationAdapter(categorySelectList)
+        codiBottomRecommendationAdapter = CodiBottomRecommendationAdapter(categoryList)
         bottom_rv.adapter = codiBottomCategoryAdapter
         switchLayoutManager()
     }
@@ -134,11 +127,11 @@ class AddCodiActivity : AppCompatActivity() {
                 override fun OnClickItem(
                     holder: CodiBottomCategoryAdapter.ItemHolder,
                     view: View,
-                    data: Category,
+                    data: String,
                     position: Int
                 ) {
-                    toolbar_codi_bottom.tv_titile.text = data.label
-                    initClothesList(data.label) // clothesList 변경 (temp data)
+                    toolbar_codi_bottom.tv_titile.text = data
+                    initClothesList(data) // clothesList 변경 (temp data)
                     bottom_rv.adapter = codiBottomClothesLinearAdapter
                     switchLayoutManager()
                 }

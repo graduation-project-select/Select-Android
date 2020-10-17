@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
 import com.konkuk.select.model.Category
 
-class CodiBottomCategoryAdapter(var categoryList: ArrayList<Category>): RecyclerView.Adapter<CodiBottomCategoryAdapter.ItemHolder>() {
+class CodiBottomCategoryAdapter(var categoryList: ArrayList<String>): RecyclerView.Adapter<CodiBottomCategoryAdapter.ItemHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
     interface OnItemClickListener {
-        fun OnClickItem(holder: ItemHolder, view: View, data: Category, position: Int)
+        fun OnClickItem(holder: ItemHolder, view: View, data: String, position: Int)
     }
 
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -36,7 +36,7 @@ class CodiBottomCategoryAdapter(var categoryList: ArrayList<Category>): Recycler
     }
 
     override fun onBindViewHolder(holder: CodiBottomCategoryAdapter.ItemHolder, position: Int) {
-        holder.tv_label.text = categoryList[position].label
+        holder.tv_label.text = categoryList[position]
 
     }
 

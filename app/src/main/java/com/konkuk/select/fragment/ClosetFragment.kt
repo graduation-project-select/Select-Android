@@ -26,6 +26,7 @@ import com.konkuk.select.adpater.ClosetClothesVerticalAdapter
 import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.network.Fbase
+import com.konkuk.select.utils.StaticValues
 import kotlinx.android.synthetic.main.fragment_closet.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import org.json.JSONObject
@@ -35,10 +36,9 @@ class ClosetFragment(val ctx: Context) : Fragment() {
 
     // 카테고리
     lateinit var closetCategoryListAdapter: ClosetCategoryListAdapter
-    var categoryList: ArrayList<Category> = arrayListOf()
+    var categoryList: ArrayList<Category> = StaticValues.categoryListTop
     lateinit var checkedCount: MutableLiveData<Int>
 
-    //    var categoryCheckedList = mutableMapOf<String, Boolean>()
     var closetId: MutableLiveData<String> = MutableLiveData("")
     var closetTitle: MutableLiveData<String> = MutableLiveData("")
 
@@ -86,18 +86,6 @@ class ClosetFragment(val ctx: Context) : Fragment() {
     }
 
     private fun init() {
-        // categoryList 초기화
-        categoryList.clear()
-        categoryList.addAll(
-            arrayListOf<Category>(
-                Category(0, "상의", true),
-                Category(1, "하의", false),
-                Category(2, "원피스", false),
-                Category(3, "아우터", false),
-                Category(4, "신발", false),
-                Category(5, "악세서리", false)
-            )
-        )
         checkedCount = MutableLiveData(initCheckedCount())
 //        // order로 번호로 정렬
 //        categoryList.sortBy({ it.order })

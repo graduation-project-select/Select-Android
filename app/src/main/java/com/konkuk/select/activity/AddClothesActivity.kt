@@ -1,5 +1,6 @@
 package com.konkuk.select.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -19,6 +20,8 @@ import com.bumptech.glide.annotation.GlideModule
 import com.google.firebase.Timestamp
 import com.google.firebase.storage.StorageReference
 import com.konkuk.select.R
+import com.konkuk.select.fragment.BottomSheetMainBtnDialog
+import com.konkuk.select.fragment.BottomSheetSingleListDialog
 import com.konkuk.select.model.ClothesProp
 import com.konkuk.select.network.Fbase
 import com.konkuk.select.network.RetrofitClient
@@ -51,6 +54,10 @@ class AddClothesActivity : AppCompatActivity() {
     lateinit var texture:String
     lateinit var imgUri:String
 
+    val BOTTOMSHEET_CATEGORYLIST_REQUEST_CODE = 1
+    val CATEGORY_LABEL_MESSAGE = "categoryLabel"
+
+
     data class ClothesRequest(
         val category: String,
         val subCategory: String,
@@ -65,7 +72,7 @@ class AddClothesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_clothes)
         settingToolBar()
-        getImgData()
+//        getImgData()
         settingOnClickListener()
     }
 
@@ -163,6 +170,42 @@ class AddClothesActivity : AppCompatActivity() {
         checkBox_winter.setOnClickListener {
             season[3] = checkBox_winter.isChecked
         }
+
+
+        // 카테고리 변경
+        category_tv.setOnClickListener {
+            val bottomSheetFragment = BottomSheetSingleListDialog(this)
+            supportFragmentManager?.let {
+//                bottomSheetFragment.onActivityResult(bottomSheetFragment.targetRequestCode, BOTTOMSHEET_CATEGORYLIST_REQUEST_CODE, intent)
+                bottomSheetFragment.show(it, bottomSheetFragment.getTag())
+            }
+        }
+    }
+
+//    fun passClosetData(label: String): Intent {
+//        val intent = Intent()
+//        intent.putExtra(CATEGORY_LABEL_MESSAGE, label)
+//        return intent
+//    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode !== Activity.RESULT_OK) {
+            return
+        }
+//        if (requestCode === BOTTOMSHEET_CATEGORYLIST_REQUEST_CODE) {
+//            if (data != null) {
+//
+////                category =  bottomSheetFragment.selectedLabel
+////                category_tv.text = category
+//                data.getStringExtra(CATEGORY_LABEL_MESSAGE)?.let {
+//                    category = it
+//                    initClothesPropView()
+//                }
+//            }
+//
+//        }
     }
 
 
