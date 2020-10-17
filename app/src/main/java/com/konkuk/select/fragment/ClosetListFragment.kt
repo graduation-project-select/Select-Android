@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.fragment_closet_list.toolbar
 import kotlinx.android.synthetic.main.toolbar.view.*
 
 class ClosetListFragment(val ctx: Context) : Fragment() {
+
     lateinit var closetListBlockAdapter:ClosetListBlockAdapter
     var closetList:ArrayList<Closet> = ArrayList()
 
@@ -87,7 +88,7 @@ class ClosetListFragment(val ctx: Context) : Fragment() {
     }
 
     private fun getClosetData(){
-        val closetRef  = Fbase.db.collection("closets")
+        val closetRef  = Fbase.db.collection("closets").whereEqualTo("uid", Fbase.uid)
         closetRef.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             if (documentSnapshot != null) {
                 closetList.clear()
@@ -100,7 +101,5 @@ class ClosetListFragment(val ctx: Context) : Fragment() {
             }
         }
     }
-
-
 
 }

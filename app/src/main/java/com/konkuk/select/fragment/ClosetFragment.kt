@@ -1,7 +1,9 @@
 package com.konkuk.select.fragment
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,54 +12,61 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.gson.JsonObject
 import com.konkuk.select.R
+import com.konkuk.select.activity.DetailClothesActivity
 import com.konkuk.select.adpater.ClosetCategoryListAdapter
 import com.konkuk.select.adpater.ClosetClothesHorizontalAdapter
 import com.konkuk.select.adpater.ClosetClothesVerticalAdapter
 import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
+import com.konkuk.select.model.RGBColor
 import com.konkuk.select.network.Fbase
-import kotlinx.android.synthetic.main.closet_category_rv_item.view.*
 import kotlinx.android.synthetic.main.fragment_closet.*
+import kotlinx.android.synthetic.main.row_bottom_sheet_closet_list.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import org.json.JSONObject
-import org.xml.sax.Parser
+
 
 class ClosetFragment(val ctx: Context) : Fragment() {
+
     // 카테고리
     lateinit var closetCategoryListAdapter: ClosetCategoryListAdapter
     var categoryList: ArrayList<Category> = arrayListOf()
     lateinit var checkedCount: MutableLiveData<Int>
-//    var categoryCheckedList = mutableMapOf<String, Boolean>()
-    var closetId:String  = ""
-    var closetTitle:String  = ""
+
+    //    var categoryCheckedList = mutableMapOf<String, Boolean>()
+    var closetId: MutableLiveData<String> = MutableLiveData("")
+    var closetTitle: MutableLiveData<String> = MutableLiveData("")
 
     // 세로 모드
     lateinit var closetClothesVerticalAdapter: ClosetClothesVerticalAdapter
     var clothesListVertical: ArrayList<Clothes> = arrayListOf()
+
     // 가로 모드
     lateinit var closetClothesHorizontalAdapter: ClosetClothesHorizontalAdapter
 
     val CLOSET_TAG = "closet"
     val FIREBASE_TAG = "firebase"
 
+    val BOTTOMSHEET_CLOSETLIST_REQUEST_CODE = 1
+    val CLOSET_ID_MESSAGE = "closetId"
+    val CLOSET_TITLE_MESSAGE = "closetTitle"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 옷장(ClosetListFragment)에서 넘어온 경우
-        arguments?.getString("closetId")?.let {
-            closetId = it
+        arguments?.getString(CLOSET_ID_MESSAGE)?.let {
+            closetId.value = it
         }
-        arguments?.getString("closetTitle")?.let {
-            closetTitle = it
+        arguments?.getString(CLOSET_TITLE_MESSAGE)?.let {
+            closetTitle.value = it
         }
+
     }
 
     override fun onCreateView(
@@ -73,13 +82,13 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         init()
         settingToolBar()
         settingAdapter()
+        settingObserver()
         settingOnClickListener()
     }
 
-    private fun init(){
-        // init view text
-        tv_closet_name.text = if(closetTitle == "") "# 전체 옷장" else "# $closetTitle"
+    private fun init() {
         // categoryList 초기화
+        categoryList.clear()
         categoryList.addAll(
             arrayListOf<Category>(
                 Category(0, "상의", true),
@@ -90,7 +99,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
                 Category(5, "악세서리", false)
             )
         )
-        checkedCount =  MutableLiveData(initCheckedCount())
+        checkedCount = MutableLiveData(initCheckedCount())
 //        // order로 번호로 정렬
 //        categoryList.sortBy({ it.order })
 //        categoryList.forEach {
@@ -106,7 +115,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         return count
     }
 
-    private fun settingToolBar(){
+    private fun settingToolBar() {
         toolbar.left_iv.setImageResource(R.drawable.closet_btn)
         toolbar.left_iv.setOnClickListener {
             fragmentManager?.let {
@@ -122,15 +131,18 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         }
     }
 
-    private fun settingAdapter() {
-        rv_category.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
-        closetCategoryListAdapter = ClosetCategoryListAdapter(ctx, categoryList)
-        rv_category.adapter = closetCategoryListAdapter
-
-        //setting observer
+    private fun settingObserver() {
+        closetId.observe(this, Observer {
+            // TODO 옷데이터 업데이트 -> livedata로 변경하여 observer에서 실행하게 바꾸기!!
+            // TODO 옷리스트 업데이트 안됨..
+            Log.d(CLOSET_TAG, "closetId observer")
+//            init()
+        })
+        closetTitle.observe(this, Observer {
+            tv_closet_name.text = if (closetTitle.value == "") "전체 옷장" else "${closetTitle.value}"
+        })
         checkedCount.observe(this, Observer {
-            Log.d(CLOSET_TAG, "checkedCount: " + it)
-            Log.d(CLOSET_TAG, "categoryList: " + categoryList.toString())
+            Log.d(CLOSET_TAG, "categoryList: $categoryList (checkedCount: $it)")
             if (it == 1) {
                 // 한개면 한개인 항목의 데이터 fetch
                 var selectedCategory: Category? = null
@@ -145,6 +157,14 @@ class ClosetFragment(val ctx: Context) : Fragment() {
             }
             switchClothesListLayout(it)
         })
+    }
+
+    private fun settingAdapter() {
+        rv_category.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
+        closetCategoryListAdapter = ClosetCategoryListAdapter(ctx, categoryList)
+        rv_category.adapter = closetCategoryListAdapter
+
+
 
         closetCategoryListAdapter.itemClickListener =
             object : ClosetCategoryListAdapter.OnItemClickListener {
@@ -186,11 +206,19 @@ class ClosetFragment(val ctx: Context) : Fragment() {
                     // TODO 상세 페이지로 이동
                     Toast.makeText(ctx, "${data.id}, ${data.category} click", Toast.LENGTH_SHORT)
                         .show()
+                    var intent = Intent(ctx, DetailClothesActivity::class.java)
+                    intent.putExtra("clothesId", data.id)
+                    startActivity(intent)
                 }
             }
 
-        rv_clothes_horizontal.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
-        closetClothesHorizontalAdapter = ClosetClothesHorizontalAdapter(ctx, categoryList, closetId)
+        rv_clothes_horizontal.layoutManager = LinearLayoutManager(
+            ctx,
+            LinearLayoutManager.VERTICAL,
+            false
+        )
+        closetClothesHorizontalAdapter =
+            ClosetClothesHorizontalAdapter(ctx, categoryList, closetId.value!!)
         rv_clothes_horizontal.adapter = closetClothesHorizontalAdapter
 
     }
@@ -201,18 +229,28 @@ class ClosetFragment(val ctx: Context) : Fragment() {
             .whereEqualTo("category", selectedCategory.label)
             .whereEqualTo("uid", Fbase.uid)
         // 옷장이 선택된 경우
-        if(closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
+        if (closetId.value != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
         clothesRef.get()
             .addOnSuccessListener { documents ->
                 clothesListVertical.clear()
                 for (document in documents) {
                     val jsonObj = JSONObject(document.data)
+                    var arr = jsonObj["checkedArr"]
+                    Log.d("서영", arr.toString())
                     clothesListVertical.add(
-                        Clothes(
-                            document.id,
-                            jsonObj["category"].toString(),
-                            jsonObj["imgUrl"].toString()
-                        )
+                        Clothes(document.id, jsonObj["category"].toString(), jsonObj["imgUrl"].toString())
+//                        Clothes(
+//                            document.id,
+//                            jsonObj["category"].toString(),
+//                            jsonObj["subCategory"].toString(),
+//                            arrayListOf(),
+//                            RGBColor(
+//                                jsonObj["color.R"].toString().toInt(),
+//                                jsonObj["color.G"].toString().toInt(),
+//                                jsonObj["color.B"].toString().toInt()
+//                            ),
+//                            jsonObj["imgUrl"].toString()
+//                        )
                     )
                 }
                 closetClothesVerticalAdapter.notifyDataSetChanged()
@@ -243,7 +281,38 @@ class ClosetFragment(val ctx: Context) : Fragment() {
     }
 
     private fun showBottomSheetDialogFragment() {
-        val bottomSheetFragment = BottomSheetFragmentDialog(ctx)
-        fragmentManager?.let { bottomSheetFragment.show(it, bottomSheetFragment.getTag()) }
+        val bottomSheetFragment = BottomSheetClosetListDialog(ctx)
+        fragmentManager?.let {
+            bottomSheetFragment.setTargetFragment(this, BOTTOMSHEET_CLOSETLIST_REQUEST_CODE)
+            bottomSheetFragment.show(it, bottomSheetFragment.tag)
+        }
+    }
+
+    fun passClosetData(id: String, title: String): Intent {
+        val intent = Intent()
+        intent.putExtra(CLOSET_ID_MESSAGE, id)
+        intent.putExtra(CLOSET_TITLE_MESSAGE, title)
+        return intent
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode !== Activity.RESULT_OK) {
+            return
+        }
+        if (requestCode === BOTTOMSHEET_CLOSETLIST_REQUEST_CODE) {
+            Log.d("closetTitle", BOTTOMSHEET_CLOSETLIST_REQUEST_CODE.toString())
+            if (data != null) {
+                data.getStringExtra(CLOSET_ID_MESSAGE)?.let {
+                    closetId.value = it
+                    Log.d("closetTitle", it)
+                }
+                data.getStringExtra(CLOSET_TITLE_MESSAGE)?.let {
+                    closetTitle.value = it
+                    Log.d("closetTitle", it)
+                }
+            }
+
+        }
     }
 }

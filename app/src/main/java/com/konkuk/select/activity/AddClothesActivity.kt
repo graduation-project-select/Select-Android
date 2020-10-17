@@ -30,6 +30,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.R
+import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.ClothesProp
 import com.konkuk.select.model.DefaultResponse
 import com.konkuk.select.model.RGBColor
@@ -55,6 +56,8 @@ class AddClothesActivity : AppCompatActivity() {
     private val TAG = "firebase"
     private lateinit var imageFile: File
     var checkedArr: ArrayList<Boolean> = arrayListOf(false, false, false, false)
+    lateinit var clothesRGB:RGBColor
+    lateinit var texture:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,7 +92,6 @@ class AddClothesActivity : AppCompatActivity() {
     private fun getClothesAttribute() {
         val requestFile: RequestBody =
             imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-//                var requestFile = ProgressRequestBody(imageFile)
         var multipartBody = MultipartBody.Part.createFormData(
             "image",
             imageFile.name,
@@ -107,9 +109,11 @@ class AddClothesActivity : AppCompatActivity() {
                 Log.d("Retrofit", response.body().toString())
                 val clothesProp = response.body()
                 clothesProp?.let {
-                    var category_label = it.category
-                    categorySub_tv.text = category_label
-                    val hex = java.lang.String.format("#%02x%02x%02x",  it.R, it.G, it.B) // RGB -> #0000 형식으로 변환
+                    category_tv.text = it.category
+                    categorySub_tv.text = it.subCategory
+                    texture = it.texture
+                    clothesRGB = RGBColor(it.R, it.G, it.B)
+                    val hex = java.lang.String.format("#%02x%02x%02x",  clothesRGB.R, clothesRGB.G, clothesRGB.B) // RGB -> #0000 형식으로 변환
                     colorCircle.setBackgroundColor(Color.parseColor(hex));
                 }
                 Toast.makeText(
@@ -121,6 +125,13 @@ class AddClothesActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<ClothesProp>, t: Throwable) {
                 Log.d("Retrofit", "Error: " + t.message)
+                // TODO 디폴트값 설정
+                category_tv.text = "error"
+                categorySub_tv.text = "error"
+                texture = "none"
+                clothesRGB = RGBColor(0, 0, 0)
+                val hex = java.lang.String.format("#%02x%02x%02x",  clothesRGB.R, clothesRGB.G, clothesRGB.B) // RGB -> #0000 형식으로 변환
+                colorCircle.setBackgroundColor(Color.parseColor(hex));
             }
 
         })
@@ -220,15 +231,10 @@ class AddClothesActivity : AppCompatActivity() {
 
     private fun uploadImage(file: File) {
         var storageRef = Fbase.storage.reference
-        // Create a child reference
-        // imagesRef now points to "images"
         var filename = Timestamp.now().nanoseconds.toString() + "_" + file.name
         var imagesRef: StorageReference? =
             Fbase.uid?.let { storageRef.child(it).child(filename) }
 
-        // Child references can also take paths
-        // spaceRef now points to "images/space.jpg
-        // imagesRef still points to "images"
         val stream = FileInputStream(file)
 
         var uploadTask = imagesRef?.putStream(stream)
@@ -236,7 +242,6 @@ class AddClothesActivity : AppCompatActivity() {
             // Handle unsuccessful uploads
         }?.addOnSuccessListener {
             // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
-            // ...
             Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
 //            Log.d(TAG, "imagesRef: ${imagesRef}")
             val imgUrl =
@@ -245,9 +250,9 @@ class AddClothesActivity : AppCompatActivity() {
             insertClothes(
                 category_tv.text.toString(),
                 categorySub_tv.text.toString(),
-                RGBColor(255, 0, 0),
+                if(clothesRGB == null) RGBColor(0,0,0) else clothesRGB,
                 checkedArr,
-                imgUrl.toString()
+                imgUrl
             )
 
         }?.addOnProgressListener { taskSnapshot ->
@@ -271,12 +276,12 @@ class AddClothesActivity : AppCompatActivity() {
         checkedArr: ArrayList<Boolean>,
         imgUrl: String
     ) {
-
         // Create a new user with a first and last name
-        val clothes = hashMapOf(
+        val clothesObj = hashMapOf(
             "uid" to Fbase.uid,
             "category" to category,
             "subCategory" to subCategory,
+            "texture" to texture,
             "color.R" to color.R,
             "color.G" to color.G,
             "color.B" to color.B,
@@ -284,14 +289,13 @@ class AddClothesActivity : AppCompatActivity() {
             "time" to Timestamp(Date()),
             "imgUrl" to imgUrl
         )
-        Log.d(TAG, "insertClothest: ${clothes}")
+        Log.d(TAG, "insertClothest: ${clothesObj}")
 
         // Add a new document with a generated ID
         Fbase.db.collection("clothes")
-            .add(clothes)
+            .add(clothesObj)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-//                finish()
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
