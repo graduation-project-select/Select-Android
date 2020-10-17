@@ -42,11 +42,8 @@ class DetailCodiActivity : AppCompatActivity() {
 
     fun setAdapter() {
         var codiItemList = ArrayList<Clothes>()
-        codiItemList.add(Clothes("111", "top", "0"));
-        codiItemList.add(Clothes("111", "top", "0"));
-        codiItemList.add(Clothes("111", "top", "0"));
-        codiItemList.add(Clothes("111", "top", "0"));
-        codiItemList.add(Clothes("111", "top", "0"));
+        for(i in 0..5)
+            codiItemList.add(Clothes("111", "top", "0", "", arrayListOf(0,0,0), arrayListOf(true,true,true,true), "", ""));
 
         codiItem_rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         clothesItemAdapter = ClothesItemAdapter(codiItemList)

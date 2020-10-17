@@ -12,11 +12,12 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import com.konkuk.select.R
 import com.konkuk.select.activity.DetailClothesActivity
 import com.konkuk.select.adpater.ClosetCategoryListAdapter
@@ -24,10 +25,8 @@ import com.konkuk.select.adpater.ClosetClothesHorizontalAdapter
 import com.konkuk.select.adpater.ClosetClothesVerticalAdapter
 import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
-import com.konkuk.select.model.RGBColor
 import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.fragment_closet.*
-import kotlinx.android.synthetic.main.row_bottom_sheet_closet_list.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import org.json.JSONObject
 
@@ -234,24 +233,8 @@ class ClosetFragment(val ctx: Context) : Fragment() {
             .addOnSuccessListener { documents ->
                 clothesListVertical.clear()
                 for (document in documents) {
-                    val jsonObj = JSONObject(document.data)
-                    var arr = jsonObj["checkedArr"]
-                    Log.d("서영", arr.toString())
-                    clothesListVertical.add(
-                        Clothes(document.id, jsonObj["category"].toString(), jsonObj["imgUrl"].toString())
-//                        Clothes(
-//                            document.id,
-//                            jsonObj["category"].toString(),
-//                            jsonObj["subCategory"].toString(),
-//                            arrayListOf(),
-//                            RGBColor(
-//                                jsonObj["color.R"].toString().toInt(),
-//                                jsonObj["color.G"].toString().toInt(),
-//                                jsonObj["color.B"].toString().toInt()
-//                            ),
-//                            jsonObj["imgUrl"].toString()
-//                        )
-                    )
+                    val clothesObj = Fbase.getClothes(document)
+                    clothesListVertical.add(clothesObj)
                 }
                 closetClothesVerticalAdapter.notifyDataSetChanged()
             }

@@ -75,14 +75,8 @@ class ClothesCheckListActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
                 clothesListVertical.clear()
                 for (document in documents) {
-                    val jsonObj = JSONObject(document.data)
-                    clothesListVertical.add(
-                        Clothes(
-                            document.id,
-                            jsonObj["category"].toString(),
-                            jsonObj["imgUrl"].toString()
-                        )
-                    )
+                    val clothesObj = Fbase.getClothes(document)
+                    clothesListVertical.add(clothesObj)
                 }
                 closetClothesVerticalAdapter.notifyDataSetChanged()
             }

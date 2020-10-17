@@ -38,7 +38,7 @@ class ClosetClothesHorizontalItemAdapter(var ctx:Context, var clothesList:ArrayL
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
 //        holder.clothesImg.setImageResource(android.R.drawable.ic_menu_gallery)
         Glide.with(ctx)
-            .load(clothesList[position].img)
+            .load(clothesList[position].imgUri)
             .into(holder.clothesImg)
     }
 }

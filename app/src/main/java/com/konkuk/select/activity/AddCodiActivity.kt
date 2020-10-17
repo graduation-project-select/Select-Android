@@ -1,5 +1,6 @@
 package com.konkuk.select.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -23,17 +24,18 @@ import com.konkuk.select.adpater.CodiBottomClothesLinearAdapter
 import com.konkuk.select.adpater.CodiBottomRecommendationAdapter
 import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
+import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
 class AddCodiActivity : AppCompatActivity() {
-    private var db = FirebaseFirestore.getInstance()
     var categoryList: ArrayList<Category> = arrayListOf<Category>(
         Category(0, "상의", true),
         Category(1, "하의", false),
@@ -42,11 +44,14 @@ class AddCodiActivity : AppCompatActivity() {
         Category(4, "신발", false),
         Category(5, "악세서리", false)
     )
+    val categorySelectList: ArrayList<String> = arrayListOf("상의", "하의", "원피스", "아우터", "신발", "악세서리")
 
-    lateinit var codiBottomCategoryAdapter: CodiBottomCategoryAdapter
-    lateinit var codiBottomRecommendationAdapter: CodiBottomRecommendationAdapter
-    lateinit var codiBottomClothesLinearAdapter: CodiBottomClothesLinearAdapter
-    var clothesList: ArrayList<Clothes> = arrayListOf()
+    lateinit var codiBottomCategoryAdapter: CodiBottomCategoryAdapter   // 카테고리 목록
+    lateinit var codiBottomClothesLinearAdapter: CodiBottomClothesLinearAdapter // 옷 목록
+    lateinit var codiBottomRecommendationAdapter: CodiBottomRecommendationAdapter //추천 목록
+    var codiBottomClothesList: ArrayList<Clothes> = arrayListOf()
+
+    var codiClothesList:ArrayList<Clothes> = arrayListOf()
 
     var oldXvalue: Float = 0.0f
     var oldYvalue: Float = 0.0f
@@ -54,13 +59,12 @@ class AddCodiActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_codi)
-        setToolBar()
-        setAdapter()
+        settingToolBar()
+        settingAdapter()
         setClickListener()
-
     }
 
-    fun setToolBar() {
+    private fun settingToolBar() {
         toolbar.title_tv.text = getString(R.string.activity_title_addCodi)
         toolbar.left_iv.setImageResource(R.drawable.back)
         toolbar.right_iv.visibility = View.GONE
@@ -70,42 +74,52 @@ class AddCodiActivity : AppCompatActivity() {
         toolbar.left_iv.setOnClickListener {
             finish()
         }
+
         toolbar.right_tv.setOnClickListener {
             val imgByte = captureScreen(codi_canvas)
             var nextIntent = Intent(this, AddCodiRegisterActivity::class.java)
+            nextIntent.putExtra("codiClothesList", codiClothesList)
             nextIntent.putExtra("codiImage", imgByte)
             startActivity(nextIntent)
-            finish() // 뒤로가기 해야되니깐 finish 하면 안되는데 일단..!
+            finish() // TODO 뒤로가기 해야되니깐 finish 하면 안되는데 일단..!
         }
     }
 
-    fun setAdapter() {
+    private fun settingAdapter() {
         codiBottomCategoryAdapter = CodiBottomCategoryAdapter(categoryList)
-        codiBottomRecommendationAdapter =
-            CodiBottomRecommendationAdapter(arrayListOf("상의", "하의", "원피스", "아우터", "신발", "악세서리"))
-        codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(this, clothesList)
+        codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(this, codiBottomClothesList)
+        codiBottomRecommendationAdapter = CodiBottomRecommendationAdapter(categorySelectList)
         bottom_rv.adapter = codiBottomCategoryAdapter
         switchLayoutManager()
     }
 
-    //temp
-    fun initTempData(category: String) {
-//        clothesList.clear()
-//        for (i in 0..Random.nextInt(1, 5)) {
-//            clothesList.add(Clothes(i.toString(), category, "cloth_test"))
-//        }
-        val docRef = db.collection("clothes")
-            .whereEqualTo("category", category)   //TODO whereEqualTo("uid", auth.uid)
+    private fun switchLayoutManager() {
+        bottom_rv.layoutManager = when (bottom_rv.adapter) {
+            codiBottomCategoryAdapter -> {
+                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            }
+            codiBottomClothesLinearAdapter -> {
+                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            }
+            codiBottomRecommendationAdapter -> {
+                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            }
+            else -> {
+                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            }
+        }
+    }
+
+    private fun initClothesList(category: String) {
+        Fbase.db.collection("clothes")
+            .whereEqualTo("category", category)
+            .whereEqualTo("uid", Fbase.auth.uid)
             .get()
             .addOnSuccessListener { documents ->
-                clothesList.clear()
+                codiBottomClothesList.clear()
                 for (document in documents) {
-                    val jsonObj = JSONObject(document.data)
-                    clothesList.add(Clothes(document.id,category, jsonObj["imgUrl"].toString()))
-//                            clothesListVertical.add(Clothes(document.id, jsonObj["category"].toString(), jsonObj["subCategory"].toString(), jsonObj["checkedArray"], jsonObj["imgUrl"].toString()))
-//                            val id: String, val category: String, val subCategory: String, val checkedArr:ArrayList<Boolean>, val R:Int, val G:Int, val B:Int, val imgUrl:String)
-//                            Log.d("firebase", "${document.id} => ${document.data}")
-//                            Log.d("firebase", "${jsonObj["imgUrl"]}")
+                    val clothesObj = Fbase.getClothes(document)
+                    codiBottomClothesList.add(clothesObj)
                 }
                 codiBottomClothesLinearAdapter.notifyDataSetChanged()
             }
@@ -114,7 +128,7 @@ class AddCodiActivity : AppCompatActivity() {
             }
     }
 
-    fun setClickListener() {
+    private fun setClickListener() {
         codiBottomCategoryAdapter.itemClickListener =
             object : CodiBottomCategoryAdapter.OnItemClickListener {
                 override fun OnClickItem(
@@ -124,7 +138,7 @@ class AddCodiActivity : AppCompatActivity() {
                     position: Int
                 ) {
                     toolbar_codi_bottom.tv_titile.text = data.label
-                    initTempData(data.label) // clothesList 변경 (temp data)
+                    initClothesList(data.label) // clothesList 변경 (temp data)
                     bottom_rv.adapter = codiBottomClothesLinearAdapter
                     switchLayoutManager()
                 }
@@ -143,14 +157,20 @@ class AddCodiActivity : AppCompatActivity() {
                         "${data.id} ${data.category} click",
                         Toast.LENGTH_SHORT
                     ).show()
-                    var addImgView = ImageView(this@AddCodiActivity)
-                    addImgView.layoutParams = ConstraintLayout.LayoutParams(450, 450)
-//                    addImgView.setImageResource(R.drawable.cloth_test)
-                    Glide.with(this@AddCodiActivity)
-                        .load(data.img)
-                        .into(addImgView)
-                    codi_canvas.addView(addImgView)
-                    draganddrop(addImgView)
+
+                    if(codiClothesList.contains(data)){
+                        Toast.makeText(this@AddCodiActivity, "중복 불가", Toast.LENGTH_SHORT).show()
+                    }else{
+                        codiClothesList.add(data)
+                        var addImgView = ImageView(this@AddCodiActivity)
+                        addImgView.layoutParams = ConstraintLayout.LayoutParams(450, 450)
+
+                        Glide.with(this@AddCodiActivity)
+                            .load(data.imgUri)
+                            .into(addImgView)
+                        codi_canvas.addView(addImgView)
+                        dragAndDrop(addImgView)
+                    }
                 }
 
             }
@@ -169,24 +189,8 @@ class AddCodiActivity : AppCompatActivity() {
 
     }
 
-    fun switchLayoutManager() {
-        bottom_rv.layoutManager = when (bottom_rv.adapter) {
-            codiBottomCategoryAdapter -> {
-                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-            }
-            codiBottomRecommendationAdapter -> {
-                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-            }
-            codiBottomClothesLinearAdapter -> {
-                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-            }
-            else -> {
-                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-            }
-        }
-    }
-
-    fun draganddrop(iv: ImageView) {
+    @SuppressLint("ClickableViewAccessibility")
+    private fun dragAndDrop(iv: ImageView) {
         iv.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 val width = (v?.parent as ViewGroup).width - v.width
@@ -237,7 +241,7 @@ class AddCodiActivity : AppCompatActivity() {
         })
     }
 
-    fun captureScreen(v: View) : ByteArray {
+    private fun captureScreen(v: View): ByteArray {
         val bm = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bm)
         val bgDrawable: Drawable = v.getBackground()

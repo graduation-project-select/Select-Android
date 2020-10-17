@@ -1,6 +1,5 @@
 package com.konkuk.select.activity
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
@@ -9,44 +8,37 @@ import android.widget.CheckBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagCheckboxListAdapter
+import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.CodiTag
+import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.activity_add_codi_register.*
-import kotlinx.android.synthetic.main.activity_add_codi_register.toolbar
 import kotlinx.android.synthetic.main.toolbar.view.*
-import java.io.File
-import java.io.FileInputStream
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class AddCodiRegisterActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
-    private var db = FirebaseFirestore.getInstance()
-    private var storage = Firebase.storage
     private val TAG = "DragClickListener"
 
     lateinit var codiTagCheckboxListAdapter: CodiTagCheckboxListAdapter
     var codiTagList = ArrayList<CodiTag>()
-    var checkTagArray = mutableMapOf<String, Boolean>()
-    lateinit var codiImgDecoding:Bitmap
+
+    var checkTagArray = arrayListOf<String>()
+    lateinit var imgUri:String
+
+    private lateinit var codiImgByte: ByteArray
+    private var codiClothesList: ArrayList<Clothes> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_codi_register)
-        setToolBar()
-        setCodiImage()
+        getDataFromIntent()
+        settingToolBar()
         settingAdapter()
-
     }
 
-    fun setToolBar() {
+    private fun settingToolBar() {
         toolbar.title_tv.text = getString(R.string.activity_title_addCodiRegister)
         toolbar.left_iv.setImageResource(R.drawable.back)
         toolbar.right_iv.visibility = View.GONE
@@ -57,19 +49,29 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             finish()
         }
         toolbar.right_tv.setOnClickListener {
-            //uploadImage()
+            uploadImage(codiImgByte)
             finish()
             // 방금 올린 코디 상세 페이지로 이동
         }
     }
 
-    fun setCodiImage() {
-        val codiImgByte = intent.getByteArrayExtra("codiImage")
-        codiImgDecoding = BitmapFactory.decodeByteArray(codiImgByte, 0, codiImgByte!!.size)
+    private fun getDataFromIntent(){
+        intent.getByteArrayExtra("codiImage")?.let {
+            codiImgByte =it
+            settingCodiImage(codiImgByte)
+        }
+        (intent.getSerializableExtra("codiClothesList") as ArrayList<Clothes>).let{
+            codiClothesList.clear()
+            codiClothesList.addAll(it)
+        }
+    }
+
+    private fun settingCodiImage(codiImgByte:ByteArray) {
+        val codiImgDecoding = BitmapFactory.decodeByteArray(codiImgByte, 0, codiImgByte!!.size)
         codiDetailImg.setImageBitmap(codiImgDecoding)
     }
 
-    fun settingAdapter() {
+    private fun settingAdapter() {
         codiTagList.add(CodiTag("111", "#데이트룩"))
         codiTagList.add(CodiTag("222", "#오피스룩"))
         codiTagList.add(CodiTag("333", "#캠퍼스룩"))
@@ -94,80 +96,68 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             ) {
                 val isChecked = (view as CheckBox).isChecked
                 if(isChecked) {
-                    checkTagArray.put(data.tag, isChecked)
+                    if(!checkTagArray.contains(data.tag)) checkTagArray.add(data.tag)
                 } else {
-                    checkTagArray.remove(data.tag)
+                    if(checkTagArray.contains(data.tag)) checkTagArray.remove(data.tag)
                 }
+                Log.d(TAG, "checkTagArray: $checkTagArray")
             }
         }
     }
 
-    fun uploadImage(file: File){
-        var codiTag:String = ""
-        var codiImg = codiDetailImg
-        var openState = open_switch.isChecked
+    private fun uploadImage(codiImgByte: ByteArray){
 
-        for(checkStatus in checkTagArray.keys) {
-            codiTag = codiTag + " " +checkStatus
-        }
-
-        var storageRef = storage.reference
-        // Create a child reference
-        // imagesRef now points to "images"
+        var storageRef = Fbase.storage.reference
+        var filename = "codi_"+Timestamp.now().nanoseconds.toString()
         var imagesRef: StorageReference? =
-            auth.uid?.let { storageRef.child(it).child(Timestamp.now().nanoseconds.toString()+"_"+file.name) }
+            Fbase.auth.uid?.let { storageRef.child(it).child("codi").child(filename) }
 
-        // Child references can also take paths
-        // spaceRef now points to "images/space.jpg
-        // imagesRef still points to "images"
-        val stream = FileInputStream(file)
-
-        var uploadTask = imagesRef?.putStream(stream)
-        uploadTask?.addOnFailureListener {
-            // Handle unsuccessful uploads
-        }?.addOnSuccessListener {
-            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
-            // ...
+        var uploadTask = imagesRef?.putBytes(codiImgByte)
+        uploadTask?.addOnSuccessListener {
             Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
-            val imgUrl = it.uploadSessionUri
-
-            insertCodi(codiTag, imgUrl.toString(), openState)
-
+//            val imgUrl = it.uploadSessionUri
+            imgUri = "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/${Fbase.uid}%2Fcodi%2F${filename}?alt=media"
+            val codiObj = CodiRequest(
+                tag = checkTagArray,
+                items = codiClothesList,
+                public = open_switch.isChecked,
+                date = Timestamp.now(),
+                imgUri = imgUri,
+                uid = Fbase.auth.uid.toString()
+            )
+            insetCodi(codiObj)
         }?.addOnProgressListener { taskSnapshot ->
             val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
-            println("Upload is $progress% done")
+            Log.d(TAG, "Upload is $progress% done")
         }?.addOnPausedListener {
-            println("Upload is paused")
+            Log.d(TAG, "Upload is paused")
         }?.addOnFailureListener {
-            // Handle unsuccessful uploads
+            Log.d(TAG, "Upload is failed")
         }?.addOnSuccessListener {
             // Handle successful uploads on complete
-            // ...
         }
 
     }
 
-    fun insertCodi(tag:String, imgUrl:String, open:Boolean) {
-        // Create a new user with a first and last name
-        val codi = hashMapOf(
-            "uid" to auth.uid,
-            "tag" to tag,
-            "time" to Timestamp(Date()),
-            "imgUrl" to imgUrl
-        )
-        Log.d(TAG, "insertClothest: ${codi}")
+    data class CodiRequest(
+        val tag:ArrayList<String>,
+        val items:ArrayList<Clothes>,
+        val public:Boolean,
+        val date:Timestamp,
+        val imgUri:String,
+        val uid: String
+    )
 
+    private fun insetCodi(codiRequest:CodiRequest){
         // Add a new document with a generated ID
-        db.collection("clothes")
-            .add(codi)
+        Fbase.db.collection("codi")
+            .add(codiRequest)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                finish()
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
             }
-
-
     }
+
 }

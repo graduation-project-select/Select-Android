@@ -68,8 +68,8 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
             .addOnSuccessListener { documents ->
                 closetClothesHorizontalItemAdapterList[index].clear()
                 for (document in documents) {
-                    val jsonObj = JSONObject(document.data)
-                    closetClothesHorizontalItemAdapterList[index].add(Clothes(document.id, category, jsonObj["imgUrl"].toString()))
+                    val clothesObj = Fbase.getClothes(document)
+                    closetClothesHorizontalItemAdapterList[index].add(clothesObj)
                 }
                 closetClothesHorizontalItemAdapter[index].notifyDataSetChanged()
             }

@@ -1,4 +1,14 @@
 package com.konkuk.select.model
 
-//data class Clothes(val id: String, val category: String, val subCategory: String, val checkedArr:ArrayList<Boolean>, val color:RGBColor, val imgUrl:String)
-data class Clothes(val id: String, val category: String, val img:String)
+import java.io.Serializable
+
+data class Clothes(
+    val id: String,
+    val category: String,
+    val subCategory: String,
+    val texture:String,
+    val color: ArrayList<Int>,
+    val season:ArrayList<Boolean>,
+    val imgUri:String,
+    val uid: String
+):Serializable
