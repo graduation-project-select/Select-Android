@@ -196,7 +196,6 @@ class AddClothesActivity : AppCompatActivity(),
 
             var clothesObj = ClothesRequest(category, subCategory, texture, clothesRGB, season, imgUri, Fbase.auth.uid.toString())
             insertClothes(clothesObj)
-
         }?.addOnProgressListener { taskSnapshot ->
             val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
             println("Upload is $progress% done")
@@ -210,6 +209,8 @@ class AddClothesActivity : AppCompatActivity(),
     }
 
     private fun insertClothes(clothes: ClothesRequest) {
+        Log.d("서영", "옷 등록함수")
+
         Log.d(TAG, "insertClothest: ${clothes}")
 
         // Add a new document with a generated ID
