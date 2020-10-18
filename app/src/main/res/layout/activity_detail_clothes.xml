@@ -26,24 +26,35 @@
             android:id="@+id/category_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:background="@drawable/border_more_round"
             android:backgroundTint="@color/colorPrimary"
             android:paddingHorizontal="18dp"
             android:paddingVertical="2dp"
-            android:text="상의"
+            android:text="하의"
             android:textColor="@color/colorBackGround"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_token"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text=">"
+            app:layout_constraintBottom_toBottomOf="@+id/category_tv"
+            app:layout_constraintStart_toEndOf="@+id/category_tv"
+            app:layout_constraintTop_toTopOf="@+id/category_tv" />
 
         <TextView
             android:id="@+id/categorySub_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="> 반팔"
-            app:layout_constraintBottom_toBottomOf="@+id/category_tv"
-            app:layout_constraintStart_toEndOf="@+id/category_tv"
-            app:layout_constraintTop_toTopOf="@+id/category_tv" />
+            android:text="긴바지"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_token"
+            app:layout_constraintStart_toEndOf="@+id/tv_token"
+            app:layout_constraintTop_toTopOf="@+id/tv_token" />
 
         <TextView
             android:id="@+id/colorTag_tv"

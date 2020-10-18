@@ -72,12 +72,12 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     }
 
     private fun settingAdapter() {
-        codiTagList.add(CodiTag("111", "#데이트룩"))
-        codiTagList.add(CodiTag("222", "#오피스룩"))
-        codiTagList.add(CodiTag("333", "#캠퍼스룩"))
-        codiTagList.add(CodiTag("444", "#헬스장갈때"))
-        codiTagList.add(CodiTag("555", "#파티룩"))
-        codiTagList.add(CodiTag("777", "#바람핀전남친결혼식갈때"))
+        codiTagList.add(CodiTag("111", "데이트룩"))
+        codiTagList.add(CodiTag("222", "오피스룩"))
+        codiTagList.add(CodiTag("333", "캠퍼스룩"))
+        codiTagList.add(CodiTag("444", "헬스장갈때"))
+        codiTagList.add(CodiTag("555", "파티룩"))
+        codiTagList.add(CodiTag("777", "바람핀전남친결혼식갈때"))
 
         codiTag_rv.layoutManager = GridLayoutManager(this, 2)
         codiTagCheckboxListAdapter = CodiTagCheckboxListAdapter(this, codiTagList)

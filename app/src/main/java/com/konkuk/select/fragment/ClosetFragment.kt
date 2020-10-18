@@ -194,7 +194,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
                     Toast.makeText(ctx, "${data.id}, ${data.category} click", Toast.LENGTH_SHORT)
                         .show()
                     var intent = Intent(ctx, DetailClothesActivity::class.java)
-                    intent.putExtra("clothesId", data.id)
+                    intent.putExtra("clothesObj", data)
                     startActivity(intent)
                 }
             }

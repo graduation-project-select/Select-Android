@@ -22,8 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="#캠퍼스룩">
-
+        tools:text="캠퍼스룩">
     </CheckBox>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

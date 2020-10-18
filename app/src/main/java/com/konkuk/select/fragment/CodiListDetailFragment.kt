@@ -62,12 +62,12 @@ class CodiListDetailFragment(val ctx: Context) : Fragment() {
 
     fun setAdapter() {
         var codiList = ArrayList<Codi>()
-        codiList.add(Codi("111", "#데이트룩", "0", true))
-        codiList.add(Codi("222", "#데이트룩", "0", true))
-        codiList.add(Codi("333", "#데이트룩", "0", true))
-        codiList.add(Codi("444", "#데이트룩", "0", true))
-        codiList.add(Codi("555", "#데이트룩", "0", true))
-        codiList.add(Codi("666", "#데이트룩", "0", true))
+        codiList.add(Codi("111", "데이트룩", "0", true))
+        codiList.add(Codi("222", "데이트룩", "0", true))
+        codiList.add(Codi("333", "데이트룩", "0", true))
+        codiList.add(Codi("444", "데이트룩", "0", true))
+        codiList.add(Codi("555", "데이트룩", "0", true))
+        codiList.add(Codi("666", "데이트룩", "0", true))
 
         codiList_rv.layoutManager = GridLayoutManager(ctx, 2)
         codiListAdapter = CodiListAdapter(codiList)
