@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +21,7 @@ class CodiBottomCategoryAdapter(var categoryList: ArrayList<String>): RecyclerVi
 
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var tv_label: TextView = itemView.findViewById(R.id.tv_label)
+
         init {
             itemView.setOnClickListener {
                 itemClickListener?.OnClickItem(this, it, categoryList[adapterPosition], adapterPosition)
@@ -37,7 +39,6 @@ class CodiBottomCategoryAdapter(var categoryList: ArrayList<String>): RecyclerVi
 
     override fun onBindViewHolder(holder: CodiBottomCategoryAdapter.ItemHolder, position: Int) {
         holder.tv_label.text = categoryList[position]
-
     }
 
     override fun getItemCount(): Int {

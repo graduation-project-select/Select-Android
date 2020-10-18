@@ -43,7 +43,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @GlideModule
-class AddClothesActivity : AppCompatActivity() {
+class AddClothesActivity : AppCompatActivity(),
+    BottomSheetSingleListDialog.onChangeCategory {
     private val TAG = "firebase"
     private lateinit var imageFile: File
 
@@ -176,38 +177,10 @@ class AddClothesActivity : AppCompatActivity() {
         category_tv.setOnClickListener {
             val bottomSheetFragment = BottomSheetSingleListDialog(this)
             supportFragmentManager?.let {
-//                bottomSheetFragment.onActivityResult(bottomSheetFragment.targetRequestCode, BOTTOMSHEET_CATEGORYLIST_REQUEST_CODE, intent)
                 bottomSheetFragment.show(it, bottomSheetFragment.getTag())
             }
         }
     }
-
-//    fun passClosetData(label: String): Intent {
-//        val intent = Intent()
-//        intent.putExtra(CATEGORY_LABEL_MESSAGE, label)
-//        return intent
-//    }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode !== Activity.RESULT_OK) {
-            return
-        }
-//        if (requestCode === BOTTOMSHEET_CATEGORYLIST_REQUEST_CODE) {
-//            if (data != null) {
-//
-////                category =  bottomSheetFragment.selectedLabel
-////                category_tv.text = category
-//                data.getStringExtra(CATEGORY_LABEL_MESSAGE)?.let {
-//                    category = it
-//                    initClothesPropView()
-//                }
-//            }
-//
-//        }
-    }
-
 
     private fun uploadImage(file: File) {
         var storageRef = Fbase.storage.reference
@@ -251,6 +224,16 @@ class AddClothesActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
             }
+    }
+
+    override fun getSelectedCategory(data: String) {
+        category = data
+
+        subCategory = data
+        texture = data
+        clothesRGB = arrayListOf(0,0,0)
+
+        initClothesPropView()
     }
 
 }

@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.fragment_bottom_sheet_closetlist_dialog.*
 
 class BottomSheetSingleListDialog(var ctx: Context) : BottomSheetDialogFragment() {
 
-    var selectedLabel = ""
     lateinit var codiBottomCategoryAdapter: CodiBottomCategoryAdapter   // 카테고리 목록
 
     override fun onCreateView(
@@ -40,13 +39,15 @@ class BottomSheetSingleListDialog(var ctx: Context) : BottomSheetDialogFragment(
                     data: String,
                     position: Int
                 ) {
-                    Toast.makeText(ctx, data, Toast.LENGTH_SHORT).show()
-                    // TODO activity로 값 전달 -> 다시
-                    selectedLabel = data
+                    (activity as onChangeCategory).getSelectedCategory(data)
                     dismiss()
                 }
             }
 
+    }
+
+    interface onChangeCategory {
+        fun getSelectedCategory(selectedLabel:String)
     }
 
 }
