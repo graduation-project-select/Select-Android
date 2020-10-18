@@ -9,13 +9,14 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.konkuk.select.R
+import com.konkuk.select.adpater.CategoryPickerAdapter
 import com.konkuk.select.adpater.CodiBottomCategoryAdapter
 import com.konkuk.select.utils.StaticValues
 import kotlinx.android.synthetic.main.fragment_bottom_sheet_closetlist_dialog.*
 
 class BottomSheetSingleListDialog(var ctx: Context) : BottomSheetDialogFragment() {
 
-    lateinit var codiBottomCategoryAdapter: CodiBottomCategoryAdapter   // 카테고리 목록
+    lateinit var codiBottomCategoryAdapter: CategoryPickerAdapter   // 카테고리 목록
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,19 +28,16 @@ class BottomSheetSingleListDialog(var ctx: Context) : BottomSheetDialogFragment(
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         tv_title.text = "카테고리 선택"
+
         rv_closet_list.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
-        codiBottomCategoryAdapter = CodiBottomCategoryAdapter(StaticValues.categoryList)
+        codiBottomCategoryAdapter = CategoryPickerAdapter(ctx, StaticValues.categoryList)
         rv_closet_list.adapter = codiBottomCategoryAdapter
 
         codiBottomCategoryAdapter.itemClickListener =
-            object : CodiBottomCategoryAdapter.OnItemClickListener {
-                override fun OnClickItem(
-                    holder: CodiBottomCategoryAdapter.ItemHolder,
-                    view: View,
-                    data: String,
-                    position: Int
-                ) {
-                    (activity as onChangeCategory).getSelectedCategory(data)
+            object : CategoryPickerAdapter.OnItemClickListener {
+
+                override fun OnClickItem(category: String, subCategory: String) {
+                    (activity as onChangeCategory).getSelectedCategory(category, subCategory)
                     dismiss()
                 }
             }
@@ -47,7 +45,7 @@ class BottomSheetSingleListDialog(var ctx: Context) : BottomSheetDialogFragment(
     }
 
     interface onChangeCategory {
-        fun getSelectedCategory(selectedLabel:String)
+        fun getSelectedCategory(category:String, subCategory:String)
     }
 
 }

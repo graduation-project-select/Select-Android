@@ -13,22 +13,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ClothesCheckListActivity"></activity>
+        <activity android:name=".activity.ClothesCheckListActivity"/>
         <activity android:name=".activity.AddClosetActivity">
         </activity>
         <activity android:name=".activity.AddClothesActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".activity.AddCodiRegisterActivity" />
         <activity android:name=".activity.AddCodiActivity" />
         <activity android:name=".activity.DetailClothesActivity" />
         <activity android:name=".activity.DetailCodiActivity" />
         <activity android:name=".activity.LoginActivty">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".activity.MainActivity" />
 

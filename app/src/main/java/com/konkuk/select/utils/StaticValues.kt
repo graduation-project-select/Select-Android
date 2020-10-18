@@ -3,6 +3,7 @@ package com.konkuk.select.utils
 import com.konkuk.select.model.Category
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 object StaticValues {
     val categoryList:ArrayList<String> = arrayListOf("top", "bottom", "dress", "outer", "shoes", "accessory")
@@ -14,5 +15,14 @@ object StaticValues {
         Category(3, "outer", false),
         Category(4, "shoes", false),
         Category(5, "accessory", false)
+    )
+
+    val subCategoryList:HashMap<String, ArrayList<String>> = hashMapOf(
+        "top" to arrayListOf("blouse", "longTshirt", "shortTshirt", "sleeveless"),
+        "bottom" to arrayListOf("longPants", "shortPants", "skirt"),
+        "dress" to arrayListOf("dress"),
+        "outer" to arrayListOf("cardigan&vest", "coat", "jacket", "jumper"),
+        "shoes" to arrayListOf("shoes"),
+        "accessory" to arrayListOf("accessory")
     )
 }

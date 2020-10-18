@@ -55,9 +55,6 @@ class AddClothesActivity : AppCompatActivity(),
     lateinit var texture:String
     lateinit var imgUri:String
 
-    val BOTTOMSHEET_CATEGORYLIST_REQUEST_CODE = 1
-    val CATEGORY_LABEL_MESSAGE = "categoryLabel"
-
 
     data class ClothesRequest(
         val category: String,
@@ -73,7 +70,7 @@ class AddClothesActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_clothes)
         settingToolBar()
-//        getImgData()
+        getImgData()
         settingOnClickListener()
     }
 
@@ -206,7 +203,7 @@ class AddClothesActivity : AppCompatActivity(),
         }?.addOnPausedListener {
             println("Upload is paused")
         }?.addOnFailureListener {
-            // Handle unsuccessful uploads
+            Log.d(TAG, "firebaseError: ${it.message}")
         }?.addOnSuccessListener {
             // Handle successful uploads on complete
         }
@@ -226,11 +223,10 @@ class AddClothesActivity : AppCompatActivity(),
             }
     }
 
-    override fun getSelectedCategory(data: String) {
-        category = data
-
-        subCategory = data
-        texture = data
+    override fun getSelectedCategory(_category: String, _subCategory: String) {
+        category = _category
+        subCategory = _subCategory
+        texture = "none"
         clothesRGB = arrayListOf(0,0,0)
 
         initClothesPropView()
