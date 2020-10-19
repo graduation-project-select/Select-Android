@@ -1,16 +1,18 @@
 package com.konkuk.select.adpater
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
 
-class CodiItemAdapter(val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiItemAdapter.ItemHolder>(){
-    var itemClickListener: CodiItemAdapter.OnItemClickListener?=null
+class CodiItemAdapter(val ctx:Context,val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiItemAdapter.ItemHolder>(){
+    var itemClickListener: OnItemClickListener?=null
 
     interface OnItemClickListener {
         fun OnClickItem(holder: CodiItemAdapter.ItemHolder, view: View, data: Codi, position: Int)
@@ -39,6 +41,8 @@ class CodiItemAdapter(val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiItem
     }
 
     override fun onBindViewHolder(holder: CodiItemAdapter.ItemHolder, position: Int) {
-        holder.codiImg.setImageResource(R.drawable.codi_test)
+        Glide.with(ctx)
+            .load(item[position].imgUri)
+            .into(holder.codiImg)
     }
 }

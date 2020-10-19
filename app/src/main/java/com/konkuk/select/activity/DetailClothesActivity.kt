@@ -15,6 +15,7 @@ import com.konkuk.select.adpater.ClothesItemAdapter
 import com.konkuk.select.adpater.CodiItemAdapter
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
+import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.activity_add_clothes.*
 import kotlinx.android.synthetic.main.activity_detail_clothes.*
 import kotlinx.android.synthetic.main.activity_detail_clothes.categorySub_tv
@@ -25,9 +26,10 @@ import kotlinx.android.synthetic.main.toolbar.view.*
 
 // TODO 옷 편집, 삭제
 class DetailClothesActivity : AppCompatActivity() {
-    lateinit var codiItemAdapter: CodiItemAdapter
 
     lateinit var clothesObj: Clothes
+    lateinit var codiItemAdapter: CodiItemAdapter
+    var codiList:ArrayList<Codi> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +38,7 @@ class DetailClothesActivity : AppCompatActivity() {
         settingAdapter()
         settingClickListener()
         getDataFromIntent()
+        getCodiList()
     }
 
     private fun settingToolBar() {
@@ -51,15 +54,8 @@ class DetailClothesActivity : AppCompatActivity() {
     }
 
     private fun settingAdapter() {
-        var codiList = ArrayList<Codi>()
-//        codiList.add(Codi("111", "#데이트룩", "0", true))
-//        codiList.add(Codi("111", "#데이트룩", "0", true))
-//        codiList.add(Codi("111", "#데이트룩", "0", true))
-//        codiList.add(Codi("111", "#데이트룩", "0", true))
-//        codiList.add(Codi("111", "#데이트룩", "0", true))
-
         codi_rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        codiItemAdapter = CodiItemAdapter(codiList)
+        codiItemAdapter = CodiItemAdapter(this, codiList)
         codi_rv.adapter = codiItemAdapter
     }
 
@@ -119,4 +115,18 @@ class DetailClothesActivity : AppCompatActivity() {
             .into(clothDetailImg)
     }
 
+
+    private fun getCodiList(){
+        Fbase.CODI_REF
+            .whereEqualTo("uid", Fbase.uid)
+            .whereArrayContains("itemsIds", clothesObj.id)
+            .get().addOnSuccessListener {documents ->
+                codiList.clear()
+                for(document in documents){
+                    val codiObj = Fbase.getCodi(document)
+                    codiList.add(codiObj)
+                }
+                codiItemAdapter.notifyDataSetChanged()
+            }
+    }
 }

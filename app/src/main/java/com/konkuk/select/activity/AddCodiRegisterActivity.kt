@@ -30,7 +30,9 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     lateinit var imgUri:String
 
     private lateinit var codiImgByte: ByteArray
-    private var codiClothesList: ArrayList<Clothes> = arrayListOf()
+    private var codiClothesList = ArrayList<Clothes>()
+    private var codiClothesIdList = ArrayList<String>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +68,11 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         (intent.getSerializableExtra("codiClothesList") as ArrayList<Clothes>).let{
             codiClothesList.clear()
             codiClothesList.addAll(it)
+
+            codiClothesIdList.clear()
+            for(codi in it){
+                codiClothesIdList.add(codi.id)
+            }
         }
     }
 
@@ -127,6 +134,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             val codiObj = CodiRequest(
                 tags = checkTagRefArray,
                 items = codiClothesList,
+                itemsIds = codiClothesIdList,
                 public = open_switch.isChecked,
                 date = Timestamp.now(),
                 imgUri = imgUri,
@@ -149,6 +157,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     data class CodiRequest(
         val tags:ArrayList<DocumentReference>,
         val items:ArrayList<Clothes>,
+        val itemsIds:ArrayList<String>,
         val public:Boolean,
         val date:Timestamp,
         val imgUri:String,
