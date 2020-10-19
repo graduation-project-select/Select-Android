@@ -44,7 +44,7 @@ class AddCodiActivity : AppCompatActivity() {
     lateinit var codiBottomRecommendationAdapter: CodiBottomRecommendationAdapter //추천 목록
     var codiBottomClothesList: ArrayList<Clothes> = arrayListOf()
 
-    var codiClothesList:ArrayList<Clothes> = arrayListOf()
+    var codiClothesList:ArrayList<Clothes> = arrayListOf()  // 코디에 사용된 옷들
 
     var oldXvalue: Float = 0.0f
     var oldYvalue: Float = 0.0f

@@ -8,6 +8,8 @@ import android.widget.CheckBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.storage.StorageReference
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagCheckboxListAdapter
@@ -24,7 +26,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     lateinit var codiTagCheckboxListAdapter: CodiTagCheckboxListAdapter
     var codiTagList = ArrayList<CodiTag>()
 
-    var checkTagArray = arrayListOf<String>()
+    var checkTagRefArray = arrayListOf<DocumentReference>()
     lateinit var imgUri:String
 
     private lateinit var codiImgByte: ByteArray
@@ -35,6 +37,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_codi_register)
         getDataFromIntent()
         settingToolBar()
+        getTagList()
         settingAdapter()
     }
 
@@ -72,13 +75,6 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     }
 
     private fun settingAdapter() {
-        codiTagList.add(CodiTag("111", "데이트룩"))
-        codiTagList.add(CodiTag("222", "오피스룩"))
-        codiTagList.add(CodiTag("333", "캠퍼스룩"))
-        codiTagList.add(CodiTag("444", "헬스장갈때"))
-        codiTagList.add(CodiTag("555", "파티룩"))
-        codiTagList.add(CodiTag("777", "바람핀전남친결혼식갈때"))
-
         codiTag_rv.layoutManager = GridLayoutManager(this, 2)
         codiTagCheckboxListAdapter = CodiTagCheckboxListAdapter(this, codiTagList)
         codiTag_rv.adapter = codiTagCheckboxListAdapter
@@ -96,14 +92,25 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             ) {
                 val isChecked = (view as CheckBox).isChecked
                 if(isChecked) {
-                    if(!checkTagArray.contains(data.tag)) checkTagArray.add(data.tag)
+                    if(!checkTagRefArray.contains(data.ref)) checkTagRefArray.add(data.ref)
                 } else {
-                    if(checkTagArray.contains(data.tag)) checkTagArray.remove(data.tag)
+                    if(checkTagRefArray.contains(data.ref)) checkTagRefArray.remove(data.ref)
                 }
-                Log.d(TAG, "checkTagArray: $checkTagArray")
+                Log.d(TAG, "checkTagArray: $checkTagRefArray")
             }
         }
     }
+
+    private fun getTagList(){
+        Fbase.CODITAG_REF.get().addOnSuccessListener {
+            codiTagList.clear()
+            for(document in it.documents){
+                codiTagList.add(CodiTag(document.reference, document.get("name").toString()))
+            }
+            codiTagCheckboxListAdapter.notifyDataSetChanged()
+        }
+    }
+
 
     private fun uploadImage(codiImgByte: ByteArray){
 
@@ -118,7 +125,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
 //            val imgUrl = it.uploadSessionUri
             imgUri = "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/${Fbase.uid}%2Fcodi%2F${filename}?alt=media"
             val codiObj = CodiRequest(
-                tag = checkTagArray,
+                tags = checkTagRefArray,
                 items = codiClothesList,
                 public = open_switch.isChecked,
                 date = Timestamp.now(),
@@ -140,7 +147,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     }
 
     data class CodiRequest(
-        val tag:ArrayList<String>,
+        val tags:ArrayList<DocumentReference>,
         val items:ArrayList<Clothes>,
         val public:Boolean,
         val date:Timestamp,
@@ -149,15 +156,24 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     )
 
     private fun insetCodi(codiRequest:CodiRequest){
-        // Add a new document with a generated ID
-        Fbase.db.collection("codi")
-            .add(codiRequest)
+        Fbase.CODI_REF.add(codiRequest)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                updateUserCodiTagList(codiRequest.tags)
+
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
             }
+    }
+
+    private fun updateUserCodiTagList(codiTagList:ArrayList<DocumentReference>) {
+        Fbase.uid?.let {
+            for(tag in codiTagList){
+                Fbase.USERS_REF.document(it)
+                    .update("codiTagList", FieldValue.arrayUnion(tag))
+            }
+        }
     }
 
 }

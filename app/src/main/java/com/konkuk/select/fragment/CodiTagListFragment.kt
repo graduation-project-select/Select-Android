@@ -53,9 +53,9 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
 
     fun setAdapter() {
         var codiTagList = ArrayList<CodiTag>()
-        codiTagList.add(CodiTag("111", "#데이트룩"))
-        codiTagList.add(CodiTag("222", "#오피스룩"))
-        codiTagList.add(CodiTag("333", "#캠퍼스룩"))
+//        codiTagList.add(CodiTag("111", "#데이트룩"))
+//        codiTagList.add(CodiTag("222", "#오피스룩"))
+//        codiTagList.add(CodiTag("333", "#캠퍼스룩"))
 
         codiTag_rv.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
         codiTagAdapter = CodiTagListAdapter(codiTagList)
@@ -70,7 +70,7 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
                 data: CodiTag,
                 position: Int
             ) {
-                Toast.makeText(ctx, "${data.id}, ${data.tag} click", Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, "${data.ref}, ${data.tag} click", Toast.LENGTH_SHORT).show()
                 val t: FragmentTransaction = fragmentManager!!.beginTransaction()
                 val mFrag: Fragment = CodiListDetailFragment(ctx)
                 val bundle:Bundle = Bundle()

@@ -1,3 +1,5 @@
 package com.konkuk.select.model
 
-data class CodiTag(val id:String, val tag:String)
+import com.google.firebase.firestore.DocumentReference
+
+data class CodiTag(val ref:DocumentReference, val tag:String)

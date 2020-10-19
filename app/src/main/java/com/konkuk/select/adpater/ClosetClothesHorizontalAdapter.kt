@@ -27,18 +27,18 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
         var underLine:View = itemView.findViewById(R.id.underLine)
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RVHolder {
+        initAdapter()
+        var v = LayoutInflater.from(parent.context).inflate(R.layout.closet_clothes_rv_item_horizontal, parent, false)
+        return RVHolder(v)
+    }
+
     private fun initAdapter(){
         for((index, c) in categoryList.withIndex()){
             closetClothesHorizontalItemAdapterList.add(arrayListOf())
             closetClothesHorizontalItemAdapter.add(ClosetClothesHorizontalItemAdapter(ctx, closetClothesHorizontalItemAdapterList[index]))
             fetchClothesData(c.label, index)
         }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RVHolder {
-        initAdapter()
-        var v = LayoutInflater.from(parent.context).inflate(R.layout.closet_clothes_rv_item_horizontal, parent, false)
-        return RVHolder(v)
     }
 
     override fun onBindViewHolder(holder: RVHolder, position: Int) {
