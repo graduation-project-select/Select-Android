@@ -12,7 +12,7 @@ import com.konkuk.select.model.CodiTag
 
 class CodiTagListAdapter(val item: ArrayList<CodiTag>) : RecyclerView.Adapter<CodiTagListAdapter.ItemHolder>() {
 
-    var itemClickListener: CodiTagListAdapter.OnItemClickListener ?= null
+    var itemClickListener: OnItemClickListener ?= null
 
     interface OnItemClickListener {
         fun OnClickItem(holder: CodiTagListAdapter.ItemHolder, view: View, data: CodiTag, position: Int)

@@ -12,22 +12,22 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Query
 import com.konkuk.select.R
 import com.konkuk.select.activity.DetailCodiActivity
 import com.konkuk.select.adpater.CodiListAdapter
 import com.konkuk.select.model.Codi
+import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.fragment_codi.*
 import kotlinx.android.synthetic.main.fragment_codi_list_detail_flagment.*
 import kotlinx.android.synthetic.main.fragment_codi_tag_list.toolbar
 import kotlinx.android.synthetic.main.toolbar.view.*
 
 class CodiListDetailFragment(val ctx: Context) : Fragment() {
+
     lateinit var codiListAdapter: CodiListAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    var codiList:ArrayList<Codi> = arrayListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,16 +38,10 @@ class CodiListDetailFragment(val ctx: Context) : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        val bundle: Bundle? = arguments
-
-        if(bundle != null) {
-            tv_codi_tag.text = bundle.getString("tag")
-        }
-
         setToolBar()
         setAdapter()
         setClickListener()
+        getDataFromBundle()
     }
 
     fun setToolBar() {
@@ -61,16 +55,8 @@ class CodiListDetailFragment(val ctx: Context) : Fragment() {
     }
 
     fun setAdapter() {
-        var codiList = ArrayList<Codi>()
-//        codiList.add(Codi("111", "데이트룩", "0", true))
-//        codiList.add(Codi("222", "데이트룩", "0", true))
-//        codiList.add(Codi("333", "데이트룩", "0", true))
-//        codiList.add(Codi("444", "데이트룩", "0", true))
-//        codiList.add(Codi("555", "데이트룩", "0", true))
-//        codiList.add(Codi("666", "데이트룩", "0", true))
-
         codiList_rv.layoutManager = GridLayoutManager(ctx, 2)
-        codiListAdapter = CodiListAdapter(codiList)
+        codiListAdapter = CodiListAdapter(ctx, codiList)
         codiList_rv.adapter = codiListAdapter
     }
 
@@ -87,5 +73,30 @@ class CodiListDetailFragment(val ctx: Context) : Fragment() {
                 startActivity(intent)
             }
         }
+    }
+
+    private fun getDataFromBundle(){
+        val bundle: Bundle? = arguments
+        if(bundle != null) {
+            tv_codi_tag.text = bundle.getString("tag")
+            val tagId = bundle.getString("tagId").toString()
+            getCodiData(tagId)
+        }
+    }
+
+    private fun getCodiData(tagId:String){
+        val tagRef = Fbase.CODITAG_REF.document(tagId)
+        Fbase.CODI_REF
+            .whereArrayContains("tags", tagRef)
+            .whereEqualTo("uid", Fbase.uid)
+            .orderBy("date", Query.Direction.ASCENDING) // TODO 최신순으로 정렬하기
+            .get().addOnSuccessListener { documents ->
+                codiList.clear()
+                for (document in documents) {
+                    val codiObj = Fbase.getCodi(document)
+                    codiList.add(codiObj)
+                }
+                codiListAdapter.notifyDataSetChanged()
+            }
     }
 }

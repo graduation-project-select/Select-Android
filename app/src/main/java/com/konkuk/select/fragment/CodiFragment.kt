@@ -71,6 +71,4 @@ class CodiFragment(val ctx: Context) : Fragment() {
         }
     }
 
-
-
 }

@@ -12,18 +12,18 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.DocumentReference
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagListAdapter
 import com.konkuk.select.model.CodiTag
+import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.fragment_codi_tag_list.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
 class CodiTagListFragment(val ctx: Context) : Fragment() {
-    lateinit var codiTagAdapter: CodiTagListAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    lateinit var codiTagAdapter: CodiTagListAdapter
+    var myTagList: ArrayList<CodiTag> = arrayListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,13 +35,13 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         setToolBar()
         setAdapter()
+        getUserCodiTagList()
         setClickListener()
     }
 
-    fun setToolBar() {
+    private fun setToolBar() {
         toolbar.left_iv.setImageResource(R.drawable.back)
         toolbar.left_iv.setOnClickListener {
             val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
@@ -51,14 +51,9 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
         }
     }
 
-    fun setAdapter() {
-        var codiTagList = ArrayList<CodiTag>()
-//        codiTagList.add(CodiTag("111", "#데이트룩"))
-//        codiTagList.add(CodiTag("222", "#오피스룩"))
-//        codiTagList.add(CodiTag("333", "#캠퍼스룩"))
-
+    private fun setAdapter() {
         codiTag_rv.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
-        codiTagAdapter = CodiTagListAdapter(codiTagList)
+        codiTagAdapter = CodiTagListAdapter(myTagList)
         codiTag_rv.adapter = codiTagAdapter
     }
 
@@ -73,7 +68,8 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
                 Toast.makeText(ctx, "${data.ref}, ${data.tag} click", Toast.LENGTH_SHORT).show()
                 val t: FragmentTransaction = fragmentManager!!.beginTransaction()
                 val mFrag: Fragment = CodiListDetailFragment(ctx)
-                val bundle:Bundle = Bundle()
+                val bundle = Bundle()
+                bundle.putString("tagId", data.ref.id)
                 bundle.putString("tag", data.tag)
                 mFrag.setArguments(bundle)
                 t.replace(R.id.codill, mFrag)
@@ -93,6 +89,21 @@ class CodiTagListFragment(val ctx: Context) : Fragment() {
 
         var itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
         itemTouchHelper.attachToRecyclerView(codiTag_rv)
+    }
+
+    private fun getUserCodiTagList() {
+        Fbase.uid?.let {
+            Fbase.USERS_REF.document(it).get().addOnSuccessListener {
+                val codiTagList = it.get("codiTagList") as ArrayList<DocumentReference>
+                myTagList.clear()
+                for (tagRef in codiTagList) {
+                    tagRef.get().addOnSuccessListener {tagObj ->
+                        myTagList.add(CodiTag(tagRef, tagObj["name"].toString()))
+                        codiTagAdapter.notifyDataSetChanged()
+                    }
+                }
+            }
+        }
     }
 
 }

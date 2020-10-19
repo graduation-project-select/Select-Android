@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Query
 import com.konkuk.select.R
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
@@ -53,8 +54,9 @@ class CodiMainListAdapter(val ctx:Context, val codiTagRefList:ArrayList<Document
     private fun getCodiListByTag(tagRef: DocumentReference, index:Int) {
         tagRef.get().addOnSuccessListener {
             Fbase.CODI_REF
-                .whereArrayContains("tags", tagRef) // TODO 최신순으로 정렬하기
+                .whereArrayContains("tags", tagRef)
                 .whereEqualTo("uid", Fbase.uid)
+                .orderBy("date", Query.Direction.ASCENDING) // TODO 최신순으로 정렬하기
                 .get().addOnSuccessListener { documents ->
                     codiListArray[index].clear()
                     for (document in documents) {

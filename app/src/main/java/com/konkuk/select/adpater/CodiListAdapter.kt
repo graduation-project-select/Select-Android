@@ -1,14 +1,16 @@
 package com.konkuk.select.adpater
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Codi
 
-class CodiListAdapter (val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiListAdapter.ItemHolder>() {
+class CodiListAdapter (val ctx:Context, val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiListAdapter.ItemHolder>() {
 
     var itemClickListener: CodiListAdapter.OnItemClickListener ?= null
 
@@ -38,7 +40,9 @@ class CodiListAdapter (val item: ArrayList<Codi>) : RecyclerView.Adapter<CodiLis
     }
 
     override fun onBindViewHolder(holder: CodiListAdapter.ItemHolder, position: Int) {
-//        holder.codiImg.setImageResource(android.R.drawable.ic_menu_gallery)
+        Glide.with(ctx)
+            .load(item[position].imgUri)
+            .into(holder.codiImg)
     }
 
 }

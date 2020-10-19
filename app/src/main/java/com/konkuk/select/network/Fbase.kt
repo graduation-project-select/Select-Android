@@ -52,9 +52,8 @@ object Fbase {
 //        val itemsArray = Array(items.length()){items.get(it)} as Array<Clothes>
         return Codi(
             id = document.id,
-            tags = arrayListOf(),
-//            tags = tagsArray.toCollection(ArrayList<DocumentReference>()),
-            items = arrayListOf(),
+            tags = arrayListOf(),   // TODO
+            items = arrayListOf(),  // TODO
             public = codiObj["public"] as Boolean,
             date = Timestamp.now(),
 //            date = codiObj["date"] as Timestamp,
