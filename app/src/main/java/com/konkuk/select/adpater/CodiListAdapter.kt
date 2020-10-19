@@ -21,7 +21,7 @@ class CodiListAdapter (val ctx:Context, val item: ArrayList<Codi>) : RecyclerVie
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var codiImg: ImageView = itemView.findViewById(R.id.codi_iv)
         init {
-            codiImg.setOnClickListener {
+            itemView.setOnClickListener {
                 itemClickListener?.OnClickItem(this, it, item[adapterPosition], adapterPosition)
             }
         }

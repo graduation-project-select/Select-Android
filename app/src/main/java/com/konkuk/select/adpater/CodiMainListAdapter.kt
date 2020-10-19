@@ -1,17 +1,20 @@
 package com.konkuk.select.adpater
 
 import android.content.Context
+import android.content.Intent
 import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import com.konkuk.select.R
+import com.konkuk.select.activity.DetailCodiActivity
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
 
@@ -44,6 +47,18 @@ class CodiMainListAdapter(val ctx:Context, val codiTagRefList:ArrayList<Document
             holder.tv_title.text = it["name"] as String
             holder.rv_codiList.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
             holder.rv_codiList.adapter = codiMainListItemAdapterArray[position]
+            codiMainListItemAdapterArray[position].itemClickListener = object:CodiMainListItemAdapter.OnItemClickListener{
+                override fun OnClickItem(
+                    holder: CodiMainListItemAdapter.CodiHolder,
+                    view: View,
+                    data: Codi,
+                    position: Int
+                ) {
+                    Toast.makeText(ctx, "${data.id} click", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(ctx, DetailCodiActivity::class.java)
+                    ctx.startActivity(intent)
+                }
+            }
         }
     }
 
