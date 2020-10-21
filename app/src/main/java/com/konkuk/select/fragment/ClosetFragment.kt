@@ -15,8 +15,6 @@ import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.fragment_closet.*
 
 private const val BOTTOMSHEET_CLOSETLIST_REQUEST_CODE = 1
-private const val CLOSET_ID_MESSAGE = "closetId"
-private const val CLOSET_TITLE_MESSAGE = "closetTitle"
 // Params
 private const val CLOSET_ID_PARAM = "closetId"
 private const val CLOSET_NAME_PARAM = "closetName"
@@ -41,7 +39,7 @@ class ClosetFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let { it ->
             closetId = it.getString(CLOSET_ID_PARAM).toString()
-            closetName = it.getString(CLOSET_NAME_PARAM).toString() // 옷장 리스트에서 넘어온 경우
+            closetName = it.getString(CLOSET_NAME_PARAM).toString()
         }
     }
 
@@ -55,10 +53,19 @@ class ClosetFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        tv_closet_name.text = if (closetName == "") "전체 옷장" else closetName
-        settingFragment(closetId, Fbase.uid.toString()) //이걸 데이터 onresume?때하면 되지않나
         settingOnClickListener()
     }
+
+    override fun onResume() {
+        super.onResume()
+        initCloset(closetId, closetName, Fbase.uid.toString())
+    }
+
+    private fun initCloset(closetId:String, closetName:String, uid:String){
+        tv_closet_name.text = if (closetName == "") "전체 옷장" else closetName
+        settingFragment(closetId, uid)
+    }
+
 
     private fun settingFragment(closetId: String, uid: String) {
         fragmentManager?.let {
@@ -87,10 +94,10 @@ class ClosetFragment : Fragment() {
         }
     }
 
-    fun passClosetData(id: String, title: String): Intent {
+    fun passClosetData(id: String, name: String): Intent {
         val intent = Intent()
-        intent.putExtra(CLOSET_ID_MESSAGE, id)
-        intent.putExtra(CLOSET_TITLE_MESSAGE, title)
+        intent.putExtra(CLOSET_ID_PARAM, id)
+        intent.putExtra(CLOSET_NAME_PARAM, name)
         return intent
     }
 
@@ -100,16 +107,10 @@ class ClosetFragment : Fragment() {
             return
         }
         if (requestCode === BOTTOMSHEET_CLOSETLIST_REQUEST_CODE) {
-            Log.d("closetTitle", BOTTOMSHEET_CLOSETLIST_REQUEST_CODE.toString())
-            if (data != null) {
-                data.getStringExtra(CLOSET_ID_MESSAGE)?.let {
-                    closetId = it
-                    Log.d("closetTitle", it)
-                }
-                data.getStringExtra(CLOSET_TITLE_MESSAGE)?.let {
-                    closetName = it
-                    Log.d("closetTitle", it)
-                }
+            if (data != null && data.hasExtra(CLOSET_ID_PARAM) && data.hasExtra(CLOSET_NAME_PARAM)) {
+                closetId = data.getStringExtra(CLOSET_ID_PARAM).toString()
+                closetName = data.getStringExtra(CLOSET_NAME_PARAM).toString()
+                initCloset(closetId, closetName, Fbase.uid.toString())
             }
         }
     }
