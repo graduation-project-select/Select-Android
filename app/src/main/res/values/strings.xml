@@ -8,7 +8,11 @@
     <string name="activity_title_addCodi">코디하기</string>
     <string name="activity_title_addCodiRegister">코디 태그 선택</string>
 
+    <string name="kakao_app_key">66f79ed0bbb53daca95c59560ead6e6c</string>
+    <string name="kakao_scheme">kakao66f79ed0bbb53daca95c59560ead6e6c</string>
+    <string name="kakaolink_host">kakaolink</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

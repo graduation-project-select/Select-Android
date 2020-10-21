@@ -5,14 +5,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.model.Closet
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
 import org.json.JSONObject
-import org.w3c.dom.Document
 
 object Fbase {
     val auth: FirebaseAuth = Firebase.auth

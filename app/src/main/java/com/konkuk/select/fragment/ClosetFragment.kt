@@ -140,7 +140,7 @@ class ClosetFragment(val ctx: Context) : Fragment() {
                     }
                 }
                 Log.d(CLOSET_TAG, selectedCategory!!.label + " 선택됨")
-                getClothesByCategory(selectedCategory)
+                getClothesByCategory(selectedCategory!!.label)
             }
             switchClothesListLayout(it)
         })
@@ -150,8 +150,6 @@ class ClosetFragment(val ctx: Context) : Fragment() {
         rv_category.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
         closetCategoryListAdapter = ClosetCategoryListAdapter(ctx, categoryList)
         rv_category.adapter = closetCategoryListAdapter
-
-
 
         closetCategoryListAdapter.itemClickListener =
             object : ClosetCategoryListAdapter.OnItemClickListener {
@@ -211,12 +209,12 @@ class ClosetFragment(val ctx: Context) : Fragment() {
     }
 
     // 카테고리에 해당하는 data fetch
-    private fun getClothesByCategory(selectedCategory: Category) {
-        var clothesRef = Fbase.db.collection("clothes")
-            .whereEqualTo("category", selectedCategory.label)
+    private fun getClothesByCategory(category:String) {
+        var clothesRef = Fbase.CLOTHES_REF
+            .whereEqualTo("category", category)
             .whereEqualTo("uid", Fbase.uid)
         // 옷장이 선택된 경우
-        if (closetId.value != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
+        if (closetId.value != "") clothesRef = clothesRef.whereArrayContains("closet", closetId.value.toString())
         clothesRef.get()
             .addOnSuccessListener { documents ->
                 clothesListVertical.clear()
@@ -283,7 +281,6 @@ class ClosetFragment(val ctx: Context) : Fragment() {
                     Log.d("closetTitle", it)
                 }
             }
-
         }
     }
 }

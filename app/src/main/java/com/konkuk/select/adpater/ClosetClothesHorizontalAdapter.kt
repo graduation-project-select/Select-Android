@@ -59,7 +59,7 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
     }
 
     private fun fetchClothesData(category:String, index:Int){
-        var clothesRef = Fbase.db.collection("clothes")
+        var clothesRef = Fbase.CLOTHES_REF
             .whereEqualTo("category", category)
             .whereEqualTo("uid", Fbase.uid)
         // 옷장이 선택된 경우
