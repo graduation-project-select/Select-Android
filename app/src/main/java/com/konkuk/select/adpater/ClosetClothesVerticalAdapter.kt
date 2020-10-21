@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Clothes
 
-class ClosetClothesVerticalAdapter(var ctx:Context, var items:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesVerticalAdapter.ImageHolder>() {
+class ClosetClothesVerticalAdapter(var items:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesVerticalAdapter.ImageHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
@@ -39,7 +39,7 @@ class ClosetClothesVerticalAdapter(var ctx:Context, var items:ArrayList<Clothes>
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
-        Glide.with(ctx)
+        Glide.with(holder.clothesImg.context)
             .load(items[position].imgUri)
             .into(holder.clothesImg)
     }

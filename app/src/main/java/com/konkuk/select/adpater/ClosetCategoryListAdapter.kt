@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
 import com.konkuk.select.model.Category
 
-class ClosetCategoryListAdapter(val context:Context, var categoryList: ArrayList<Category>): RecyclerView.Adapter<ClosetCategoryListAdapter.ItemHolder>(){
+class ClosetCategoryListAdapter(var categoryList: ArrayList<Category>): RecyclerView.Adapter<ClosetCategoryListAdapter.ItemHolder>(){
 
     var itemClickListener:OnItemClickListener?=null
 

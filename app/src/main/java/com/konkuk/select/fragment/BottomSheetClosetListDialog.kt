@@ -17,7 +17,7 @@ import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.fragment_bottom_sheet_closetlist_dialog.*
 
 
-class BottomSheetClosetListDialog(var ctx: Context) : BottomSheetDialogFragment() {
+class BottomSheetClosetListDialog : BottomSheetDialogFragment() {
 
     var closetList:ArrayList<Closet> = ArrayList()
     lateinit var bottomSheetClosetListAdapter:BottomSheetClosetListAdapter
@@ -32,7 +32,7 @@ class BottomSheetClosetListDialog(var ctx: Context) : BottomSheetDialogFragment(
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         getClosetData()
-        rv_closet_list.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
+        rv_closet_list.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         bottomSheetClosetListAdapter = BottomSheetClosetListAdapter(closetList)
         rv_closet_list.adapter = bottomSheetClosetListAdapter
 
@@ -45,7 +45,7 @@ class BottomSheetClosetListDialog(var ctx: Context) : BottomSheetDialogFragment(
             ) {
                 Log.d("BottomSheetClosetListDialog",data.id + " " + data.name + " " + data.count )
                 if (targetFragment != null) {
-                    val intent: Intent = ClosetFragment(ctx).passClosetData(data.id, data.name)
+                    val intent: Intent = ClosetFragment().passClosetData(data.id, data.name)
                     targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
                     dismiss()
                 }else{

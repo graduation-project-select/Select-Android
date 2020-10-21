@@ -1,22 +1,17 @@
 package com.konkuk.select.adpater
 
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.firestore.FirebaseFirestore
 import com.konkuk.select.R
 import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.network.Fbase
-import org.json.JSONObject
-import kotlin.random.Random
 
-class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayList<Category>, private val closetId:String = ""):
+class ClosetClothesHorizontalAdapter(var categoryList:ArrayList<Category>, private val closetId:String = "", private val uid:String):
     RecyclerView.Adapter<ClosetClothesHorizontalAdapter.RVHolder>() {
 
     var closetClothesHorizontalItemAdapter: ArrayList<ClosetClothesHorizontalItemAdapter> = arrayListOf()
@@ -36,8 +31,8 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
     private fun initAdapter(){
         for((index, c) in categoryList.withIndex()){
             closetClothesHorizontalItemAdapterList.add(arrayListOf())
-            closetClothesHorizontalItemAdapter.add(ClosetClothesHorizontalItemAdapter(ctx, closetClothesHorizontalItemAdapterList[index]))
-            fetchClothesData(c.label, index)
+            closetClothesHorizontalItemAdapter.add(ClosetClothesHorizontalItemAdapter(closetClothesHorizontalItemAdapterList[index]))
+            fetchClothesData(c.label, index, closetId, uid)
         }
     }
 
@@ -45,23 +40,21 @@ class ClosetClothesHorizontalAdapter(val ctx: Context, var categoryList:ArrayLis
         if(categoryList[position].checked){
             holder.rv_of_rv.visibility = View.VISIBLE
             holder.underLine.visibility = View.VISIBLE
-            holder.rv_of_rv.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
+            holder.rv_of_rv.layoutManager = LinearLayoutManager(holder.rv_of_rv.context, LinearLayoutManager.HORIZONTAL, false)
             holder.rv_of_rv.adapter = closetClothesHorizontalItemAdapter[position]
         }else{
             holder.rv_of_rv.visibility = View.GONE
             holder.underLine.visibility = View.GONE
         }
-
     }
 
     override fun getItemCount(): Int {
         return categoryList.size
     }
-
-    private fun fetchClothesData(category:String, index:Int){
+    private fun fetchClothesData(category:String, index:Int, closetId: String, userId:String){
         var clothesRef = Fbase.CLOTHES_REF
             .whereEqualTo("category", category)
-            .whereEqualTo("uid", Fbase.uid)
+            .whereEqualTo("uid", userId)
         // 옷장이 선택된 경우
         if(closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
         clothesRef.get()

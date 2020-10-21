@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Clothes
 
-class ClosetClothesHorizontalItemAdapter(var ctx:Context, var clothesList:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesHorizontalItemAdapter.ImageHolder>()  {
+class ClosetClothesHorizontalItemAdapter(var clothesList:ArrayList<Clothes>): RecyclerView.Adapter<ClosetClothesHorizontalItemAdapter.ImageHolder>()  {
     var itemClickListener:OnItemClickListener?=null
 
     interface OnItemClickListener {
@@ -36,7 +36,7 @@ class ClosetClothesHorizontalItemAdapter(var ctx:Context, var clothesList:ArrayL
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
-        Glide.with(ctx)
+        Glide.with(holder.clothesImg.context)
             .load(clothesList[position].imgUri)
             .into(holder.clothesImg)
     }

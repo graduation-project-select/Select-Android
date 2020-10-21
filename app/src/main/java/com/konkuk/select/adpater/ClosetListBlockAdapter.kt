@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
 import com.konkuk.select.model.Closet
 
-class ClosetListBlockAdapter(var context: Context, val closetList:ArrayList<Closet>):
+class ClosetListBlockAdapter(val closetList:ArrayList<Closet>):
     RecyclerView.Adapter<ClosetListBlockAdapter.ItemHolder>() {
 
     var itemClickListener:OnItemClickListener?=null

@@ -1,26 +1,19 @@
 package com.konkuk.select.activity
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.CheckBox
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.firestore.FieldValue
 import com.konkuk.select.R
 import com.konkuk.select.adpater.ClosetClothesVerticalAdapter
-import com.konkuk.select.fragment.ClosetListFragment
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.network.Fbase
-import kotlinx.android.synthetic.main.activity_add_closet.*
 import kotlinx.android.synthetic.main.activity_add_closet.toolbar
-import kotlinx.android.synthetic.main.fragment_closet.*
+import kotlinx.android.synthetic.main.activity_clothes_check_list.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import org.json.JSONObject
 
 class ClothesCheckListActivity : AppCompatActivity() {
 
@@ -87,7 +80,7 @@ class ClothesCheckListActivity : AppCompatActivity() {
 
     private fun settingAdapter() {
         rv_clothes_vertical.layoutManager = GridLayoutManager(this, 2)
-        closetClothesVerticalAdapter = ClosetClothesVerticalAdapter(this, clothesListVertical)
+        closetClothesVerticalAdapter = ClosetClothesVerticalAdapter(clothesListVertical)
         rv_clothes_vertical.adapter = closetClothesVerticalAdapter
         closetClothesVerticalAdapter.itemClickListener =
             object : ClosetClothesVerticalAdapter.OnItemClickListener {
