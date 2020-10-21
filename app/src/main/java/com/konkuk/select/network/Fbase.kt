@@ -8,9 +8,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import com.konkuk.select.model.Closet
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
 import org.json.JSONObject
+import org.w3c.dom.Document
 
 object Fbase {
     val auth: FirebaseAuth = Firebase.auth
@@ -63,4 +65,18 @@ object Fbase {
             uid = codiObj["uid"] as String
         )
     }
+
+    fun getCloset(document:DocumentSnapshot):Closet{
+        val name = document["name"].toString()
+        val count = document["count"].toString().toInt()
+        val uid = document["uid"].toString()
+        return Closet(
+            id = document.id,
+            name = name,
+            count = count,
+            imgUri = "",
+            uid = uid
+        )
+    }
+
 }

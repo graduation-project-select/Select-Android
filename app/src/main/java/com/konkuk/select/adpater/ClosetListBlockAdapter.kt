@@ -16,7 +16,8 @@ class ClosetListBlockAdapter(var context: Context, val closetList:ArrayList<Clos
     var itemClickListener:OnItemClickListener?=null
 
     interface OnItemClickListener {
-        fun OnClickItem(holder: ItemHolder, view: View, data: Closet, position: Int)
+        fun onClickItem(holder: ItemHolder, view: View, data: Closet, position: Int)
+        fun onClickShareBtn(holder: ItemHolder, view: View, data: Closet, position: Int)
     }
 
     inner class ItemHolder(itemView:View): RecyclerView.ViewHolder(itemView){
@@ -28,7 +29,10 @@ class ClosetListBlockAdapter(var context: Context, val closetList:ArrayList<Clos
 
         init {
             itemView.setOnClickListener {
-                itemClickListener?.OnClickItem(this, it, closetList[adapterPosition], adapterPosition)
+                itemClickListener?.onClickItem(this, it, closetList[adapterPosition], adapterPosition)
+            }
+            iv_sharebtn.setOnClickListener {
+                itemClickListener?.onClickShareBtn(this, it, closetList[adapterPosition], adapterPosition)
             }
         }
     }
@@ -40,7 +44,7 @@ class ClosetListBlockAdapter(var context: Context, val closetList:ArrayList<Clos
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
 //        holder.iv_img 에 closetList[position].imgUrl 넣기
-        holder.tv_title.text = closetList[position].title
+        holder.tv_title.text = closetList[position].name
         holder.tv_count.text = closetList[position].count.toString()
     }
 

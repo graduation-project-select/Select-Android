@@ -35,7 +35,7 @@ class BottomSheetClosetListAdapter(val closetList:ArrayList<Closet>):RecyclerVie
     }
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
-        holder.tv_title.text = closetList[position].title
+        holder.tv_title.text = closetList[position].name
         holder.tv_count.text = closetList[position].count.toString()
     }
 

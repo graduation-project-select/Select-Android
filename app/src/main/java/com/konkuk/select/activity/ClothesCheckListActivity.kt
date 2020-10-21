@@ -110,7 +110,6 @@ class ClothesCheckListActivity : AppCompatActivity() {
                         checkedClothesList.add(data.id)
                         holder.checkMark.visibility = View.VISIBLE
                     }
-//                    Log.d(TAG, checkedClothesList.toString())
                 }
             }
     }

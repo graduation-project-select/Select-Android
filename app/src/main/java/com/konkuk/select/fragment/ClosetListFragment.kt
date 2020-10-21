@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import com.konkuk.select.R
@@ -61,7 +62,7 @@ class ClosetListFragment(val ctx: Context) : Fragment() {
         closetListBlockAdapter = ClosetListBlockAdapter(ctx, closetList)
         rv_closet_list.adapter = closetListBlockAdapter
         closetListBlockAdapter.itemClickListener = object :ClosetListBlockAdapter.OnItemClickListener{
-            override fun OnClickItem(
+            override fun onClickItem(
                 holder: ClosetListBlockAdapter.ItemHolder,
                 view: View,
                 data: Closet,
@@ -72,11 +73,20 @@ class ClosetListFragment(val ctx: Context) : Fragment() {
                         .replace(R.id.ll, ClosetFragment(ctx).apply {
                             arguments = Bundle().apply {
                                 putString("closetId", data.id)
-                                putString("closetTitle", data.title)
+                                putString("closetTitle", data.name)
                             }
                         })
                         .commit()
                 }
+            }
+
+            override fun onClickShareBtn(
+                holder: ClosetListBlockAdapter.ItemHolder,
+                view: View,
+                data: Closet,
+                position: Int
+            ) {
+                Toast.makeText(ctx, "옷장 공유 ${data.id}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -93,13 +103,16 @@ class ClosetListFragment(val ctx: Context) : Fragment() {
             if (documentSnapshot != null) {
                 closetList.clear()
                 for(doc in documentSnapshot.documents){
-                    val name = doc["name"].toString()
-                    val count = doc["count"].toString().toInt()
-                    closetList.add(Closet(doc.id, name, count, ""))
+                    val closetObj = Fbase.getCloset(doc)
+                    closetList.add(closetObj)
                 }
                 closetListBlockAdapter.notifyDataSetChanged()
             }
         }
+    }
+
+    private fun sendShareLink(){
+
     }
 
 }

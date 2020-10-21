@@ -43,9 +43,9 @@ class BottomSheetClosetListDialog(var ctx: Context) : BottomSheetDialogFragment(
                 data: Closet,
                 position: Int
             ) {
-                Log.d("BottomSheetClosetListDialog",data.id + " " + data.title + " " + data.count )
+                Log.d("BottomSheetClosetListDialog",data.id + " " + data.name + " " + data.count )
                 if (targetFragment != null) {
-                    val intent: Intent = ClosetFragment(ctx).passClosetData(data.id, data.title)
+                    val intent: Intent = ClosetFragment(ctx).passClosetData(data.id, data.name)
                     targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
                     dismiss()
                 }else{
@@ -63,9 +63,8 @@ class BottomSheetClosetListDialog(var ctx: Context) : BottomSheetDialogFragment(
             if (documentSnapshot != null) {
                 closetList.clear()
                 for(doc in documentSnapshot.documents){
-                    val name = doc["name"].toString()
-                    val count = doc["count"].toString().toInt()
-                    closetList.add(Closet(doc.id, name, count, ""))
+                    val closetObj = Fbase.getCloset(doc)
+                    closetList.add(closetObj)
                 }
                 bottomSheetClosetListAdapter.notifyDataSetChanged()
             }
