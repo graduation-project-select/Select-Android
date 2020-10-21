@@ -56,6 +56,7 @@ class CodiMainListAdapter(val ctx:Context, val codiTagRefList:ArrayList<Document
                 ) {
                     Toast.makeText(ctx, "${data.id} click", Toast.LENGTH_SHORT).show()
                     val intent = Intent(ctx, DetailCodiActivity::class.java)
+                    intent.putExtra("codiId", data.id)    // TODO 여기서 ERROR
                     ctx.startActivity(intent)
                 }
             }

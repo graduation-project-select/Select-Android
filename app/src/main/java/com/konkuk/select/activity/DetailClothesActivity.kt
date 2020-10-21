@@ -68,6 +68,7 @@ class DetailClothesActivity : AppCompatActivity() {
                 position: Int
             ) {
                 val intent = Intent(this@DetailClothesActivity, DetailCodiActivity::class.java)
+                intent.putExtra("codiId", data.id)
                 startActivity(intent)
             }
 

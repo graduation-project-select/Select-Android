@@ -1,31 +1,34 @@
 package com.konkuk.select.activity
 
-import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.google.firebase.firestore.DocumentReference
 import com.konkuk.select.R
 import com.konkuk.select.adpater.ClothesItemAdapter
 import com.konkuk.select.model.Clothes
-import kotlinx.android.synthetic.main.activity_detail_clothes.*
+import com.konkuk.select.model.Codi
+import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.activity_detail_codi.*
-import kotlinx.android.synthetic.main.activity_detail_codi.toolbar
 import kotlinx.android.synthetic.main.toolbar.view.*
 
 class DetailCodiActivity : AppCompatActivity() {
+
+    lateinit var codiId:String
+    lateinit var codiObj: Codi
     lateinit var clothesItemAdapter: ClothesItemAdapter
+    var codiItemList = ArrayList<Clothes>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_codi)
-
         setToolBar()
         setAdapter()
         setClickListener()
+        getDataFromIntent()
     }
 
     fun setToolBar() {
@@ -41,12 +44,8 @@ class DetailCodiActivity : AppCompatActivity() {
     }
 
     fun setAdapter() {
-        var codiItemList = ArrayList<Clothes>()
-        for(i in 0..5)
-            codiItemList.add(Clothes("111", "top", "0", "", arrayListOf(0,0,0), arrayListOf(true,true,true,true), "", ""));
-
         codiItem_rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        clothesItemAdapter = ClothesItemAdapter(codiItemList)
+        clothesItemAdapter = ClothesItemAdapter(this, codiItemList)
         codiItem_rv.adapter = clothesItemAdapter
     }
 
@@ -59,8 +58,49 @@ class DetailCodiActivity : AppCompatActivity() {
                 position: Int
             ) {
                 val intent = Intent(this@DetailCodiActivity, DetailClothesActivity::class.java)
+                intent.putExtra("clothesObj", data)
                 startActivity(intent)
             }
         }
     }
+
+    private fun getDataFromIntent() {
+        intent.getStringExtra("codiId")?.let {
+            codiId = it
+            Fbase.CODI_REF.document(codiId)
+                .get().addOnSuccessListener {document ->
+                    codiObj  = Fbase.getCodi(document)
+                    initView(codiObj.tags, codiObj.imgUri)
+                    getClothesListById(codiObj.itemsIds)
+                }
+        }
+    }
+
+    fun initView(tags:ArrayList<DocumentReference>,imgUri:String){
+        var tagString = ""
+        for(tag in tags){
+            tag.get().addOnSuccessListener {
+                tagString += it.get("name")
+                codiTag.text = tagString
+            }
+        }
+
+        Glide.with(this)
+            .load(imgUri)
+            .into(codiDetailImg)
+    }
+
+    // TODO firebase에서 clothes 객체 배열은 가져올수 없나
+    fun getClothesListById(itemsIds:ArrayList<String>){
+        for(id in itemsIds){
+            codiItemList.clear()
+            Fbase.CLOTHES_REF.document(id)
+                .get().addOnSuccessListener {
+                    val clothesObj = Fbase.getClothes(it)
+                     codiItemList.add(clothesObj)
+                    clothesItemAdapter.notifyDataSetChanged()
+                }
+        }
+    }
+
 }

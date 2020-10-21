@@ -3,6 +3,7 @@ package com.konkuk.select.network
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.ktx.Firebase
@@ -23,7 +24,7 @@ object Fbase {
     val CODI_REF = db.collection("codi")
     val CODITAG_REF = db.collection("codiTag")
 
-    fun getClothes(document:QueryDocumentSnapshot):Clothes{
+    fun getClothes(document:DocumentSnapshot):Clothes{
         val clothesObj = JSONObject(document.data)
 
         val color = clothesObj.getJSONArray("color")
@@ -43,17 +44,18 @@ object Fbase {
         )
     }
 
-    fun getCodi(document: QueryDocumentSnapshot):Codi{
+    fun getCodi(document: DocumentSnapshot):Codi{
         val codiObj = JSONObject(document.data)
 
         val tags = codiObj.getJSONArray("tags")
 //        val tagsArray = Array(tags.length()) {tags.get(it)} as Array<DocumentReference>
-        val items = codiObj.getJSONArray("items")
-//        val itemsArray = Array(items.length()){items.get(it)} as Array<Clothes>
+        val itemsIds = codiObj.getJSONArray("itemsIds")
+        val itemsIdsArray = Array(itemsIds.length()){itemsIds.getString(it)}
+
         return Codi(
             id = document.id,
             tags = arrayListOf(),   // TODO
-            items = arrayListOf(),  // TODO
+            itemsIds = itemsIdsArray.toCollection(ArrayList<String>()),
             public = codiObj["public"] as Boolean,
             date = Timestamp.now(),
 //            date = codiObj["date"] as Timestamp,
