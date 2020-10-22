@@ -87,7 +87,7 @@ class ClothesListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        loadData(checkedCount.value!!)
+        loadData(checkedCount.value!!) // TODO pull to refresh 로 새로고침구현하기
     }
 
     private fun init() {

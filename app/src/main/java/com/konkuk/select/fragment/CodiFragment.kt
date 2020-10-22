@@ -36,7 +36,11 @@ class CodiFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         settingAdapter()
-        getUserCodiTagList()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getUserCodiTagList()  // TODO pull to refresh 로 새로고침구현하기
     }
 
     private fun settingAdapter(){
@@ -44,7 +48,6 @@ class CodiFragment : Fragment() {
         codiMainListAdapter = CodiMainListAdapter(myTagList)
         rv_codiList.adapter = codiMainListAdapter
     }
-
 
     private fun getUserCodiTagList() {
         Fbase.uid?.let {

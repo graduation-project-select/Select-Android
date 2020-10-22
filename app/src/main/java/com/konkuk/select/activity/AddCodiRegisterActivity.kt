@@ -56,7 +56,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         toolbar.right_tv.setOnClickListener {
             uploadImage(codiImgByte)
             finish()
-            // 방금 올린 코디 상세 페이지로 이동
+            // TODO 방금 올린 코디 상세 페이지로 이동
         }
     }
 
@@ -166,7 +166,6 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
                 updateUserCodiTagList(codiRequest.tags)
-
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
