@@ -1,6 +1,7 @@
 package com.konkuk.select.activity
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -32,7 +33,16 @@ import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.Random
-import kotlin.collections.ArrayList
+import kotlin.Array
+import kotlin.Boolean
+import kotlin.ByteArray
+import kotlin.Comparator
+import kotlin.Float
+import kotlin.Int
+import kotlin.String
+import kotlin.arrayOf
+import kotlin.let
+import kotlin.toString
 
 
 class AddCodiActivity : AppCompatActivity() {
@@ -46,10 +56,10 @@ class AddCodiActivity : AppCompatActivity() {
     var codiClothesList: ArrayList<Clothes> = arrayListOf()  // 코디에 사용된 옷들
 
     val myClothes: ArrayList<Clothes> = arrayListOf() // 내 옷들
-    lateinit var inputClothes: Clothes // 코디 추천에 input으로 준 옷
+    var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID
     var recommendItemsList: ArrayList<ArrayList<Clothes>> = arrayListOf() // 추천된 코디들
     var recommendItems: ArrayList<Clothes> = arrayListOf() // 코디 추천 옷들
-    var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID
+
     var hBool: MutableSet<String> = mutableSetOf()
     var sBool: MutableSet<String> = mutableSetOf()
     var vBool: MutableSet<String> = mutableSetOf()
@@ -64,10 +74,10 @@ class AddCodiActivity : AppCompatActivity() {
     var oldXvalue: Float = 0.0f
     var oldYvalue: Float = 0.0f
 
-    var isSharing:Boolean = false
-    var closetId:String = ""
-    var ownerUid:String = ""
-    var senderUid:String = ""
+    var isSharing: Boolean = false
+    var closetId: String = ""
+    var ownerUid: String = ""
+    var senderUid: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,14 +95,14 @@ class AddCodiActivity : AppCompatActivity() {
             intent.getStringExtra("closetId")?.let {
                 closetId = it
             }
-            intent.getStringExtra("ownerUid")?.let{
+            intent.getStringExtra("ownerUid")?.let {
                 ownerUid = it
             }
-            intent.getStringExtra("senderUid")?.let{
+            intent.getStringExtra("senderUid")?.let {
                 senderUid = it
             }
         }
-        if(isSharing){
+        if (isSharing) {
             toolbar_codi_bottom.randomCodiBtn.visibility = View.GONE
         }
     }
@@ -114,7 +124,7 @@ class AddCodiActivity : AppCompatActivity() {
             var nextIntent = Intent(this, AddCodiRegisterActivity::class.java)
             nextIntent.putExtra("codiClothesList", codiClothesList)
             nextIntent.putExtra("codiImage", imgByte)
-            if(isSharing){
+            if (isSharing) {
                 nextIntent.putExtra("isSharing", true)
                 nextIntent.putExtra("ownerUid", ownerUid)
                 nextIntent.putExtra("senderUid", senderUid)
@@ -149,11 +159,11 @@ class AddCodiActivity : AppCompatActivity() {
         }
     }
 
-    private fun initClothesList(category: String, uid:String, closetId:String = "") {
+    private fun initClothesList(category: String, uid: String, closetId: String = "") {
         var clothesRef = Fbase.CLOTHES_REF
             .whereEqualTo("category", category)
             .whereEqualTo("uid", uid)
-        if(closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
+        if (closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
         clothesRef.get()
             .addOnSuccessListener { documents ->
                 codiBottomClothesList.clear()
@@ -178,9 +188,9 @@ class AddCodiActivity : AppCompatActivity() {
                     position: Int
                 ) {
                     toolbar_codi_bottom.tv_titile.text = category
-                    if(isSharing){
+                    if (isSharing) {
                         initClothesList(category, uid = ownerUid, closetId = closetId)
-                    }else{
+                    } else {
                         Fbase.uid?.let { initClothesList(category, uid = it) }
                     }
                     bottom_rv.adapter = codiBottomClothesLinearAdapter
@@ -454,8 +464,3 @@ class AddCodiActivity : AppCompatActivity() {
     }
 
 }
-
-/*
-* json 데이터 밀어넣기 -> 이때 기존의 clothes랑 혼합될때 문제 없는지 확인 -> 색인 재설정
-* 추천된 코디안에 옷들 가장 많은 것 순으로 추천 -> adapter 이미지 보여주기
-* */
