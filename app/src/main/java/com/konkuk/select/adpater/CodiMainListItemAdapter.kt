@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Codi
 
-class CodiMainListItemAdapter(val ctx:Context, val codiList: ArrayList<Codi>) :
+class CodiMainListItemAdapter(val codiList: ArrayList<Codi>) :
     RecyclerView.Adapter<CodiMainListItemAdapter.CodiHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
@@ -36,7 +36,7 @@ class CodiMainListItemAdapter(val ctx:Context, val codiList: ArrayList<Codi>) :
     }
 
     override fun onBindViewHolder(holder: CodiHolder, position: Int) {
-        Glide.with(ctx)
+        Glide.with(holder.codi_iv.context)
             .load(codiList[position].imgUri)
             .into(holder.codi_iv)
     }

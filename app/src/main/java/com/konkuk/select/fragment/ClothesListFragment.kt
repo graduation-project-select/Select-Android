@@ -53,7 +53,6 @@ class ClothesListFragment : Fragment() {
         arguments?.let {
             closetId = it.getString(CLOSET_ID_PARAM).toString()
             uid = it.getString(USER_ID_PARAM).toString()
-            Log.d("서영3", "closetId: $closetId, uid: $uid")
         }
     }
 

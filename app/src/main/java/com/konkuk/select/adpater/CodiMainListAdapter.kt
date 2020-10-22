@@ -18,7 +18,7 @@ import com.konkuk.select.activity.DetailCodiActivity
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
 
-class CodiMainListAdapter(val ctx:Context, val codiTagRefList:ArrayList<DocumentReference>):RecyclerView.Adapter<CodiMainListAdapter.ListHolder>() {
+class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>):RecyclerView.Adapter<CodiMainListAdapter.ListHolder>() {
 
     var codiMainListItemAdapterArray: ArrayList<CodiMainListItemAdapter> = arrayListOf()
     var codiListArray: ArrayList<ArrayList<Codi>> = arrayListOf()
@@ -37,7 +37,7 @@ class CodiMainListAdapter(val ctx:Context, val codiTagRefList:ArrayList<Document
     private fun initAdapter(){
         for((index, tagRef) in codiTagRefList.withIndex()){
             codiListArray.add(arrayListOf())
-            codiMainListItemAdapterArray.add(CodiMainListItemAdapter(ctx, codiListArray[index]))
+            codiMainListItemAdapterArray.add(CodiMainListItemAdapter(codiListArray[index]))
             getCodiListByTag(tagRef, index)
         }
     }
@@ -45,7 +45,7 @@ class CodiMainListAdapter(val ctx:Context, val codiTagRefList:ArrayList<Document
     override fun onBindViewHolder(holder: ListHolder, position: Int) {
         codiTagRefList[position].get().addOnSuccessListener {
             holder.tv_title.text = it["name"] as String
-            holder.rv_codiList.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
+            holder.rv_codiList.layoutManager = LinearLayoutManager(holder.rv_codiList.context, LinearLayoutManager.HORIZONTAL, false)
             holder.rv_codiList.adapter = codiMainListItemAdapterArray[position]
             codiMainListItemAdapterArray[position].itemClickListener = object:CodiMainListItemAdapter.OnItemClickListener{
                 override fun OnClickItem(
@@ -54,10 +54,10 @@ class CodiMainListAdapter(val ctx:Context, val codiTagRefList:ArrayList<Document
                     data: Codi,
                     position: Int
                 ) {
-                    Toast.makeText(ctx, "${data.id} click", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(ctx, DetailCodiActivity::class.java)
+                    Toast.makeText(view.context, "${data.id} click", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(view.context, DetailCodiActivity::class.java)
                     intent.putExtra("codiId", data.id)    // TODO 여기서 ERROR
-                    ctx.startActivity(intent)
+                    view.context.startActivity(intent)
                 }
             }
         }

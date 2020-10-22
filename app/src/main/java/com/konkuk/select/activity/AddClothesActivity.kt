@@ -42,10 +42,12 @@ import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 
+private const val TAG = "AddClothes"
+
 @GlideModule
 class AddClothesActivity : AppCompatActivity(),
     BottomSheetSingleListDialog.onChangeCategory {
-    private val TAG = "firebase"
+
     private lateinit var imageFile: File
 
     var season: ArrayList<Boolean> = arrayListOf(false, false, false, false)
@@ -180,6 +182,8 @@ class AddClothesActivity : AppCompatActivity(),
     }
 
     private fun uploadImage(file: File) {
+        Log.d(TAG, "이미지 업로드 uid:${Fbase.uid}")
+
         var storageRef = Fbase.storage.reference
         var filename = Timestamp.now().nanoseconds.toString() + "_" + file.name
         var imagesRef: StorageReference? = Fbase.uid?.let { storageRef.child(it).child("clothes").child(filename) }
@@ -198,19 +202,15 @@ class AddClothesActivity : AppCompatActivity(),
             insertClothes(clothesObj)
         }?.addOnProgressListener { taskSnapshot ->
             val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
-            println("Upload is $progress% done")
+            Log.d(TAG, "Upload is $progress% done")
         }?.addOnPausedListener {
-            println("Upload is paused")
+            Log.d(TAG, "Upload is paused")
         }?.addOnFailureListener {
             Log.d(TAG, "firebaseError: ${it.message}")
-        }?.addOnSuccessListener {
-            // Handle successful uploads on complete
         }
     }
 
     private fun insertClothes(clothes: ClothesRequest) {
-        Log.d("서영", "옷 등록함수")
-
         Log.d(TAG, "insertClothest: ${clothes}")
 
         // Add a new document with a generated ID

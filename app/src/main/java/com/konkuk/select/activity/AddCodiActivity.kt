@@ -145,13 +145,7 @@ class AddCodiActivity : AppCompatActivity() {
                     data: Clothes,
                     position: Int
                 ) {
-                    Toast.makeText(
-                        this@AddCodiActivity,
-                        "${data.id} ${data.category} click",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    if(codiClothesList.contains(data)){
+                     if(codiClothesList.contains(data)){
                         Toast.makeText(this@AddCodiActivity, "중복 불가", Toast.LENGTH_SHORT).show()
                     }else{
                         codiClothesList.add(data)

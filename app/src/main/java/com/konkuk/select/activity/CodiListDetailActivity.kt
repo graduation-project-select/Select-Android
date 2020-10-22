@@ -1,62 +1,48 @@
-package com.konkuk.select.fragment
+package com.konkuk.select.activity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.FragmentTransaction
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import com.konkuk.select.R
-import com.konkuk.select.activity.DetailCodiActivity
 import com.konkuk.select.adpater.CodiListAdapter
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
-import kotlinx.android.synthetic.main.fragment_codi.*
-import kotlinx.android.synthetic.main.fragment_codi_list_detail_flagment.*
-import kotlinx.android.synthetic.main.fragment_codi_tag_list.toolbar
+import kotlinx.android.synthetic.main.activity_codi_tag_list.toolbar
+import kotlinx.android.synthetic.main.activity_codi_list_detail.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
-class CodiListDetailFragment(val ctx: Context) : Fragment() {
+private const val TAG_ID_MESSAGE = "tagId"
+private const val TAG_NAME_MESSAGE = "tagName"
+
+class CodiListDetailActivity : AppCompatActivity() {
 
     lateinit var codiListAdapter: CodiListAdapter
     var codiList:ArrayList<Codi> = arrayListOf()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_codi_list_detail_flagment, container, false)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_codi_list_detail)
         setToolBar()
         setAdapter()
         setClickListener()
-        getDataFromBundle()
+        getDataFromIntent()
     }
 
     fun setToolBar() {
         toolbar.left_iv.setImageResource(R.drawable.back)
         toolbar.left_iv.setOnClickListener {
-            val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
-            val mFrag: Fragment = CodiTagListFragment(ctx)
-            t.replace(R.id.codill, mFrag)
-            t.commit()
+            finish()
         }
+        toolbar.right_iv.visibility = View.INVISIBLE
     }
 
     fun setAdapter() {
-        codiList_rv.layoutManager = GridLayoutManager(ctx, 2)
-        codiListAdapter = CodiListAdapter(ctx, codiList)
+        codiList_rv.layoutManager = GridLayoutManager(this, 2)
+        codiListAdapter = CodiListAdapter(this, codiList)
         codiList_rv.adapter = codiListAdapter
     }
 
@@ -68,18 +54,17 @@ class CodiListDetailFragment(val ctx: Context) : Fragment() {
                 data: Codi,
                 position: Int
             ) {
-                Toast.makeText(ctx, "${data.id} click", Toast.LENGTH_SHORT).show()
-                val intent = Intent(ctx, DetailCodiActivity::class.java)
+                Toast.makeText(this@CodiListDetailActivity, "${data.id} click", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@CodiListDetailActivity, DetailCodiActivity::class.java)
                 startActivity(intent)
             }
         }
     }
 
-    private fun getDataFromBundle(){
-        val bundle: Bundle? = arguments
-        if(bundle != null) {
-            tv_codi_tag.text = bundle.getString("tag")
-            val tagId = bundle.getString("tagId").toString()
+    private fun getDataFromIntent(){
+        if(intent.hasExtra(TAG_ID_MESSAGE) && intent.hasExtra(TAG_NAME_MESSAGE)){
+            tv_codi_tag.text = intent.getStringExtra(TAG_NAME_MESSAGE)
+            val tagId = intent.getStringExtra(TAG_ID_MESSAGE).toString()
             getCodiData(tagId)
         }
     }

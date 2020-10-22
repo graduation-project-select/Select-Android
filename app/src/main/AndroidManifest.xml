@@ -19,6 +19,8 @@
         </activity>
         <activity android:name=".activity.ClothesCheckListActivity" />
         <activity android:name=".activity.ClosetListActivity" />
+        <activity android:name=".activity.CodiTagListActivity" />
+        <activity android:name=".activity.CodiListDetailActivity" />
         <activity android:name=".activity.AddClosetActivity" />
         <activity android:name=".activity.AddClothesActivity" />
         <activity android:name=".activity.AddCodiRegisterActivity" />

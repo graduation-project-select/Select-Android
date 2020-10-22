@@ -20,9 +20,9 @@ import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.fragment_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
-class CodiFragment(val ctx: Context) : Fragment() {
+class CodiFragment : Fragment() {
 
-    lateinit var codiMainListAdapter:CodiMainListAdapter
+    private lateinit var codiMainListAdapter:CodiMainListAdapter
     var myTagList: ArrayList<DocumentReference> = arrayListOf()
 
     override fun onCreateView(
@@ -35,25 +35,13 @@ class CodiFragment(val ctx: Context) : Fragment() {
     @SuppressLint("ResourceType")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        settingToolBar()
         settingAdapter()
         getUserCodiTagList()
     }
 
-    private fun settingToolBar() {
-        toolbar.left_iv.setImageResource(R.drawable.hashtag)
-        toolbar.left_iv.setOnClickListener {
-            Toast.makeText(ctx, "코디 태그 메뉴", Toast.LENGTH_SHORT).show()
-            val t: FragmentTransaction = this.fragmentManager!!.beginTransaction()
-            val mFrag: Fragment = CodiTagListFragment(ctx)
-            t.replace(R.id.codill, mFrag)
-            t.commit()
-        }
-    }
-
     private fun settingAdapter(){
-        rv_codiList.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
-        codiMainListAdapter = CodiMainListAdapter(ctx, myTagList)
+        rv_codiList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        codiMainListAdapter = CodiMainListAdapter(myTagList)
         rv_codiList.adapter = codiMainListAdapter
     }
 

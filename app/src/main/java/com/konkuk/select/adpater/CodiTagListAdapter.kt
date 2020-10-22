@@ -6,8 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
-import com.konkuk.select.fragment.CodiTagListFragment
-import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.CodiTag
 
 class CodiTagListAdapter(val item: ArrayList<CodiTag>) : RecyclerView.Adapter<CodiTagListAdapter.ItemHolder>() {

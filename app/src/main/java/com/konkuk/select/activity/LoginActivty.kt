@@ -84,6 +84,8 @@ class LoginActivty : AppCompatActivity() {
 
     // 일반 로그인 (이메일, 비밀번호)
     private fun login(email: String, password: String){
+        Log.d(LOGIN_TAG, "login: $email")
+
         Fbase.auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -156,7 +158,7 @@ class LoginActivty : AppCompatActivity() {
                     clearField()
                     Toast.makeText(this, "회원가입 완료, 로그인하세요", Toast.LENGTH_SHORT).show()
                     // TODO: 회원가입 후 추가 정보 DB에 저장
-                    // addAditionalInfo(user.uid,"고서영", "man", 1998)
+                    Fbase.uid?.let { addAditionalInfo(it,"고서영", "man", 1998) }
                 } else {
                     // Sign in fails
                     Log.w(SIGNUP_TAG, "createUserWithEmail:failure", task.exception)

@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
             initClosetMenuFragment(null, null)
         }
 
+        // 옷장 선택한 경우
         if(intent.hasExtra(CLOSET_ID_MESSAGE) && intent.hasExtra(CLOSET_NAME_MESSAGE)){
             val closetId = intent.getStringExtra(CLOSET_ID_MESSAGE)
             val closetName = intent.getStringExtra(CLOSET_NAME_MESSAGE)
@@ -47,24 +48,15 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.codiItem -> {
-                val fragment = CodiFragment(this)
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, fragment, fragment.javaClass.simpleName)
-                    .commit()
+                initCodiMenuFragment()
                 return true
             }
             R.id.communityItem -> {
-                val fragment = CommunityFragment()
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, fragment, fragment.javaClass.simpleName)
-                    .commit()
+                initCommunityFragment()
                 return true
             }
             R.id.MyPageItem -> {
-                val fragment = MyPageFragment()
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, fragment, fragment.javaClass.simpleName)
-                    .commit()
+                initMyPageFragment()
                 return true
             }
         }
@@ -86,6 +78,61 @@ class MainActivity : AppCompatActivity() {
         toolbar.left_iv.setImageResource(R.drawable.closet_btn)
         toolbar.left_iv.setOnClickListener {
             startActivity(Intent(this, ClosetListActivity::class.java))
+        }
+        toolbar.right_tv.visibility = View.GONE
+        toolbar.right_iv.setImageResource(R.drawable.alarm)
+        toolbar.right_iv.setOnClickListener {
+            Toast.makeText(this, "알림 클릭", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun initCodiMenuFragment(){
+        initCodiMenuToolbar()
+        val fragment = CodiFragment()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment, fragment.javaClass.simpleName)
+            .commit()
+    }
+
+    private fun initCodiMenuToolbar(){
+        toolbar.left_iv.setImageResource(R.drawable.hashtag)
+        toolbar.left_iv.setOnClickListener {
+            startActivity(Intent(this, CodiTagListActivity::class.java))
+        }
+    }
+
+    private fun initCommunityFragment(){
+        initCommunityToolbar()
+        val fragment = CommunityFragment()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment, fragment.javaClass.simpleName)
+            .commit()
+    }
+
+    private fun initCommunityToolbar(){
+        toolbar.left_iv.setImageResource(R.drawable.closet_btn)
+        toolbar.left_iv.setOnClickListener {
+            Toast.makeText(this, "click", Toast.LENGTH_SHORT).show()
+        }
+        toolbar.right_tv.visibility = View.GONE
+        toolbar.right_iv.setImageResource(R.drawable.alarm)
+        toolbar.right_iv.setOnClickListener {
+            Toast.makeText(this, "알림 클릭", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun initMyPageFragment(){
+        initMyPageToolbar()
+        val fragment = MyPageFragment()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment, fragment.javaClass.simpleName)
+            .commit()
+    }
+
+    private fun initMyPageToolbar() {
+        toolbar.left_iv.setImageResource(R.drawable.closet_btn)
+        toolbar.left_iv.setOnClickListener {
+            Toast.makeText(this, "click", Toast.LENGTH_SHORT).show()
         }
         toolbar.right_tv.visibility = View.GONE
         toolbar.right_iv.setImageResource(R.drawable.alarm)

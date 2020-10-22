@@ -148,10 +148,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             Log.d(TAG, "Upload is paused")
         }?.addOnFailureListener {
             Log.d(TAG, "Upload is failed")
-        }?.addOnSuccessListener {
-            // Handle successful uploads on complete
         }
-
     }
 
     data class CodiRequest(
