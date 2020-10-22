@@ -40,7 +40,6 @@ class AddClosetActivity : AppCompatActivity() {
         addBtn.setOnClickListener{
             Toast.makeText(this, "옷장 추가", Toast.LENGTH_SHORT).show()
             createNewCloset(et_name.text.toString())
-
         }
     }
 

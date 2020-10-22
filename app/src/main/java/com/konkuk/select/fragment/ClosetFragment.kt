@@ -54,10 +54,6 @@ class ClosetFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         settingOnClickListener()
-    }
-
-    override fun onResume() {
-        super.onResume()
         initCloset(closetId, closetName, Fbase.uid.toString())
     }
 
@@ -65,7 +61,6 @@ class ClosetFragment : Fragment() {
         tv_closet_name.text = if (closetName == "") "전체 옷장" else closetName
         settingFragment(closetId, uid)
     }
-
 
     private fun settingFragment(closetId: String, uid: String) {
         fragmentManager?.let {

@@ -153,9 +153,7 @@ class AddClothesActivity : AppCompatActivity(),
     private fun settingOnClickListener() {
         addBtn.setOnClickListener {
             uploadImage(imageFile)
-            startActivity(Intent(this, MainActivity::class.java))
-            // stack 비우기
-            finish()
+
         }
 
         checkBox_spring.setOnClickListener {
@@ -214,10 +212,11 @@ class AddClothesActivity : AppCompatActivity(),
         Log.d(TAG, "insertClothest: ${clothes}")
 
         // Add a new document with a generated ID
-        Fbase.db.collection("clothes")
+        Fbase.CLOTHES_REF
             .add(clothes)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                finish()
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)

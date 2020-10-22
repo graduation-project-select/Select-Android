@@ -81,8 +81,13 @@ class ClothesListFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         Toast.makeText(activity, closetId + ", " + uid, Toast.LENGTH_SHORT).show()
         init()
-        settingObserver()
         settingAdapter()
+        settingObserver()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadData(checkedCount.value!!)
     }
 
     private fun init() {
@@ -105,20 +110,25 @@ class ClothesListFragment : Fragment() {
     private fun settingObserver() {
         checkedCount.observe(this, Observer {
             Log.d(CLOSET_TAG, "categoryList: $categoryList (checkedCount: $it)")
-            if (it == 1) {
-                // 한개면 한개인 항목의 데이터 fetch
-                var selectedCategory: Category? = null
-                for (cat in categoryList) {
-                    if (cat.checked) {
-                        selectedCategory = cat
-                        break;
-                    }
-                }
-                getClothesByCategory(selectedCategory!!.label, closetId!!, uid!!)
-            }
-            switchClothesListLayout(it)
+            loadData(it)
         })
     }
+
+    private fun loadData(count:Int){
+        if (count == 1) {
+            // 한개면 한개인 항목의 데이터 fetch
+            var selectedCategory: Category? = null
+            for (cat in categoryList) {
+                if (cat.checked) {
+                    selectedCategory = cat
+                    break;
+                }
+            }
+            getClothesByCategory(selectedCategory!!.label, closetId!!, uid!!)
+        }
+        switchClothesListLayout(count)
+    }
+
 
     private fun switchClothesListLayout(checkedCount: Int) {
         if (checkedCount <= 1) {
