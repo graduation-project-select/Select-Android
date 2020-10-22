@@ -1,5 +1,6 @@
 package com.konkuk.select.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -15,14 +16,18 @@ import kotlinx.android.synthetic.main.toolbar.view.*
 
 class ClosetShareActivity : AppCompatActivity() {
 
-    val closetObj = Closet("AD1fQXH3A6zeuh2hkSTh", "My Closet", 3, "", "bMYknEYE6RPK4JEOdiBrTc7vAs33")
+    var closetId = "2PEmGmU41ZZhvRENoCr0"
+    var uid = "bMYknEYE6RPK4JEOdiBrTc7vAs33"    // 고서영
+
+    var myUid = "enmKDWEYDxgE2GxTmTSd5BFVHyp1"  // 최서희
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_closet_share)
         settingToolBar()
-        initViews()
-        settingFragment()
+        initViews(closetId)
+        settingFragment(closetId, uid)
+        settingOnClickListener()
     }
 
     private fun settingToolBar() {
@@ -44,22 +49,34 @@ class ClosetShareActivity : AppCompatActivity() {
 //        }
     }
 
-    private fun initViews() {
-        Fbase.USERS_REF.document(closetObj.uid).get().addOnSuccessListener {
+    private fun initViews(closetId: String) {
+        Fbase.CLOSETS_REF.document(closetId)
+            .get().addOnSuccessListener {
+                val closetObj = Fbase.getCloset(it)
+                tv_closet_name.text = closetObj.name
+            }
+        Fbase.USERS_REF.document(uid).get().addOnSuccessListener {
             val userName = it["name"].toString()
             tv_nickname1.text = userName
             tv_nickname2.text = userName
-            tv_closet_name.text = closetObj.name
         }
     }
 
-    private fun settingFragment() {
-        // TODO 여기로 closetId와 uid를 보내야겠다 (아니면 옷장으로 필터링시->uid는 필터링할 필요가 없지 않나?)
-        val fragment =
-            supportFragmentManager.beginTransaction().replace(
-                R.id.closet_container,
-                ClothesListFragment.newInstance(closetObj.id, closetObj.uid)
-            ).commit()
+    private fun settingFragment(closetId: String, uid: String) {
+        supportFragmentManager.beginTransaction().replace(
+            R.id.closet_container,
+            ClothesListFragment.newInstance(closetId, uid)
+        ).commit()
+    }
+
+    private fun settingOnClickListener() {
+        addCodiBtn.setOnClickListener {
+            var nextIntent = Intent(this, AddCodiActivity::class.java)
+            nextIntent.putExtra("isSahring", true)
+            nextIntent.putExtra("closetId", closetId)
+            nextIntent.putExtra("currentUid", uid)
+            startActivity(nextIntent)
+        }
     }
 
 }

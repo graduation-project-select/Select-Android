@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Clothes
 
-class CodiBottomClothesLinearAdapter(val ctx:Context, val clothesList:ArrayList<Clothes>): RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {
+class CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>): RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
@@ -34,9 +34,7 @@ class CodiBottomClothesLinearAdapter(val ctx:Context, val clothesList:ArrayList<
     }
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
-//        holder.iv_clothes_img 에 src넣어주기
-//        holder.iv_clothes_img.setImageResource(R.drawable.cloth_test)
-        Glide.with(ctx)
+        Glide.with(holder.iv_clothes_img.context)
             .load(clothesList[position].imgUri)
             .into(holder.iv_clothes_img)
     }

@@ -96,7 +96,7 @@ class AddCodiActivity : AppCompatActivity() {
 
     private fun settingAdapter() {
         codiBottomCategoryAdapter = CodiBottomCategoryAdapter(categoryList)
-        codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(this, codiBottomClothesList)
+        codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(codiBottomClothesList)
         codiBottomRecommendationAdapter = CodiBottomRecommendationAdapter(categoryList)
         bottom_rv.adapter = codiBottomCategoryAdapter
         switchLayoutManager()
