@@ -71,7 +71,7 @@ class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>):Recyc
             Fbase.CODI_REF
                 .whereArrayContains("tags", tagRef)
                 .whereEqualTo("uid", Fbase.uid)
-                .orderBy("date", Query.Direction.ASCENDING) // TODO 최신순으로 정렬하기
+                .orderBy("date", Query.Direction.DESCENDING)
                 .get().addOnSuccessListener { documents ->
                     codiListArray[index].clear()
                     for (document in documents) {
