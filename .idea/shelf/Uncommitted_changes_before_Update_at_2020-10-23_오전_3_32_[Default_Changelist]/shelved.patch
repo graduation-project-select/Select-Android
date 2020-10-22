@@ -1,0 +1,681 @@
+Index: app/src/main/java/com/konkuk/select/activity/DetailClothesActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.activity\r\n\r\nimport android.content.Intent\r\nimport android.graphics.Color\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport android.os.Bundle\r\nimport android.util.Log\r\nimport android.view.View\r\nimport android.widget.ImageView\r\nimport android.widget.TextView\r\nimport androidx.recyclerview.widget.LinearLayoutManager\r\nimport com.bumptech.glide.Glide\r\nimport com.konkuk.select.R\r\nimport com.konkuk.select.adpater.ClothesItemAdapter\r\nimport com.konkuk.select.adpater.CodiItemAdapter\r\nimport com.konkuk.select.model.Clothes\r\nimport com.konkuk.select.model.Codi\r\nimport com.konkuk.select.network.Fbase\r\nimport kotlinx.android.synthetic.main.activity_add_clothes.*\r\nimport kotlinx.android.synthetic.main.activity_detail_clothes.*\r\nimport kotlinx.android.synthetic.main.activity_detail_clothes.categorySub_tv\r\nimport kotlinx.android.synthetic.main.activity_detail_clothes.category_tv\r\nimport kotlinx.android.synthetic.main.activity_detail_clothes.colorCircle\r\nimport kotlinx.android.synthetic.main.activity_detail_clothes.toolbar\r\nimport kotlinx.android.synthetic.main.toolbar.view.*\r\n\r\n// TODO 옷 편집, 삭제\r\nclass DetailClothesActivity : AppCompatActivity() {\r\n\r\n    lateinit var clothesObj: Clothes\r\n    lateinit var codiItemAdapter: CodiItemAdapter\r\n    var codiList: ArrayList<Codi> = arrayListOf()\r\n\r\n    var isSharing: Boolean = false\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        setContentView(R.layout.activity_detail_clothes)\r\n        checkSharing()\r\n        settingToolBar()\r\n        settingAdapter()\r\n        settingClickListener()\r\n        getDataFromIntent()\r\n        if(!isSharing) getCodiList()\r\n    }\r\n\r\n    private fun checkSharing() {\r\n        if (intent.hasExtra(\"isSharing\")) {\r\n            isSharing = intent.getBooleanExtra(\"isSharing\", false)\r\n            if(isSharing){\r\n                codi_tv.visibility = View.GONE\r\n                codi_rv.visibility = View.GONE\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun settingToolBar() {\r\n        toolbar.title_tv.text = \"옷 상세보기\"\r\n        toolbar.left_iv.setImageResource(R.drawable.back)\r\n        toolbar.left_iv.setOnClickListener {\r\n            finish()\r\n        }\r\n\r\n        if(isSharing){\r\n            toolbar.right_iv.visibility = View.INVISIBLE\r\n        }else{\r\n            toolbar.right_iv.setImageResource(R.drawable.x)\r\n            toolbar.right_iv.setOnClickListener {\r\n                val intent = Intent(this, MainActivity::class.java)\r\n                startActivity(intent)\r\n                finishAffinity()\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun settingAdapter() {\r\n        codi_rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)\r\n        codiItemAdapter = CodiItemAdapter(this, codiList)\r\n        codi_rv.adapter = codiItemAdapter\r\n    }\r\n\r\n    private fun settingClickListener() {\r\n        codiItemAdapter.itemClickListener = object : CodiItemAdapter.OnItemClickListener {\r\n            override fun OnClickItem(\r\n                holder: CodiItemAdapter.ItemHolder,\r\n                view: View,\r\n                data: Codi,\r\n                position: Int\r\n            ) {\r\n                val intent = Intent(this@DetailClothesActivity, DetailCodiActivity::class.java)\r\n                intent.putExtra(\"codiId\", data.id)\r\n                startActivity(intent)\r\n            }\r\n\r\n        }\r\n    }\r\n\r\n    private fun getDataFromIntent() {\r\n        clothesObj = intent.getSerializableExtra(\"clothesObj\") as Clothes\r\n        Log.d(\"TAG\", clothesObj.toString())\r\n        initView(clothesObj.category, clothesObj.subCategory, clothesObj.color, clothesObj.season, clothesObj.imgUri)\r\n    }\r\n\r\n    private fun initView(\r\n        category: String,\r\n        subCategory: String,\r\n        clothesRGB: ArrayList<Int>,\r\n        season: ArrayList<Boolean>,\r\n        imgUri: String\r\n    ) {\r\n        category_tv.text = category\r\n        categorySub_tv.text = subCategory\r\n\r\n        val hex = java.lang.String.format(\r\n            \"#%02x%02x%02x\",\r\n            clothesRGB[0],\r\n            clothesRGB[1],\r\n            clothesRGB[2]\r\n        )\r\n        colorCircle.setBackgroundColor(Color.parseColor(hex))\r\n\r\n        val seasonText: ArrayList<String> = arrayListOf(\"봄\", \"여름\", \"가을\", \"겨울\")\r\n        var seasonStr = \"\"\r\n        for ((i, s) in season.withIndex()) {\r\n            if (s) {\r\n                if (seasonStr != \"\") seasonStr += \",\"\r\n                seasonStr += seasonText[i]\r\n            }\r\n            if (i == 3 && seasonStr != \"\") seasonStr += \" 용\"\r\n        }\r\n        if (seasonStr == \"\") seasonStr = \"계절을 등록해주세요\"\r\n        season_tv.text = seasonStr\r\n\r\n        Glide.with(this)\r\n            .load(imgUri)\r\n            .into(clothDetailImg)\r\n    }\r\n\r\n\r\n    private fun getCodiList() {\r\n        Fbase.CODI_REF\r\n            .whereEqualTo(\"uid\", Fbase.uid)\r\n            .whereArrayContains(\"itemsIds\", clothesObj.id)\r\n            .get().addOnSuccessListener { documents ->\r\n                codiList.clear()\r\n                for (document in documents) {\r\n                    val codiObj = Fbase.getCodi(document)\r\n                    codiList.add(codiObj)\r\n                }\r\n                codiItemAdapter.notifyDataSetChanged()\r\n            }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/activity/DetailClothesActivity.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/activity/DetailClothesActivity.kt	(date 1603381303151)
+@@ -16,6 +16,7 @@
+ import com.konkuk.select.model.Clothes
+ import com.konkuk.select.model.Codi
+ import com.konkuk.select.network.Fbase
++import com.konkuk.select.utils.ColorConverter
+ import kotlinx.android.synthetic.main.activity_add_clothes.*
+ import kotlinx.android.synthetic.main.activity_detail_clothes.*
+ import kotlinx.android.synthetic.main.activity_detail_clothes.categorySub_tv
+@@ -98,13 +99,18 @@
+     private fun getDataFromIntent() {
+         clothesObj = intent.getSerializableExtra("clothesObj") as Clothes
+         Log.d("TAG", clothesObj.toString())
+-        initView(clothesObj.category, clothesObj.subCategory, clothesObj.color, clothesObj.season, clothesObj.imgUri)
++        val colorHSV = IntArray(3)
++        colorHSV[0] = clothesObj.color_h
++        colorHSV[1] = clothesObj.color_s
++        colorHSV[2] = clothesObj.color_v
++        val colorRGB = ColorConverter.convertHSVtoRGB(colorHSV)
++        initView(clothesObj.category, clothesObj.subCategory, colorRGB, clothesObj.season, clothesObj.imgUri)
+     }
+ 
+     private fun initView(
+         category: String,
+         subCategory: String,
+-        clothesRGB: ArrayList<Int>,
++        colorRGB: IntArray,
+         season: ArrayList<Boolean>,
+         imgUri: String
+     ) {
+@@ -113,9 +119,9 @@
+ 
+         val hex = java.lang.String.format(
+             "#%02x%02x%02x",
+-            clothesRGB[0],
+-            clothesRGB[1],
+-            clothesRGB[2]
++            colorRGB[0],
++            colorRGB[1],
++            colorRGB[2]
+         )
+         colorCircle.setBackgroundColor(Color.parseColor(hex))
+ 
+Index: app/src/main/res/layout/activity_closet_share_recommendation_list.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    tools:context=\".activity.ClosetShareRecommendationListActivity\">\r\n    <include\r\n        android:id=\"@+id/toolbar\"\r\n        layout=\"@layout/toolbar\"/>\r\n\r\n    <androidx.recyclerview.widget.RecyclerView\r\n        android:layout_width=\"0dp\"\r\n        android:layout_height=\"0dp\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@id/toolbar\" />\r\n\r\n</androidx.constraintlayout.widget.ConstraintLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_closet_share_recommendation_list.xml	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/res/layout/activity_closet_share_recommendation_list.xml	(date 1603381303166)
+@@ -1,5 +1,6 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++<androidx.constraintlayout.widget.ConstraintLayout
++    xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+Index: app/src/main/java/com/konkuk/select/activity/AddCodiActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.activity\r\n\r\nimport android.annotation.SuppressLint\r\nimport android.content.Intent\r\nimport android.graphics.Bitmap\r\nimport android.graphics.Canvas\r\nimport android.graphics.Color\r\nimport android.graphics.drawable.Drawable\r\nimport android.os.Bundle\r\nimport android.util.Log\r\nimport android.view.MotionEvent\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport android.widget.ImageView\r\nimport android.widget.Toast\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport androidx.constraintlayout.widget.ConstraintLayout\r\nimport androidx.lifecycle.MutableLiveData\r\nimport androidx.lifecycle.Observer\r\nimport androidx.recyclerview.widget.LinearLayoutManager\r\nimport com.bumptech.glide.Glide\r\nimport com.konkuk.select.R\r\nimport com.konkuk.select.adpater.CodiBottomCategoryAdapter\r\nimport com.konkuk.select.adpater.CodiBottomClothesLinearAdapter\r\nimport com.konkuk.select.adpater.CodiBottomRecommendationAdapter\r\nimport com.konkuk.select.model.Clothes\r\nimport com.konkuk.select.network.Fbase\r\nimport com.konkuk.select.utils.StaticValues\r\nimport kotlinx.android.synthetic.main.activity_add_codi.*\r\nimport kotlinx.android.synthetic.main.toolbar.view.*\r\nimport kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*\r\nimport org.json.JSONObject\r\nimport java.io.ByteArrayOutputStream\r\nimport java.util.Random\r\nimport kotlin.collections.ArrayList\r\n\r\n\r\nclass AddCodiActivity : AppCompatActivity() {\r\n    var categoryList: ArrayList<String> = StaticValues.categoryList\r\n\r\n    lateinit var codiBottomCategoryAdapter: CodiBottomCategoryAdapter   // 카테고리 목록\r\n    lateinit var codiBottomClothesLinearAdapter: CodiBottomClothesLinearAdapter // 옷 목록\r\n    lateinit var codiBottomRecommendationAdapter: CodiBottomRecommendationAdapter //추천 목록\r\n    var codiBottomClothesList: ArrayList<Clothes> = arrayListOf()\r\n\r\n    var codiClothesList: ArrayList<Clothes> = arrayListOf()  // 코디에 사용된 옷들\r\n\r\n    val myClothes: ArrayList<Clothes> = arrayListOf() // 내 옷들\r\n    lateinit var inputClothes: Clothes // 코디 추천에 input으로 준 옷\r\n    var recommendItemsList: ArrayList<ArrayList<Clothes>> = arrayListOf() // 추천된 코디들\r\n    var recommendItems: ArrayList<Clothes> = arrayListOf() // 코디 추천 옷들\r\n    var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID\r\n    var hBool: MutableSet<String> = mutableSetOf()\r\n    var sBool: MutableSet<String> = mutableSetOf()\r\n    var vBool: MutableSet<String> = mutableSetOf()\r\n\r\n    var isClothesLoading: MutableLiveData<Boolean> = MutableLiveData(false)\r\n    var isHLoading: MutableLiveData<Boolean> = MutableLiveData(false)\r\n    var isSLoading: MutableLiveData<Boolean> = MutableLiveData(false)\r\n    var isVLoading: MutableLiveData<Boolean> = MutableLiveData(false)\r\n    var isAllLoading: MutableLiveData<Boolean> = MutableLiveData(false)\r\n    var isCodiRecmLodaing: MutableLiveData<Boolean> = MutableLiveData(false)\r\n\r\n    var oldXvalue: Float = 0.0f\r\n    var oldYvalue: Float = 0.0f\r\n\r\n    var isSharing:Boolean = false\r\n    var closetId:String = \"\"\r\n    var ownerUid:String = \"\"\r\n    var senderUid:String = \"\"\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        setContentView(R.layout.activity_add_codi)\r\n        checkSharing()\r\n        settingToolBar()\r\n        settingAdapter()\r\n        setClickListener()\r\n        setObserver()\r\n    }\r\n\r\n    private fun checkSharing(){\r\n        if(intent.hasExtra(\"isSharing\")){\r\n            isSharing = intent.getBooleanExtra(\"isSharing\", false)\r\n            intent.getStringExtra(\"closetId\")?.let {\r\n                closetId = it\r\n            }\r\n            intent.getStringExtra(\"ownerUid\")?.let{\r\n                ownerUid = it\r\n            }\r\n            intent.getStringExtra(\"senderUid\")?.let{\r\n                senderUid = it\r\n            }\r\n        }\r\n        if(isSharing){\r\n            toolbar_codi_bottom.randomCodiBtn.visibility = View.GONE\r\n        }\r\n    }\r\n\r\n    private fun settingToolBar() {\r\n        toolbar.title_tv.text = getString(R.string.activity_title_addCodi)\r\n        toolbar.left_iv.setImageResource(R.drawable.back)\r\n        toolbar.right_iv.visibility = View.GONE\r\n        toolbar.right_tv.visibility = View.VISIBLE\r\n        toolbar.right_tv.text = \"완료\"\r\n\r\n        toolbar.left_iv.setOnClickListener {\r\n            finish()\r\n        }\r\n\r\n        // 완료 버튼\r\n        toolbar.right_tv.setOnClickListener {\r\n            val imgByte = captureScreen(codi_canvas)\r\n            var nextIntent = Intent(this, AddCodiRegisterActivity::class.java)\r\n            nextIntent.putExtra(\"codiClothesList\", codiClothesList)\r\n            nextIntent.putExtra(\"codiImage\", imgByte)\r\n            if(isSharing){\r\n                nextIntent.putExtra(\"isSharing\", true)\r\n                nextIntent.putExtra(\"ownerUid\", ownerUid)\r\n                nextIntent.putExtra(\"senderUid\", senderUid)\r\n            }\r\n            startActivity(nextIntent)\r\n            finish() // TODO 뒤로가기 해야되니깐 finish 하면 안되는데 일단..!\r\n        }\r\n    }\r\n\r\n    private fun settingAdapter() {\r\n        codiBottomCategoryAdapter = CodiBottomCategoryAdapter(categoryList)\r\n        codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(codiBottomClothesList)\r\n        codiBottomRecommendationAdapter = CodiBottomRecommendationAdapter(categoryList)\r\n        bottom_rv.adapter = codiBottomCategoryAdapter\r\n        switchLayoutManager()\r\n    }\r\n\r\n    private fun switchLayoutManager() {\r\n        bottom_rv.layoutManager = when (bottom_rv.adapter) {\r\n            codiBottomCategoryAdapter -> {\r\n                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)\r\n            }\r\n            codiBottomClothesLinearAdapter -> {\r\n                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)\r\n            }\r\n            codiBottomRecommendationAdapter -> {\r\n                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)\r\n            }\r\n            else -> {\r\n                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun initClothesList(category: String, uid:String, closetId:String = \"\") {\r\n        var clothesRef = Fbase.CLOTHES_REF\r\n            .whereEqualTo(\"category\", category)\r\n            .whereEqualTo(\"uid\", uid)\r\n        if(closetId != \"\") clothesRef = clothesRef.whereArrayContains(\"closet\", closetId)\r\n        clothesRef.get()\r\n            .addOnSuccessListener { documents ->\r\n                codiBottomClothesList.clear()\r\n                for (document in documents) {\r\n                    val clothesObj = Fbase.getClothes(document)\r\n                    codiBottomClothesList.add(clothesObj)\r\n                }\r\n                codiBottomClothesLinearAdapter.notifyDataSetChanged()\r\n            }\r\n            .addOnFailureListener { exception ->\r\n                Log.w(\"firebase\", \"Error getting documents: \", exception)\r\n            }\r\n    }\r\n\r\n    private fun setClickListener() {\r\n        codiBottomCategoryAdapter.itemClickListener =\r\n            object : CodiBottomCategoryAdapter.OnItemClickListener {\r\n                override fun OnClickItem(\r\n                    holder: CodiBottomCategoryAdapter.ItemHolder,\r\n                    view: View,\r\n                    category: String,\r\n                    position: Int\r\n                ) {\r\n                    toolbar_codi_bottom.tv_titile.text = category\r\n                    if(isSharing){\r\n                        initClothesList(category, uid = ownerUid, closetId = closetId)\r\n                    }else{\r\n                        Fbase.uid?.let { initClothesList(category, uid = it) }\r\n                    }\r\n                    bottom_rv.adapter = codiBottomClothesLinearAdapter\r\n                    switchLayoutManager()\r\n                }\r\n            }\r\n\r\n        codiBottomClothesLinearAdapter.itemClickListener =\r\n            object : CodiBottomClothesLinearAdapter.OnItemClickListener {\r\n                override fun OnClickItem(\r\n                    holder: CodiBottomClothesLinearAdapter.ItemHolder,\r\n                    view: View,\r\n                    data: Clothes,\r\n                    position: Int\r\n                ) {\r\n                    if (codiClothesList.contains(data)) {\r\n                        Toast.makeText(this@AddCodiActivity, \"중복 불가\", Toast.LENGTH_SHORT).show()\r\n                    } else {\r\n                        codiClothesList.add(data)\r\n                        var addImgView = ImageView(this@AddCodiActivity)\r\n                        addImgView.layoutParams = ConstraintLayout.LayoutParams(450, 450)\r\n\r\n                        Glide.with(this@AddCodiActivity)\r\n                            .load(data.imgUri)\r\n                            .into(addImgView)\r\n                        codi_canvas.addView(addImgView)\r\n                        dragAndDrop(addImgView)\r\n                    }\r\n                }\r\n\r\n            }\r\n\r\n        toolbar_codi_bottom.randomCodiBtn.setOnClickListener {\r\n            toolbar_codi_bottom.tv_titile.text = \"추천 아이템\"\r\n            Fbase.db.collection(\"clothes\")\r\n                .whereEqualTo(\"uid\", Fbase.auth.uid)\r\n                .get()\r\n                .addOnSuccessListener { documents -> // 내 옷장에 있는 옷들\r\n                    for (document in documents)\r\n                        myClothes.add(Fbase.getClothes(document))\r\n                    isClothesLoading.value = true\r\n                }\r\n\r\n            if (codiClothesList.isEmpty()) inputClothes = myClothes[Random().nextInt(myClothes.size)]\r\n            else inputClothes = codiClothesList[0]\r\n\r\n            getCodiFirebaseDocument(inputClothes)\r\n\r\n            bottom_rv.adapter = codiBottomRecommendationAdapter\r\n            switchLayoutManager()\r\n        }\r\n\r\n        toolbar_codi_bottom.categoryListBtn.setOnClickListener {\r\n            toolbar_codi_bottom.tv_titile.text = \"카테고리\"\r\n            bottom_rv.adapter = codiBottomCategoryAdapter\r\n            switchLayoutManager()\r\n        }\r\n    }\r\n\r\n    private fun setObserver() {\r\n        isHLoading.observe(this, Observer {\r\n            if (isHLoading.value!! && isSLoading.value!! && isVLoading.value!!) isAllLoading.value = true\r\n        })\r\n        isSLoading.observe(this, Observer {\r\n            if (isHLoading.value!! && isSLoading.value!! && isVLoading.value!!) isAllLoading.value = true\r\n        })\r\n        isVLoading.observe(this, Observer {\r\n            if (isHLoading.value!! && isSLoading.value!! && isVLoading.value!!) isAllLoading.value = true\r\n        })\r\n        isAllLoading.observe(this, Observer {\r\n            if (isAllLoading.value!! && isClothesLoading.value!!) {\r\n                for (h in hBool) if (sBool.contains(h) && vBool.contains(h)) codiClothesID.add(h)\r\n                codiRecommend()\r\n            }\r\n        })\r\n        isCodiRecmLodaing.observe(this, Observer {\r\n            if (isCodiRecmLodaing.value!!) {\r\n                Log.d(\"추천된 코디 개수: \", recommendItemsList.size.toString())\r\n            }\r\n        })\r\n    }\r\n\r\n    private fun codiRecommend() {\r\n        /*\r\n        * 0 : 상의\r\n        * 1 : 하의\r\n        * 2 : 드레스\r\n        * 3 : 아우터\r\n        * 4 : 신발\r\n        * 5 : 액세서리\r\n        * */\r\n\r\n        Log.e(\"codiClothesID\", codiClothesID.size.toString())\r\n        for ((index, codiID) in codiClothesID.withIndex()) {\r\n            recommendItems.clear()\r\n            recommendItems.add(inputClothes)\r\n            Log.d(\"현재 검색중인 codiID\", codiID.toString())\r\n            Fbase.db.collection(\"clothes_test\")\r\n                .whereEqualTo(\"codiId\", codiID)\r\n                .get()\r\n                .addOnSuccessListener { documents ->\r\n                    for (document in documents) {\r\n                        val clothesObj = JSONObject(document.data)\r\n                        var color = arrayListOf<Int>(clothesObj.getInt(\"color_h\"), clothesObj.getInt(\"color_s\"), clothesObj.getInt(\"color_v\"))\r\n                        val codiClothes = Clothes(\r\n                            id = \"\",\r\n                            category = clothesObj[\"category\"] as String,\r\n                            subCategory = clothesObj[\"subCategory\"] as String,\r\n                            texture = clothesObj[\"texture\"] as String,\r\n                            color = color,\r\n                            season = arrayListOf<Boolean>(),\r\n                            imgUri = \"\",\r\n                            uid = \"\"\r\n                        )\r\n\r\n                        for (clothes in myClothes) {\r\n                            if (codiClothes.category != inputClothes.category) {\r\n                                if (compareClothes(clothes, codiClothes)) {\r\n                                    recommendItems.add(clothes)\r\n                                }\r\n                            }\r\n                        }\r\n                    }\r\n                    var onepiece = false\r\n                    var twopiece: Array<Boolean> = arrayOf(false, false)\r\n                    for (clothes in recommendItems) {\r\n                        // 상의 하의 또는 드레스는 무조건 있어야함!!\r\n                        if (clothes.category == \"top\") {\r\n                            twopiece[0] = true\r\n                        } else if (clothes.category == \"bottom\") {\r\n                            twopiece[1] = true\r\n                        } else if (clothes.category == \"dress\")\r\n                            onepiece = true\r\n                    }\r\n                    if (onepiece || (twopiece[0] && twopiece[1])) {\r\n                        Log.d(\"추천 코디의 codiID\", codiID.toString())\r\n                        Log.d(\"추천 코디 안의 옷 개수 : \", recommendItems.size.toString())\r\n                        recommendItemsList.add(recommendItems)\r\n                    }\r\n\r\n                    if (index == codiClothesID.size - 1) {\r\n                        isCodiRecmLodaing.value = true\r\n                    }\r\n                }\r\n        }\r\n    }\r\n\r\n    private fun compareClothes(input1: Clothes, input2: Clothes): Boolean {\r\n        if (input1.category == input2.category && input1.subCategory == input2.subCategory && input1.texture == input2.texture) {\r\n            return (input1.color[0] >= (input2.color[0] - 10) && input1.color[0] <= (input2.color[0] + 10)) &&\r\n                    (input1.color[1] >= (input2.color[1] - 10) && input1.color[1] <= (input2.color[1] + 10)) &&\r\n                    (input1.color[2] >= (input2.color[2] - 10) && input1.color[2] <= (input2.color[2] + 10))\r\n        } else return false\r\n    }\r\n\r\n    private fun getCodiFirebaseDocument(inputClothes: Clothes) {\r\n        codiClothesID.clear()\r\n        var allClothes: ArrayList<String> = arrayListOf()\r\n        Fbase.db.collection(\"clothes_test\").get().addOnSuccessListener { documents ->\r\n            for (document in documents)\r\n                allClothes.add(document[\"codiId\"].toString())\r\n        }\r\n\r\n        Fbase.db.collection(\"clothes_test\")\r\n            .whereEqualTo(\"category\", inputClothes.category)\r\n            .whereEqualTo(\"subCategory\", inputClothes.subCategory)\r\n            .whereGreaterThanOrEqualTo(\"color_h\", inputClothes.color[0] - 10)\r\n            .whereLessThanOrEqualTo(\"color_h\", inputClothes.color[0] + 10)\r\n            .get()\r\n            .addOnSuccessListener { documents ->\r\n                hBool.clear()\r\n                for (document in documents)\r\n                    hBool.add(document[\"codiId\"] as String)\r\n                isHLoading.value = true\r\n            }\r\n\r\n        Fbase.db.collection(\"clothes_test\")\r\n            .whereEqualTo(\"category\", inputClothes.category)\r\n            .whereEqualTo(\"subCategory\", inputClothes.subCategory)\r\n            .whereGreaterThanOrEqualTo(\"color_s\", inputClothes.color[1] - 10)\r\n            .whereLessThanOrEqualTo(\"color_s\", inputClothes.color[1] + 10)\r\n            .get()\r\n            .addOnSuccessListener { documents ->\r\n                sBool.clear()\r\n                for (document in documents)\r\n                    sBool.add(document[\"codiId\"] as String)\r\n                isSLoading.value = true\r\n            }\r\n\r\n        Fbase.db.collection(\"clothes_test\")\r\n            .whereEqualTo(\"category\", inputClothes.category)\r\n            .whereEqualTo(\"subCategory\", inputClothes.subCategory)\r\n            .whereGreaterThanOrEqualTo(\"color_v\", inputClothes.color[2] - 10)\r\n            .whereLessThanOrEqualTo(\"color_v\", inputClothes.color[2] + 10)\r\n            .get()\r\n            .addOnSuccessListener { documents ->\r\n                vBool.clear()\r\n                for (document in documents)\r\n                    vBool.add(document[\"codiId\"] as String)\r\n                isVLoading.value = true\r\n            }\r\n    }\r\n\r\n    @SuppressLint(\"ClickableViewAccessibility\")\r\n    private fun dragAndDrop(iv: ImageView) {\r\n        iv.setOnTouchListener(object : View.OnTouchListener {\r\n            override fun onTouch(v: View?, event: MotionEvent?): Boolean {\r\n                val width = (v?.parent as ViewGroup).width - v.width\r\n                val height = (v?.parent as ViewGroup).height - v.height\r\n                if (event?.action == MotionEvent.ACTION_DOWN) {\r\n                    oldXvalue = event.x\r\n                    oldYvalue = event.y\r\n                    //  Log.i(\"Tag1\", \"Action Down X\" + event.getX() + \",\" + event.getY());\r\n                    Log.i(\"Tag1\", \"Action Down rX \" + event.rawX + \",\" + event.rawY)\r\n                } else if (event?.action == MotionEvent.ACTION_MOVE) {\r\n                    v.x = event.rawX - oldXvalue\r\n                    v.y = event.rawY - (oldYvalue + v.height / 2)\r\n                    //  Log.i(\"Tag2\", \"Action Down \" + me.getRawX() + \",\" + me.getRawY());\r\n                } else if (event?.action == MotionEvent.ACTION_UP) {\r\n                    if (v.x > width && v.y > height) {\r\n                        v.x = width.toFloat()\r\n                        v.y = height.toFloat()\r\n                    } else if (v.x < 0 && v.y > height) {\r\n                        v.x = 0f\r\n                        v.y = height.toFloat()\r\n                    } else if (v.x > width && v.y < 0) {\r\n                        v.x = width.toFloat()\r\n                        v.y = 0f\r\n                    } else if (v.x < 0 && v.y < 0) {\r\n                        v.x = 0f\r\n                        v.y = 0f\r\n                    } else if (v.x < 0 || v.x > width) {\r\n                        if (v.x < 0) {\r\n                            v.x = 0f\r\n                            v.y = event.rawY - oldYvalue - v.height\r\n                        } else {\r\n                            v.x = width.toFloat()\r\n                            v.y = event.rawY - oldYvalue - v.height\r\n                        }\r\n                    } else if (v.y < 0 || v.y > height) {\r\n                        if (v.y < 0) {\r\n                            v.x = event.rawX - oldXvalue\r\n                            v.y = 0f\r\n                        } else {\r\n                            v.x = event.rawX - oldXvalue\r\n                            v.y = height.toFloat()\r\n                        }\r\n                    }\r\n                }\r\n                v.bringToFront()\r\n                return true\r\n            }\r\n        })\r\n    }\r\n\r\n    private fun captureScreen(v: View): ByteArray {\r\n        val bm = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888)\r\n        val canvas = Canvas(bm)\r\n        val bgDrawable: Drawable = v.getBackground()\r\n        if (bgDrawable != null) {\r\n            bgDrawable.draw(canvas)\r\n        } else {\r\n            canvas.drawColor(Color.WHITE)\r\n        }\r\n        v.draw(canvas)\r\n        val bytes = ByteArrayOutputStream()\r\n        bm.compress(Bitmap.CompressFormat.JPEG, 100, bytes)\r\n\r\n        return bytes.toByteArray()\r\n    }\r\n\r\n}\r\n\r\n/*\r\n* json 데이터 밀어넣기 -> 이때 기존의 clothes랑 혼합될때 문제 없는지 확인 -> 색인 재설정\r\n* 추천된 코디안에 옷들 가장 많은 것 순으로 추천 -> adapter 이미지 보여주기\r\n* */
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/activity/AddCodiActivity.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/activity/AddCodiActivity.kt	(date 1603390460897)
+@@ -1,6 +1,7 @@
+ package com.konkuk.select.activity
+ 
+ import android.annotation.SuppressLint
++import android.app.Activity
+ import android.content.Intent
+ import android.graphics.Bitmap
+ import android.graphics.Canvas
+@@ -32,7 +33,16 @@
+ import org.json.JSONObject
+ import java.io.ByteArrayOutputStream
+ import java.util.Random
+-import kotlin.collections.ArrayList
++import kotlin.Array
++import kotlin.Boolean
++import kotlin.ByteArray
++import kotlin.Comparator
++import kotlin.Float
++import kotlin.Int
++import kotlin.String
++import kotlin.arrayOf
++import kotlin.let
++import kotlin.toString
+ 
+ 
+ class AddCodiActivity : AppCompatActivity() {
+@@ -46,10 +56,10 @@
+     var codiClothesList: ArrayList<Clothes> = arrayListOf()  // 코디에 사용된 옷들
+ 
+     val myClothes: ArrayList<Clothes> = arrayListOf() // 내 옷들
+-    lateinit var inputClothes: Clothes // 코디 추천에 input으로 준 옷
++    var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID
+     var recommendItemsList: ArrayList<ArrayList<Clothes>> = arrayListOf() // 추천된 코디들
+     var recommendItems: ArrayList<Clothes> = arrayListOf() // 코디 추천 옷들
+-    var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID
++
+     var hBool: MutableSet<String> = mutableSetOf()
+     var sBool: MutableSet<String> = mutableSetOf()
+     var vBool: MutableSet<String> = mutableSetOf()
+@@ -64,10 +74,10 @@
+     var oldXvalue: Float = 0.0f
+     var oldYvalue: Float = 0.0f
+ 
+-    var isSharing:Boolean = false
+-    var closetId:String = ""
+-    var ownerUid:String = ""
+-    var senderUid:String = ""
++    var isSharing: Boolean = false
++    var closetId: String = ""
++    var ownerUid: String = ""
++    var senderUid: String = ""
+ 
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+@@ -85,14 +95,14 @@
+             intent.getStringExtra("closetId")?.let {
+                 closetId = it
+             }
+-            intent.getStringExtra("ownerUid")?.let{
++            intent.getStringExtra("ownerUid")?.let {
+                 ownerUid = it
+             }
+-            intent.getStringExtra("senderUid")?.let{
++            intent.getStringExtra("senderUid")?.let {
+                 senderUid = it
+             }
+         }
+-        if(isSharing){
++        if (isSharing) {
+             toolbar_codi_bottom.randomCodiBtn.visibility = View.GONE
+         }
+     }
+@@ -114,7 +124,7 @@
+             var nextIntent = Intent(this, AddCodiRegisterActivity::class.java)
+             nextIntent.putExtra("codiClothesList", codiClothesList)
+             nextIntent.putExtra("codiImage", imgByte)
+-            if(isSharing){
++            if (isSharing) {
+                 nextIntent.putExtra("isSharing", true)
+                 nextIntent.putExtra("ownerUid", ownerUid)
+                 nextIntent.putExtra("senderUid", senderUid)
+@@ -149,11 +159,11 @@
+         }
+     }
+ 
+-    private fun initClothesList(category: String, uid:String, closetId:String = "") {
++    private fun initClothesList(category: String, uid: String, closetId: String = "") {
+         var clothesRef = Fbase.CLOTHES_REF
+             .whereEqualTo("category", category)
+             .whereEqualTo("uid", uid)
+-        if(closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
++        if (closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
+         clothesRef.get()
+             .addOnSuccessListener { documents ->
+                 codiBottomClothesList.clear()
+@@ -178,9 +188,9 @@
+                     position: Int
+                 ) {
+                     toolbar_codi_bottom.tv_titile.text = category
+-                    if(isSharing){
++                    if (isSharing) {
+                         initClothesList(category, uid = ownerUid, closetId = closetId)
+-                    }else{
++                    } else {
+                         Fbase.uid?.let { initClothesList(category, uid = it) }
+                     }
+                     bottom_rv.adapter = codiBottomClothesLinearAdapter
+@@ -284,13 +294,14 @@
+                 .addOnSuccessListener { documents ->
+                     for (document in documents) {
+                         val clothesObj = JSONObject(document.data)
+-                        var color = arrayListOf<Int>(clothesObj.getInt("color_h"), clothesObj.getInt("color_s"), clothesObj.getInt("color_v"))
+                         val codiClothes = Clothes(
+                             id = "",
+                             category = clothesObj["category"] as String,
+                             subCategory = clothesObj["subCategory"] as String,
+                             texture = clothesObj["texture"] as String,
+-                            color = color,
++                            color_h = clothesObj.getInt("color_h"),
++                            color_s = clothesObj.getInt("color_s"),
++                            color_v = clothesObj.getInt("color_v"),
+                             season = arrayListOf<Boolean>(),
+                             imgUri = "",
+                             uid = ""
+@@ -330,9 +341,9 @@
+ 
+     private fun compareClothes(input1: Clothes, input2: Clothes): Boolean {
+         if (input1.category == input2.category && input1.subCategory == input2.subCategory && input1.texture == input2.texture) {
+-            return (input1.color[0] >= (input2.color[0] - 10) && input1.color[0] <= (input2.color[0] + 10)) &&
+-                    (input1.color[1] >= (input2.color[1] - 10) && input1.color[1] <= (input2.color[1] + 10)) &&
+-                    (input1.color[2] >= (input2.color[2] - 10) && input1.color[2] <= (input2.color[2] + 10))
++            return (input1.color_h >= (input2.color_h - 10) && input1.color_h <= (input2.color_h + 10)) &&
++                    (input1.color_s >= (input2.color_s - 10) && input1.color_s <= (input2.color_s + 10)) &&
++                    (input1.color_v >= (input2.color_v - 10) && input1.color_v <= (input2.color_v + 10))
+         } else return false
+     }
+ 
+@@ -347,8 +358,8 @@
+         Fbase.db.collection("clothes_test")
+             .whereEqualTo("category", inputClothes.category)
+             .whereEqualTo("subCategory", inputClothes.subCategory)
+-            .whereGreaterThanOrEqualTo("color_h", inputClothes.color[0] - 10)
+-            .whereLessThanOrEqualTo("color_h", inputClothes.color[0] + 10)
++            .whereGreaterThanOrEqualTo("color_h", inputClothes.color_h - 10)
++            .whereLessThanOrEqualTo("color_h", inputClothes.color_h + 10)
+             .get()
+             .addOnSuccessListener { documents ->
+                 hBool.clear()
+@@ -360,8 +371,8 @@
+         Fbase.db.collection("clothes_test")
+             .whereEqualTo("category", inputClothes.category)
+             .whereEqualTo("subCategory", inputClothes.subCategory)
+-            .whereGreaterThanOrEqualTo("color_s", inputClothes.color[1] - 10)
+-            .whereLessThanOrEqualTo("color_s", inputClothes.color[1] + 10)
++            .whereGreaterThanOrEqualTo("color_s", inputClothes.color_s - 10)
++            .whereLessThanOrEqualTo("color_s", inputClothes.color_s + 10)
+             .get()
+             .addOnSuccessListener { documents ->
+                 sBool.clear()
+@@ -373,8 +384,8 @@
+         Fbase.db.collection("clothes_test")
+             .whereEqualTo("category", inputClothes.category)
+             .whereEqualTo("subCategory", inputClothes.subCategory)
+-            .whereGreaterThanOrEqualTo("color_v", inputClothes.color[2] - 10)
+-            .whereLessThanOrEqualTo("color_v", inputClothes.color[2] + 10)
++            .whereGreaterThanOrEqualTo("color_v", inputClothes.color_v - 10)
++            .whereLessThanOrEqualTo("color_v", inputClothes.color_v + 10)
+             .get()
+             .addOnSuccessListener { documents ->
+                 vBool.clear()
+@@ -452,9 +463,4 @@
+         return bytes.toByteArray()
+     }
+ 
+-}
+-
+-/*
+-* json 데이터 밀어넣기 -> 이때 기존의 clothes랑 혼합될때 문제 없는지 확인 -> 색인 재설정
+-* 추천된 코디안에 옷들 가장 많은 것 순으로 추천 -> adapter 이미지 보여주기
+-* */
+\ No newline at end of file
++}
+\ No newline at end of file
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    package=\"com.konkuk.select\">\r\n\r\n    <uses-permission android:name=\"android.permission.CAMERA\" />\r\n    <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />\r\n    <uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" />\r\n    <uses-permission android:name=\"android.permission.INTERNET\" />\r\n\r\n    <application\r\n        android:allowBackup=\"true\"\r\n        android:icon=\"@mipmap/ic_launcher\"\r\n        android:label=\"@string/app_name\"\r\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\r\n        android:supportsRtl=\"true\"\r\n        android:theme=\"@style/AppTheme\">\r\n        <activity android:name=\".activity.ClosetShareRecommendationListActivity\"></activity>\r\n        <activity android:name=\".activity.ClosetShareActivity\">\r\n            <intent-filter>\r\n                <action android:name=\"android.intent.action.MAIN\" />\r\n\r\n                <category android:name=\"android.intent.category.LAUNCHER\" />\r\n            </intent-filter>\r\n        </activity>\r\n        <activity android:name=\".activity.ClothesCheckListActivity\" />\r\n        <activity android:name=\".activity.ClosetListActivity\" />\r\n        <activity android:name=\".activity.CodiTagListActivity\" />\r\n        <activity android:name=\".activity.CodiListDetailActivity\" />\r\n        <activity android:name=\".activity.AddClosetActivity\" />\r\n        <activity android:name=\".activity.AddClothesActivity\" />\r\n        <activity android:name=\".activity.AddCodiRegisterActivity\" />\r\n        <activity android:name=\".activity.AddCodiActivity\" />\r\n        <activity android:name=\".activity.DetailClothesActivity\" />\r\n        <activity android:name=\".activity.DetailCodiActivity\" />\r\n        <activity android:name=\".activity.LoginActivty\"></activity>\r\n        <activity android:name=\".activity.MainActivity\">\r\n            <intent-filter>\r\n                <action android:name=\"android.intent.action.VIEW\" />\r\n\r\n                <category android:name=\"android.intent.category.DEFAULT\" />\r\n                <category android:name=\"android.intent.category.BROWSABLE\" />\r\n\r\n                <data\r\n                    android:host=\"@string/kakaolink_host\"\r\n                    android:scheme=\"@string/kakao_scheme\" />\r\n            </intent-filter>\r\n        </activity>\r\n\r\n        <meta-data\r\n            android:name=\"com.kakao.sdk.AppKey\"\r\n            android:value=\"@string/kakao_app_key\" />\r\n\r\n        <provider\r\n            android:name=\"androidx.core.content.FileProvider\"\r\n            android:authorities=\"com.konkuk.select.fileprovider\"\r\n            android:exported=\"false\"\r\n            android:grantUriPermissions=\"true\">\r\n            <meta-data\r\n                android:name=\"android.support.FILE_PROVIDER_PATHS\"\r\n                android:resource=\"@xml/file_paths\" />\r\n        </provider>\r\n    </application>\r\n\r\n</manifest>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/AndroidManifest.xml	(date 1603381341600)
+@@ -16,11 +16,7 @@
+         android:theme="@style/AppTheme">
+         <activity android:name=".activity.ClosetShareRecommendationListActivity"></activity>
+         <activity android:name=".activity.ClosetShareActivity">
+-            <intent-filter>
+-                <action android:name="android.intent.action.MAIN" />
+ 
+-                <category android:name="android.intent.category.LAUNCHER" />
+-            </intent-filter>
+         </activity>
+         <activity android:name=".activity.ClothesCheckListActivity" />
+         <activity android:name=".activity.ClosetListActivity" />
+@@ -32,7 +28,13 @@
+         <activity android:name=".activity.AddCodiActivity" />
+         <activity android:name=".activity.DetailClothesActivity" />
+         <activity android:name=".activity.DetailCodiActivity" />
+-        <activity android:name=".activity.LoginActivty"></activity>
++        <activity android:name=".activity.LoginActivty">
++            <intent-filter>
++                <action android:name="android.intent.action.MAIN" />
++
++                <category android:name="android.intent.category.LAUNCHER" />
++            </intent-filter>
++        </activity>
+         <activity android:name=".activity.MainActivity">
+             <intent-filter>
+                 <action android:name="android.intent.action.VIEW" />
+Index: app/src/main/java/com/konkuk/select/adpater/CodiBottomRecommendationAdapter.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.adpater\r\n\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport android.widget.ImageView\r\nimport android.widget.TextView\r\nimport androidx.recyclerview.widget.RecyclerView\r\nimport com.konkuk.select.R\r\nimport com.konkuk.select.model.Category\r\n\r\nclass CodiBottomRecommendationAdapter(var rcmdList:ArrayList<String>):\r\n    RecyclerView.Adapter<CodiBottomRecommendationAdapter.ItemHolder>() {\r\n\r\n    var itemClickListener:OnItemClickListener?=null\r\n\r\n    interface OnItemClickListener {\r\n        fun OnClickItem(holder: ItemHolder, view: View, data: String, position: Int)\r\n    }\r\n\r\n    inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {\r\n        var tv_category_label: TextView = itemView.findViewById(R.id.tv_category_label)\r\n        var reloadBtn: ImageView = itemView.findViewById(R.id.reloadBtn)\r\n        init {\r\n            reloadBtn.setOnClickListener {\r\n                itemClickListener?.OnClickItem(this, it, rcmdList[adapterPosition], adapterPosition)\r\n            }\r\n        }\r\n    }\r\n\r\n    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {\r\n        var v = LayoutInflater.from(parent.context).inflate(R.layout.codi_bottom_recommendation_item, parent, false)\r\n        return ItemHolder(v)\r\n    }\r\n\r\n    override fun onBindViewHolder(holder: ItemHolder, position: Int) {\r\n        holder.tv_category_label.text = rcmdList[position]\r\n    }\r\n\r\n    override fun getItemCount(): Int {\r\n        return rcmdList.size\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/adpater/CodiBottomRecommendationAdapter.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/adpater/CodiBottomRecommendationAdapter.kt	(date 1603387523389)
+@@ -6,20 +6,24 @@
+ import android.widget.ImageView
+ import android.widget.TextView
+ import androidx.recyclerview.widget.RecyclerView
++import com.bumptech.glide.Glide
+ import com.konkuk.select.R
+ import com.konkuk.select.model.Category
++import com.konkuk.select.model.Clothes
++import java.util.ArrayList
+ 
+-class CodiBottomRecommendationAdapter(var rcmdList:ArrayList<String>):
++class CodiBottomRecommendationAdapter(var rcmdList: ArrayList<Clothes>):
+     RecyclerView.Adapter<CodiBottomRecommendationAdapter.ItemHolder>() {
+ 
+     var itemClickListener:OnItemClickListener?=null
+ 
+     interface OnItemClickListener {
+-        fun OnClickItem(holder: ItemHolder, view: View, data: String, position: Int)
++        fun OnClickItem(holder: ItemHolder, view: View, data: Clothes, position: Int)
+     }
+ 
+     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+         var tv_category_label: TextView = itemView.findViewById(R.id.tv_category_label)
++        var iv_clothes_imgae: ImageView = itemView.findViewById(R.id.iv_img)
+         var reloadBtn: ImageView = itemView.findViewById(R.id.reloadBtn)
+         init {
+             reloadBtn.setOnClickListener {
+@@ -34,7 +38,10 @@
+     }
+ 
+     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
+-        holder.tv_category_label.text = rcmdList[position]
++        holder.tv_category_label.text = rcmdList[position].category
++        Glide.with(holder.iv_clothes_imgae.context)
++            .load(rcmdList[position].imgUri)
++            .into(holder.iv_clothes_imgae)
+     }
+ 
+     override fun getItemCount(): Int {
+Index: app/src/main/java/com/konkuk/select/adpater/CodiBottomClothesLinearAdapter.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.adpater\r\n\r\nimport android.content.Context\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport android.widget.ImageView\r\nimport android.widget.TextView\r\nimport androidx.recyclerview.widget.RecyclerView\r\nimport com.bumptech.glide.Glide\r\nimport com.konkuk.select.R\r\nimport com.konkuk.select.model.Clothes\r\n\r\nclass CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>): RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {\r\n\r\n    var itemClickListener:OnItemClickListener?=null\r\n\r\n    interface OnItemClickListener {\r\n        fun OnClickItem(holder: ItemHolder, view: View, data: Clothes, position: Int)\r\n    }\r\n\r\n    inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {\r\n        var iv_clothes_img: ImageView = itemView.findViewById(R.id.iv_clothes_img)\r\n        init {\r\n            itemView.setOnClickListener {\r\n                itemClickListener?.OnClickItem(this, it, clothesList[adapterPosition], adapterPosition)\r\n            }\r\n        }\r\n    }\r\n\r\n    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {\r\n        var v = LayoutInflater.from(parent.context).inflate(R.layout.codi_bottom_clothes_item_linear, parent, false)\r\n        return ItemHolder(v)\r\n    }\r\n\r\n    override fun onBindViewHolder(holder: ItemHolder, position: Int) {\r\n        Glide.with(holder.iv_clothes_img.context)\r\n            .load(clothesList[position].imgUri)\r\n            .into(holder.iv_clothes_img)\r\n    }\r\n\r\n    override fun getItemCount(): Int {\r\n        return clothesList.size\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/adpater/CodiBottomClothesLinearAdapter.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/adpater/CodiBottomClothesLinearAdapter.kt	(date 1603371101910)
+@@ -11,7 +11,8 @@
+ import com.konkuk.select.R
+ import com.konkuk.select.model.Clothes
+ 
+-class CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>): RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {
++class CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>):
++    RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {
+ 
+     var itemClickListener:OnItemClickListener?=null
+ 
+Index: app/src/main/java/com/konkuk/select/model/Clothes.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.model\r\n\r\nimport java.io.Serializable\r\n\r\ndata class Clothes(\r\n    val id: String,\r\n    val category: String,\r\n    val subCategory: String,\r\n    val texture:String,\r\n    val color: ArrayList<Int>,\r\n    val season:ArrayList<Boolean>,\r\n    val imgUri:String,\r\n    val uid: String\r\n):Serializable\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/model/Clothes.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/model/Clothes.kt	(date 1603381303153)
+@@ -7,7 +7,9 @@
+     val category: String,
+     val subCategory: String,
+     val texture:String,
+-    val color: ArrayList<Int>,
++    val color_h:Int,
++    val color_s:Int,
++    val color_v:Int,
+     val season:ArrayList<Boolean>,
+     val imgUri:String,
+     val uid: String
+Index: app/src/main/java/com/konkuk/select/activity/AddCodiRegisterActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.activity\r\n\r\nimport android.graphics.BitmapFactory\r\nimport android.os.Bundle\r\nimport android.util.Log\r\nimport android.view.View\r\nimport android.widget.CheckBox\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport androidx.recyclerview.widget.GridLayoutManager\r\nimport com.google.firebase.Timestamp\r\nimport com.google.firebase.firestore.DocumentReference\r\nimport com.google.firebase.firestore.FieldValue\r\nimport com.google.firebase.storage.StorageReference\r\nimport com.konkuk.select.R\r\nimport com.konkuk.select.adpater.CodiTagCheckboxListAdapter\r\nimport com.konkuk.select.model.Clothes\r\nimport com.konkuk.select.model.CodiTag\r\nimport com.konkuk.select.network.Fbase\r\nimport kotlinx.android.synthetic.main.activity_add_codi_register.*\r\nimport kotlinx.android.synthetic.main.toolbar.view.*\r\n\r\n\r\nclass AddCodiRegisterActivity : AppCompatActivity() {\r\n    private val TAG = \"DragClickListener\"\r\n\r\n    lateinit var codiTagCheckboxListAdapter: CodiTagCheckboxListAdapter\r\n    var codiTagList = ArrayList<CodiTag>()\r\n\r\n    var checkTagRefArray = arrayListOf<DocumentReference>()\r\n\r\n    private lateinit var codiImgByte: ByteArray\r\n    private var codiClothesList = ArrayList<Clothes>()\r\n    private var codiClothesIdList = ArrayList<String>()\r\n\r\n    private var isSharing:Boolean = false\r\n    private var ownerUid:String = \"\"\r\n    private var senderUid:String = \"\"\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        setContentView(R.layout.activity_add_codi_register)\r\n        checkSharing()\r\n        getDataFromIntent()\r\n        settingToolBar()\r\n        getTagList()\r\n        settingAdapter()\r\n    }\r\n\r\n    private fun checkSharing(){\r\n        if(intent.hasExtra(\"isSharing\") && intent.getBooleanExtra(\"isSharing\", false)){\r\n            isSharing = intent.getBooleanExtra(\"isSharing\", false)\r\n            intent.getStringExtra(\"ownerUid\")?.let{\r\n                ownerUid = it\r\n            }\r\n            intent.getStringExtra(\"senderUid\")?.let{\r\n                senderUid = it\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun settingToolBar() {\r\n        toolbar.title_tv.text = getString(R.string.activity_title_addCodiRegister)\r\n        toolbar.left_iv.setImageResource(R.drawable.back)\r\n        toolbar.right_iv.visibility = View.GONE\r\n        toolbar.right_tv.visibility = View.VISIBLE\r\n        toolbar.right_tv.text = \"올리기\"\r\n\r\n        toolbar.left_iv.setOnClickListener {\r\n            finish()\r\n        }\r\n        toolbar.right_tv.setOnClickListener {\r\n            if(isSharing){\r\n//                uploadImage(codiImgByte, Fbase.TEMP_STORAGE_ROOT_NAME)\r\n            }else{\r\n                Fbase.uid?.let { it1 -> uploadImage(codiImgByte, it1) }\r\n            }\r\n            finish()\r\n            // TODO 방금 올린 코디 상세 페이지로 이동\r\n        }\r\n    }\r\n\r\n    private fun getDataFromIntent(){\r\n        intent.getByteArrayExtra(\"codiImage\")?.let {\r\n            codiImgByte =it\r\n            settingCodiImage(codiImgByte)\r\n        }\r\n        (intent.getSerializableExtra(\"codiClothesList\") as ArrayList<Clothes>).let{\r\n            codiClothesList.clear()\r\n            codiClothesList.addAll(it)\r\n\r\n            codiClothesIdList.clear()\r\n            for(codi in it){\r\n                codiClothesIdList.add(codi.id)\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun settingCodiImage(codiImgByte:ByteArray) {\r\n        val codiImgDecoding = BitmapFactory.decodeByteArray(codiImgByte, 0, codiImgByte!!.size)\r\n        codiDetailImg.setImageBitmap(codiImgDecoding)\r\n    }\r\n\r\n    private fun settingAdapter() {\r\n        codiTag_rv.layoutManager = GridLayoutManager(this, 2)\r\n        codiTagCheckboxListAdapter = CodiTagCheckboxListAdapter(this, codiTagList)\r\n        codiTag_rv.adapter = codiTagCheckboxListAdapter\r\n\r\n        val myDisplay = applicationContext.resources.displayMetrics\r\n        val deviceWidth = myDisplay.widthPixels\r\n        // 코디 태그 뷰마다 길이 가져와서 계산하여 화면 width보다 크면 다음줄 작으면 한 줄에 출력 -> 코드 짜기\r\n\r\n        codiTagCheckboxListAdapter.itemClickListener = object : CodiTagCheckboxListAdapter.OnItemClickListener {\r\n            override fun OnClickItem(\r\n                holder: CodiTagCheckboxListAdapter.ItemHolder,\r\n                view: View,\r\n                data: CodiTag,\r\n                position: Int\r\n            ) {\r\n                val isChecked = (view as CheckBox).isChecked\r\n                if(isChecked) {\r\n                    if(!checkTagRefArray.contains(data.ref)) checkTagRefArray.add(data.ref)\r\n                } else {\r\n                    if(checkTagRefArray.contains(data.ref)) checkTagRefArray.remove(data.ref)\r\n                }\r\n                Log.d(TAG, \"checkTagArray: $checkTagRefArray\")\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun getTagList(){\r\n        Fbase.CODITAG_REF.get().addOnSuccessListener {\r\n            codiTagList.clear()\r\n            for(document in it.documents){\r\n                codiTagList.add(CodiTag(document.reference, document.get(\"name\").toString()))\r\n            }\r\n            codiTagCheckboxListAdapter.notifyDataSetChanged()\r\n        }\r\n    }\r\n\r\n\r\n    private fun uploadImage(codiImgByte: ByteArray, rootFolderName:String){\r\n        var storageRef = Fbase.storage.reference\r\n        var filename = \"codi_\"+Timestamp.now().nanoseconds.toString()\r\n        var imagesRef: StorageReference? = storageRef.child(rootFolderName).child(\"codi\").child(filename)\r\n\r\n        var uploadTask = imagesRef?.putBytes(codiImgByte)\r\n        uploadTask?.addOnSuccessListener {\r\n            imagesRef?.downloadUrl?.addOnSuccessListener {uri ->\r\n                Log.d(TAG, \"downloadUrl: $uri\")\r\n                val imgUri = uri.toString()\r\n                val codiObj = CodiRequest(\r\n                    tags = checkTagRefArray,\r\n                    items = codiClothesList,\r\n                    itemsIds = codiClothesIdList,\r\n                    public = open_switch.isChecked,\r\n                    date = Timestamp.now(),\r\n                    imgUri = imgUri,\r\n                    uid = Fbase.auth.uid.toString()\r\n                )\r\n                insetCodi(codiObj)\r\n            }\r\n        }?.addOnProgressListener { taskSnapshot ->\r\n            val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount\r\n            Log.d(TAG, \"Upload is $progress% done\")\r\n        }?.addOnPausedListener {\r\n            Log.d(TAG, \"Upload is paused\")\r\n        }?.addOnFailureListener {\r\n            Log.d(TAG, \"Upload is failed\")\r\n        }\r\n    }\r\n\r\n    data class CodiRequest(\r\n        val tags:ArrayList<DocumentReference>,\r\n        val items:ArrayList<Clothes>,\r\n        val itemsIds:ArrayList<String>,\r\n        val public:Boolean,\r\n        val date:Timestamp,\r\n        val imgUri:String,\r\n        val uid: String\r\n    )\r\n\r\n    data class CodiRcmd(\r\n        val rcmdId:String,\r\n        val itemsIds:ArrayList<String>,\r\n        val imgUri:String,\r\n        val ownerUid: String,\r\n        val senderUid: String\r\n    )\r\n\r\n    private fun insetCodi(codiRequest:CodiRequest){\r\n        Fbase.CODI_REF.add(codiRequest)\r\n            .addOnSuccessListener { documentReference ->\r\n                Log.d(TAG, \"DocumentSnapshot added with ID: ${documentReference.id}\")\r\n                updateUserCodiTagList(codiRequest.tags)\r\n            }\r\n            .addOnFailureListener { e ->\r\n                Log.w(TAG, \"Error adding document\", e)\r\n            }\r\n    }\r\n\r\n    private fun updateUserCodiTagList(codiTagList:ArrayList<DocumentReference>) {\r\n        Fbase.uid?.let {\r\n            for(tag in codiTagList){\r\n                Fbase.USERS_REF.document(it)\r\n                    .update(\"codiTagList\", FieldValue.arrayUnion(tag))\r\n            }\r\n        }\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/activity/AddCodiRegisterActivity.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/activity/AddCodiRegisterActivity.kt	(date 1603381303142)
+@@ -55,6 +55,8 @@
+             intent.getStringExtra("senderUid")?.let{
+                 senderUid = it
+             }
++            // TODO 추천시는 태그 선택할 필요 x, 메세지를 첨부할 수 있도록 변경
++            // TODO 추천 코디 저장만 하면 됨 (구조 쫌만 더 생각 -> 필터링 어떻게 해야할지)
+         }
+     }
+ 
+@@ -183,9 +185,15 @@
+         val rcmdId:String,
+         val itemsIds:ArrayList<String>,
+         val imgUri:String,
++        val message:String,
+         val ownerUid: String,
+-        val senderUid: String
++        val senderUid: String,
++        val date:Timestamp
+     )
++    // TODO 필드 결정하기
++    // select -> rcmdId로
++    // ownerUid ->
++    // senderUid -> 알림 시 누가 추천했는지 알려주기 위해
+ 
+     private fun insetCodi(codiRequest:CodiRequest){
+         Fbase.CODI_REF.add(codiRequest)
+Index: app/src/main/java/com/konkuk/select/activity/AddClothesActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.activity\r\n\r\nimport android.app.Activity\r\nimport android.content.Intent\r\nimport android.graphics.Bitmap\r\nimport android.graphics.BitmapFactory\r\nimport android.graphics.Color\r\nimport android.graphics.Matrix\r\nimport android.media.ExifInterface\r\nimport android.os.Bundle\r\nimport android.os.Handler\r\nimport android.os.Looper\r\nimport android.util.Log\r\nimport android.view.View\r\nimport android.widget.ImageView\r\nimport android.widget.TextView\r\nimport android.widget.Toast\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport com.bumptech.glide.annotation.GlideModule\r\nimport com.google.firebase.Timestamp\r\nimport com.google.firebase.storage.StorageReference\r\nimport com.konkuk.select.R\r\nimport com.konkuk.select.fragment.BottomSheetMainBtnDialog\r\nimport com.konkuk.select.fragment.BottomSheetSingleListDialog\r\nimport com.konkuk.select.model.ClothesProp\r\nimport com.konkuk.select.network.Fbase\r\nimport com.konkuk.select.network.RetrofitClient\r\nimport com.konkuk.select.utils.ImageManager\r\nimport kotlinx.android.synthetic.main.activity_add_clothes.*\r\nimport okhttp3.MediaType\r\nimport okhttp3.MediaType.Companion.toMediaTypeOrNull\r\nimport okhttp3.MultipartBody\r\nimport okhttp3.RequestBody\r\nimport okhttp3.RequestBody.Companion.asRequestBody\r\nimport okio.BufferedSink\r\nimport retrofit2.Call\r\nimport retrofit2.Callback\r\nimport retrofit2.Response\r\nimport java.io.File\r\nimport java.io.FileInputStream\r\nimport java.io.IOException\r\nimport java.util.*\r\nimport kotlin.collections.ArrayList\r\n\r\nprivate const val TAG = \"AddClothes\"\r\n\r\n@GlideModule\r\nclass AddClothesActivity : AppCompatActivity(),\r\n    BottomSheetSingleListDialog.onChangeCategory {\r\n\r\n    private lateinit var imageFile: File\r\n\r\n    var season: ArrayList<Boolean> = arrayListOf(false, false, false, false)\r\n    lateinit var clothesRGB:ArrayList<Int>\r\n    lateinit var category:String\r\n    lateinit var subCategory: String\r\n    lateinit var texture:String\r\n\r\n    data class ClothesRequest(\r\n        val category: String,\r\n        val subCategory: String,\r\n        val texture:String,\r\n        val color:ArrayList<Int>,\r\n        val season:ArrayList<Boolean>,\r\n        val imgUri:String,\r\n        val uid: String\r\n    )\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        setContentView(R.layout.activity_add_clothes)\r\n        settingToolBar()\r\n        getImgData()\r\n        settingOnClickListener()\r\n    }\r\n\r\n    private fun settingToolBar() {\r\n        val leftBtn: ImageView = toolbar.findViewById(R.id.left_iv)\r\n        val title: TextView = toolbar.findViewById(R.id.title_tv)\r\n        val rightBtn: ImageView = toolbar.findViewById(R.id.right_iv)\r\n\r\n        leftBtn.setImageResource(R.drawable.back)\r\n        title.text = \"옷 추가하기\"\r\n        rightBtn.setImageResource(0)\r\n        rightBtn.visibility = View.INVISIBLE\r\n\r\n        leftBtn.setOnClickListener {\r\n            finish()\r\n        }\r\n    }\r\n\r\n    private fun getImgData() {\r\n        val currentPhotoPath: String? = intent.getStringExtra(\"currentPhotoPath\")\r\n        imageFile = File(currentPhotoPath)\r\n        clothImg.setImageBitmap(ImageManager.rotateImageIfRequired(imageFile.path))\r\n        getClothesAttribute()\r\n    }\r\n\r\n    private fun getClothesAttribute() {\r\n        val requestFile: RequestBody =\r\n            imageFile.asRequestBody(\"multipart/form-data\".toMediaTypeOrNull())\r\n        var multipartBody = MultipartBody.Part.createFormData(\r\n            \"image\",\r\n            imageFile.name,\r\n            requestFile\r\n        )\r\n\r\n        // 서버에서 정보 가져옴\r\n        RetrofitClient.instance.predictClothesProp(imageFile.name, multipartBody).enqueue(object :\r\n            Callback<ClothesProp> {\r\n            override fun onResponse(\r\n                call: Call<ClothesProp>,\r\n                response: Response<ClothesProp>\r\n            ) {\r\n                Log.d(\"Retrofit\", response.body().toString())\r\n                val clothesProp = response.body()\r\n                clothesProp?.let {\r\n                    category = it.category\r\n                    subCategory = it.subCategory\r\n                    texture = it.texture\r\n                    clothesRGB = arrayListOf(it.R, it.G, it.B)\r\n                    initClothesPropView()\r\n                }\r\n                Toast.makeText(\r\n                    this@AddClothesActivity,\r\n                    response.body().toString(),\r\n                    Toast.LENGTH_SHORT\r\n                ).show()\r\n            }\r\n\r\n            override fun onFailure(call: Call<ClothesProp>, t: Throwable) {\r\n                Log.d(\"Retrofit\", \"Error: \" + t.message)\r\n                // TODO 디폴트값 설정\r\n                category = \"error\"\r\n                subCategory = \"error\"\r\n                texture = \"error\"\r\n                clothesRGB = arrayListOf(0,0,0)\r\n                initClothesPropView()\r\n            }\r\n\r\n        })\r\n    }\r\n\r\n    fun initClothesPropView() {\r\n        category_tv.text = category\r\n        categorySub_tv.text = subCategory\r\n        val hex = java.lang.String.format(\"#%02x%02x%02x\",  clothesRGB[0], clothesRGB[1], clothesRGB[2]) // RGB -> #0000 형식으로 변환\r\n        colorCircle.setBackgroundColor(Color.parseColor(hex));\r\n    }\r\n\r\n    private fun settingOnClickListener() {\r\n        addBtn.setOnClickListener {\r\n            uploadImage(imageFile)\r\n\r\n        }\r\n\r\n        checkBox_spring.setOnClickListener {\r\n            season[0] = checkBox_spring.isChecked\r\n        }\r\n        checkBox_summer.setOnClickListener {\r\n            season[1] = checkBox_summer.isChecked\r\n        }\r\n        checkBox_fall.setOnClickListener {\r\n            season[2] = checkBox_fall.isChecked\r\n        }\r\n        checkBox_winter.setOnClickListener {\r\n            season[3] = checkBox_winter.isChecked\r\n        }\r\n\r\n\r\n        // 카테고리 변경\r\n        category_tv.setOnClickListener {\r\n            val bottomSheetFragment = BottomSheetSingleListDialog(this)\r\n            supportFragmentManager?.let {\r\n                bottomSheetFragment.show(it, bottomSheetFragment.getTag())\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun uploadImage(file: File) {\r\n        Log.d(TAG, \"이미지 업로드 uid:${Fbase.uid}\")\r\n\r\n        var storageRef = Fbase.storage.reference\r\n        var filename = Timestamp.now().nanoseconds.toString() + \"_\" + file.name\r\n        var imagesRef: StorageReference? = Fbase.uid?.let { storageRef.child(it).child(\"clothes\").child(filename) }\r\n\r\n        val stream = FileInputStream(file)\r\n        var uploadTask = imagesRef?.putStream(stream)\r\n        uploadTask?.addOnSuccessListener {\r\n            imagesRef?.downloadUrl?.addOnSuccessListener {uri->\r\n                val imgUri = uri.toString()\r\n                var clothesObj = ClothesRequest(category, subCategory, texture, clothesRGB, season, imgUri, Fbase.auth.uid.toString())\r\n                insertClothes(clothesObj)\r\n            }\r\n        }?.addOnProgressListener { taskSnapshot ->\r\n            val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount\r\n            Log.d(TAG, \"Upload is $progress% done\")\r\n        }?.addOnPausedListener {\r\n            Log.d(TAG, \"Upload is paused\")\r\n        }?.addOnFailureListener {\r\n            Log.d(TAG, \"firebaseError: ${it.message}\")\r\n        }\r\n    }\r\n\r\n    private fun insertClothes(clothes: ClothesRequest) {\r\n        Log.d(TAG, \"insertClothest: ${clothes}\")\r\n\r\n        // Add a new document with a generated ID\r\n        Fbase.CLOTHES_REF\r\n            .add(clothes)\r\n            .addOnSuccessListener { documentReference ->\r\n                Log.d(TAG, \"DocumentSnapshot added with ID: ${documentReference.id}\")\r\n                finish()\r\n            }\r\n            .addOnFailureListener { e ->\r\n                Log.w(TAG, \"Error adding document\", e)\r\n            }\r\n    }\r\n\r\n    override fun getSelectedCategory(_category: String, _subCategory: String) {\r\n        category = _category\r\n        subCategory = _subCategory\r\n        texture = \"none\"\r\n        clothesRGB = arrayListOf(0,0,0)\r\n\r\n        initClothesPropView()\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/activity/AddClothesActivity.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/activity/AddClothesActivity.kt	(date 1603381303137)
+@@ -25,6 +25,7 @@
+ import com.konkuk.select.model.ClothesProp
+ import com.konkuk.select.network.Fbase
+ import com.konkuk.select.network.RetrofitClient
++import com.konkuk.select.utils.ColorConverter
+ import com.konkuk.select.utils.ImageManager
+ import kotlinx.android.synthetic.main.activity_add_clothes.*
+ import okhttp3.MediaType
+@@ -51,7 +52,7 @@
+     private lateinit var imageFile: File
+ 
+     var season: ArrayList<Boolean> = arrayListOf(false, false, false, false)
+-    lateinit var clothesRGB:ArrayList<Int>
++    var colorRGB = IntArray(3)
+     lateinit var category:String
+     lateinit var subCategory: String
+     lateinit var texture:String
+@@ -60,7 +61,9 @@
+         val category: String,
+         val subCategory: String,
+         val texture:String,
+-        val color:ArrayList<Int>,
++        val color_h:Int,
++        val color_s:Int,
++        val color_v:Int,
+         val season:ArrayList<Boolean>,
+         val imgUri:String,
+         val uid: String
+@@ -118,7 +121,9 @@
+                     category = it.category
+                     subCategory = it.subCategory
+                     texture = it.texture
+-                    clothesRGB = arrayListOf(it.R, it.G, it.B)
++                    colorRGB[0] = it.R
++                    colorRGB[1] = it.G
++                    colorRGB[2] = it.B
+                     initClothesPropView()
+                 }
+                 Toast.makeText(
+@@ -134,7 +139,9 @@
+                 category = "error"
+                 subCategory = "error"
+                 texture = "error"
+-                clothesRGB = arrayListOf(0,0,0)
++                colorRGB[0] = 0
++                colorRGB[1] = 0
++                colorRGB[2] = 0
+                 initClothesPropView()
+             }
+ 
+@@ -144,7 +151,7 @@
+     fun initClothesPropView() {
+         category_tv.text = category
+         categorySub_tv.text = subCategory
+-        val hex = java.lang.String.format("#%02x%02x%02x",  clothesRGB[0], clothesRGB[1], clothesRGB[2]) // RGB -> #0000 형식으로 변환
++        val hex = java.lang.String.format("#%02x%02x%02x",  colorRGB[0], colorRGB[1], colorRGB[2]) // RGB -> #0000 형식으로 변환
+         colorCircle.setBackgroundColor(Color.parseColor(hex));
+     }
+ 
+@@ -189,7 +196,19 @@
+         uploadTask?.addOnSuccessListener {
+             imagesRef?.downloadUrl?.addOnSuccessListener {uri->
+                 val imgUri = uri.toString()
+-                var clothesObj = ClothesRequest(category, subCategory, texture, clothesRGB, season, imgUri, Fbase.auth.uid.toString())
++                val colorHSV = ColorConverter.convertRGBtoHSV(colorRGB)
++
++                var clothesObj = ClothesRequest(
++                    category = category,
++                    subCategory = subCategory,
++                    texture = texture,
++                    color_h = colorHSV[0],
++                    color_s = colorHSV[1],
++                    color_v = colorHSV[2],
++                    season = season,
++                    imgUri = imgUri,
++                    uid = Fbase.auth.uid.toString()
++                )
+                 insertClothes(clothesObj)
+             }
+         }?.addOnProgressListener { taskSnapshot ->
+@@ -202,6 +221,8 @@
+         }
+     }
+ 
++
++
+     private fun insertClothes(clothes: ClothesRequest) {
+         Log.d(TAG, "insertClothest: ${clothes}")
+ 
+@@ -220,8 +241,10 @@
+     override fun getSelectedCategory(_category: String, _subCategory: String) {
+         category = _category
+         subCategory = _subCategory
+-        texture = "none"
+-        clothesRGB = arrayListOf(0,0,0)
++//        texture = "none"
++//        colorRGB[0] = 0
++//        colorRGB[1] = 0
++//        colorRGB[2] = 0
+ 
+         initClothesPropView()
+     }
+Index: app/src/main/java/com/konkuk/select/activity/ClosetShareRecommendationListActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.activity\r\n\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport android.os.Bundle\r\nimport com.konkuk.select.R\r\n\r\nclass ClosetShareRecommendationListActivity : AppCompatActivity() {\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        setContentView(R.layout.activity_closet_share_recommendation_list)\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/activity/ClosetShareRecommendationListActivity.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/activity/ClosetShareRecommendationListActivity.kt	(date 1603381303146)
+@@ -10,4 +10,5 @@
+         super.onCreate(savedInstanceState)
+         setContentView(R.layout.activity_closet_share_recommendation_list)
+     }
++
+ }
+Index: app/src/main/java/com/konkuk/select/utils/ColorConverter.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.utils\r\n\r\nobject ColorConverter {\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/utils/ColorConverter.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/utils/ColorConverter.kt	(date 1603381303161)
+@@ -1,4 +1,32 @@
+ package com.konkuk.select.utils
+ 
++import android.graphics.Color
++
+ object ColorConverter {
++    fun convertRGBtoHSV(colorRGB:IntArray):IntArray{
++        var hsv = IntArray(3)
++        var hsv_float = FloatArray(3)
++        // RGB to HSV
++        Color.RGBToHSV(colorRGB[0], colorRGB[1], colorRGB[2], hsv_float)
++        hsv[0] = (hsv_float[0] as Number).toInt()
++        hsv[1] = ((hsv_float[1]*100) as Number).toInt()
++        hsv[2] = ((hsv_float[2]*100) as Number).toInt()
++        return hsv
++    }
++
++    fun convertHSVtoRGB(colorHSV:IntArray):IntArray{
++        var rgb = IntArray(3)
++        // HSV to RGB
++        var hsv = FloatArray(3)
++        hsv[0] = colorHSV[0].toFloat()
++        hsv[1] = (colorHSV[1].toFloat())/100
++        hsv[2] = (colorHSV[2].toFloat())/100
++        var currentColor = Color.HSVToColor(hsv)
++
++        // assign red, green and blue
++        rgb[0] = Color.red(currentColor)
++        rgb[1] = Color.green(currentColor)
++        rgb[2] = Color.blue(currentColor)
++        return rgb
++    }
+ }
+\ No newline at end of file
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"GradleMigrationSettings\" migrationVersion=\"1\" />\r\n  <component name=\"GradleSettings\">\r\n    <option name=\"linkedExternalProjectsSettings\">\r\n      <GradleProjectSettings>\r\n        <option name=\"testRunner\" value=\"PLATFORM\" />\r\n        <option name=\"distributionType\" value=\"DEFAULT_WRAPPED\" />\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"modules\">\r\n          <set>\r\n            <option value=\"$PROJECT_DIR$\" />\r\n            <option value=\"$PROJECT_DIR$/app\" />\r\n          </set>\r\n        </option>\r\n        <option name=\"resolveModulePerSourceSet\" value=\"false\" />\r\n      </GradleProjectSettings>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/gradle.xml	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ .idea/gradle.xml	(date 1603368609310)
+@@ -14,6 +14,7 @@
+           </set>
+         </option>
+         <option name="resolveModulePerSourceSet" value="false" />
++        <option name="useQualifiedModuleNames" value="true" />
+       </GradleProjectSettings>
+     </option>
+   </component>
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_1_8\" project-jdk-name=\"1.8\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/build/classes\" />\r\n  </component>\r\n  <component name=\"ProjectType\">\r\n    <option name=\"id\" value=\"Android\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/misc.xml	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ .idea/misc.xml	(date 1603368627552)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/build/classes" />
+   </component>
+   <component name="ProjectType">
+Index: app/src/main/java/com/konkuk/select/network/Fbase.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.konkuk.select.network\r\n\r\nimport com.google.firebase.Timestamp\r\nimport com.google.firebase.auth.FirebaseAuth\r\nimport com.google.firebase.auth.ktx.auth\r\nimport com.google.firebase.firestore.DocumentSnapshot\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\nimport com.google.firebase.ktx.Firebase\r\nimport com.google.firebase.storage.ktx.storage\r\nimport com.konkuk.select.model.Closet\r\nimport com.konkuk.select.model.Clothes\r\nimport com.konkuk.select.model.Codi\r\nimport org.json.JSONObject\r\n\r\nobject Fbase {\r\n    val auth: FirebaseAuth = Firebase.auth\r\n    val uid = auth.currentUser?.uid\r\n    val db = FirebaseFirestore.getInstance()\r\n    val storage = Firebase.storage\r\n\r\n    val USERS_REF = db.collection(\"users\")\r\n    val CLOSETS_REF = db.collection(\"closets\")\r\n    val CLOTHES_REF = db.collection(\"clothes\")\r\n    val CODI_REF = db.collection(\"codi\")\r\n    val CODITAG_REF = db.collection(\"codiTag\")\r\n\r\n    val TEMP_STORAGE_ROOT_NAME = \"tempImgs\"\r\n\r\n    fun getClothes(document:DocumentSnapshot):Clothes{\r\n        val clothesObj = JSONObject(document.data)\r\n\r\n        val color = clothesObj.getJSONArray(\"color\")\r\n        val colorArray = Array(color.length()) { color.getInt(it) }\r\n        val season = clothesObj.getJSONArray(\"season\")\r\n        val seasonArray = Array(season.length()) { season.getBoolean(it) }\r\n\r\n        return Clothes(\r\n            id = document.id,\r\n            category = clothesObj[\"category\"] as String,\r\n            subCategory = clothesObj[\"subCategory\"] as String,\r\n            texture = clothesObj[\"texture\"] as String,\r\n            color = colorArray.toCollection(ArrayList<Int>()),\r\n            season = seasonArray.toCollection(ArrayList<Boolean>()),\r\n            imgUri = clothesObj[\"imgUri\"] as String,\r\n            uid = clothesObj[\"uid\"] as String\r\n        )\r\n    }\r\n\r\n    fun getCodi(document: DocumentSnapshot):Codi{\r\n        val codiObj = JSONObject(document.data)\r\n\r\n        val tags = codiObj.getJSONArray(\"tags\")\r\n//        val tagsArray = Array(tags.length()) {tags.get(it)} as Array<DocumentReference>\r\n        val itemsIds = codiObj.getJSONArray(\"itemsIds\")\r\n        val itemsIdsArray = Array(itemsIds.length()){itemsIds.getString(it)}\r\n\r\n        return Codi(\r\n            id = document.id,\r\n            tags = arrayListOf(),   // TODO\r\n            itemsIds = itemsIdsArray.toCollection(ArrayList<String>()),\r\n            public = codiObj[\"public\"] as Boolean,\r\n            date = Timestamp.now(),\r\n//            date = codiObj[\"date\"] as Timestamp,\r\n            imgUri = codiObj[\"imgUri\"] as String,\r\n            uid = codiObj[\"uid\"] as String\r\n        )\r\n    }\r\n\r\n    fun getCloset(document:DocumentSnapshot):Closet{\r\n        val name = document[\"name\"].toString()\r\n        val count = document[\"count\"].toString().toInt()\r\n        val uid = document[\"uid\"].toString()\r\n        return Closet(\r\n            id = document.id,\r\n            name = name,\r\n            count = count,\r\n            imgUri = \"\",\r\n            uid = uid\r\n        )\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/konkuk/select/network/Fbase.kt	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ app/src/main/java/com/konkuk/select/network/Fbase.kt	(date 1603381303158)
+@@ -29,8 +29,6 @@
+     fun getClothes(document:DocumentSnapshot):Clothes{
+         val clothesObj = JSONObject(document.data)
+ 
+-        val color = clothesObj.getJSONArray("color")
+-        val colorArray = Array(color.length()) { color.getInt(it) }
+         val season = clothesObj.getJSONArray("season")
+         val seasonArray = Array(season.length()) { season.getBoolean(it) }
+ 
+@@ -39,7 +37,9 @@
+             category = clothesObj["category"] as String,
+             subCategory = clothesObj["subCategory"] as String,
+             texture = clothesObj["texture"] as String,
+-            color = colorArray.toCollection(ArrayList<Int>()),
++            color_h = clothesObj.getInt("color_h"),
++            color_s = clothesObj.getInt("color_s"),
++            color_v = clothesObj.getInt("color_v"),
+             season = seasonArray.toCollection(ArrayList<Boolean>()),
+             imgUri = clothesObj["imgUri"] as String,
+             uid = clothesObj["uid"] as String
+Index: .idea/codeStyles/Project.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><component name=\"ProjectCodeStyleConfiguration\">\r\n  <code_scheme name=\"Project\" version=\"173\">\r\n    <option name=\"RIGHT_MARGIN\" value=\"150\" />\r\n    <JetCodeStyleSettings>\r\n      <option name=\"PACKAGES_TO_USE_STAR_IMPORTS\">\r\n        <value>\r\n          <package name=\"java.util\" alias=\"false\" withSubpackages=\"false\" />\r\n          <package name=\"kotlinx.android.synthetic\" alias=\"false\" withSubpackages=\"true\" />\r\n          <package name=\"io.ktor\" alias=\"false\" withSubpackages=\"true\" />\r\n        </value>\r\n      </option>\r\n      <option name=\"PACKAGES_IMPORT_LAYOUT\">\r\n        <value>\r\n          <package name=\"\" alias=\"false\" withSubpackages=\"true\" />\r\n          <package name=\"java\" alias=\"false\" withSubpackages=\"true\" />\r\n          <package name=\"javax\" alias=\"false\" withSubpackages=\"true\" />\r\n          <package name=\"kotlin\" alias=\"false\" withSubpackages=\"true\" />\r\n          <package name=\"\" alias=\"true\" withSubpackages=\"true\" />\r\n        </value>\r\n      </option>\r\n      <option name=\"CODE_STYLE_DEFAULTS\" value=\"KOTLIN_OFFICIAL\" />\r\n    </JetCodeStyleSettings>\r\n    <codeStyleSettings language=\"XML\">\r\n      <indentOptions>\r\n        <option name=\"CONTINUATION_INDENT_SIZE\" value=\"4\" />\r\n      </indentOptions>\r\n      <arrangement>\r\n        <rules>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>xmlns:android</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>^$</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n            </rule>\r\n          </section>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>xmlns:.*</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>^$</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n              <order>BY_NAME</order>\r\n            </rule>\r\n          </section>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>.*:id</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n            </rule>\r\n          </section>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>.*:name</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n            </rule>\r\n          </section>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>name</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>^$</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n            </rule>\r\n          </section>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>style</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>^$</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n            </rule>\r\n          </section>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>.*</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>^$</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n              <order>BY_NAME</order>\r\n            </rule>\r\n          </section>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>.*</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n              <order>ANDROID_ATTRIBUTE_ORDER</order>\r\n            </rule>\r\n          </section>\r\n          <section>\r\n            <rule>\r\n              <match>\r\n                <AND>\r\n                  <NAME>.*</NAME>\r\n                  <XML_ATTRIBUTE />\r\n                  <XML_NAMESPACE>.*</XML_NAMESPACE>\r\n                </AND>\r\n              </match>\r\n              <order>BY_NAME</order>\r\n            </rule>\r\n          </section>\r\n        </rules>\r\n      </arrangement>\r\n    </codeStyleSettings>\r\n    <codeStyleSettings language=\"kotlin\">\r\n      <option name=\"CODE_STYLE_DEFAULTS\" value=\"KOTLIN_OFFICIAL\" />\r\n    </codeStyleSettings>\r\n  </code_scheme>\r\n</component>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/codeStyles/Project.xml	(revision a8d1ebe74384d659f4ec052d748556e13ea842e2)
++++ .idea/codeStyles/Project.xml	(date 1603370563510)
+@@ -4,18 +4,9 @@
+     <JetCodeStyleSettings>
+       <option name="PACKAGES_TO_USE_STAR_IMPORTS">
+         <value>
+-          <package name="java.util" alias="false" withSubpackages="false" />
+-          <package name="kotlinx.android.synthetic" alias="false" withSubpackages="true" />
+-          <package name="io.ktor" alias="false" withSubpackages="true" />
+-        </value>
+-      </option>
+-      <option name="PACKAGES_IMPORT_LAYOUT">
+-        <value>
+-          <package name="" alias="false" withSubpackages="true" />
+-          <package name="java" alias="false" withSubpackages="true" />
+-          <package name="javax" alias="false" withSubpackages="true" />
+-          <package name="kotlin" alias="false" withSubpackages="true" />
+-          <package name="" alias="true" withSubpackages="true" />
++          <package name="java.util" withSubpackages="false" static="false" />
++          <package name="kotlinx.android.synthetic" withSubpackages="true" static="false" />
++          <package name="io.ktor" withSubpackages="true" static="false" />
+         </value>
+       </option>
+       <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL" />
