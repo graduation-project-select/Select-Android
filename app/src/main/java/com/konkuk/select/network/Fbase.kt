@@ -1,8 +1,10 @@
 package com.konkuk.select.network
 
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -50,18 +52,15 @@ object Fbase {
     fun getCodi(document: DocumentSnapshot):Codi{
         val codiObj = JSONObject(document.data)
 
-        val tags = codiObj.getJSONArray("tags")
-//        val tagsArray = Array(tags.length()) {tags.get(it)} as Array<DocumentReference>
         val itemsIds = codiObj.getJSONArray("itemsIds")
         val itemsIdsArray = Array(itemsIds.length()){itemsIds.getString(it)}
 
         return Codi(
             id = document.id,
-            tags = arrayListOf(),   // TODO
+            tags = document.get("tags") as ArrayList<DocumentReference>,
             itemsIds = itemsIdsArray.toCollection(ArrayList<String>()),
             public = codiObj["public"] as Boolean,
-            date = Timestamp.now(),
-//            date = codiObj["date"] as Timestamp,
+            date = document.get("date") as Timestamp,
             imgUri = codiObj["imgUri"] as String,
             uid = codiObj["uid"] as String
         )

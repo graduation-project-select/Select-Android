@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.konkuk.select.R
 import com.konkuk.select.adpater.ClothesItemAdapter
@@ -14,6 +15,7 @@ import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.activity_detail_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import java.text.SimpleDateFormat
 
 class DetailCodiActivity : AppCompatActivity() {
 
@@ -73,30 +75,33 @@ class DetailCodiActivity : AppCompatActivity() {
         intent.getStringExtra("codiId")?.let {
             codiId = it
             Fbase.CODI_REF.document(codiId)
-                .get().addOnSuccessListener {document ->
+                .get().addOnSuccessListener { document ->
                     codiObj  = Fbase.getCodi(document)
-                    initView(codiObj.tags, codiObj.imgUri)
+                    initView(codiObj.tags, codiObj.imgUri, codiObj.date)
                     getClothesListById(codiObj.itemsIds)
                 }
         }
     }
 
-    fun initView(tags:ArrayList<DocumentReference>,imgUri:String){
+    fun initView(tags: ArrayList<DocumentReference>, imgUri: String, date: Timestamp){
+        // 태그
         var tagString = ""
         for(tag in tags){
             tag.get().addOnSuccessListener {
-                tagString += it.get("name")
+                tagString += "#${it.get("name")} "
                 codiTag.text = tagString
             }
         }
-
+        // 이미지
         Glide.with(this)
             .load(imgUri)
             .into(codiDetailImg)
+        // 날짜
+        val dateStr: String = SimpleDateFormat("yyyy.MM.dd").format(date.toDate())
+        lastWearDate.text = dateStr
     }
 
-    // TODO firebase에서 clothes 객체 배열은 가져올수 없나
-    fun getClothesListById(itemsIds:ArrayList<String>){
+    fun getClothesListById(itemsIds: ArrayList<String>){
         for(id in itemsIds){
             codiItemList.clear()
             Fbase.CLOTHES_REF.document(id)
