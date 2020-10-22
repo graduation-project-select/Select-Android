@@ -22,6 +22,7 @@ object Fbase {
     val CLOSETS_REF = db.collection("closets")
     val CLOTHES_REF = db.collection("clothes")
     val CODI_REF = db.collection("codi")
+    val CODI_ITEMS_REF = db.collection("clothes_test")
     val CODITAG_REF = db.collection("codiTag")
 
     val TEMP_STORAGE_ROOT_NAME = "tempImgs"

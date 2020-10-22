@@ -62,6 +62,11 @@ class DetailCodiActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+        CombiDoCodi.setOnClickListener {
+            val intent = Intent(this@DetailCodiActivity, AddCodiActivity::class.java)
+            intent.putExtra("combiCodiClothesList", codiItemList)
+            startActivity(intent)
+        }
     }
 
     private fun getDataFromIntent() {
@@ -97,7 +102,7 @@ class DetailCodiActivity : AppCompatActivity() {
             Fbase.CLOTHES_REF.document(id)
                 .get().addOnSuccessListener {
                     val clothesObj = Fbase.getClothes(it)
-                     codiItemList.add(clothesObj)
+                    codiItemList.add(clothesObj)
                     clothesItemAdapter.notifyDataSetChanged()
                 }
         }

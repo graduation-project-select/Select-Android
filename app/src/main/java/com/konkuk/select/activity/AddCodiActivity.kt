@@ -55,6 +55,8 @@ class AddCodiActivity : AppCompatActivity() {
 
     var codiClothesList: ArrayList<Clothes> = arrayListOf()  // 코디에 사용된 옷들
 
+    lateinit var inputClothes: Clothes // 코디 추천에 input으로 준 옷
+    var combiCodiclothes: ArrayList<Clothes> = arrayListOf() // 이 조합으로 코디하기에서 넘어옷 코디
     val myClothes: ArrayList<Clothes> = arrayListOf() // 내 옷들
     var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID
     var recommendItemsList: ArrayList<ArrayList<Clothes>> = arrayListOf() // 추천된 코디들
@@ -82,6 +84,8 @@ class AddCodiActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_codi)
+        if (intent.hasExtra("combiCodiClothesList"))
+            combiCodiclothes = intent.getSerializableExtra("combiCodiClothesList") as ArrayList<Clothes>
         checkSharing()
         settingToolBar()
         settingAdapter()
@@ -89,8 +93,8 @@ class AddCodiActivity : AppCompatActivity() {
         setObserver()
     }
 
-    private fun checkSharing(){
-        if(intent.hasExtra("isSharing")){
+    private fun checkSharing() {
+        if (intent.hasExtra("isSharing")) {
             isSharing = intent.getBooleanExtra("isSharing", false)
             intent.getStringExtra("closetId")?.let {
                 closetId = it
@@ -137,8 +141,13 @@ class AddCodiActivity : AppCompatActivity() {
     private fun settingAdapter() {
         codiBottomCategoryAdapter = CodiBottomCategoryAdapter(categoryList)
         codiBottomClothesLinearAdapter = CodiBottomClothesLinearAdapter(codiBottomClothesList)
-        codiBottomRecommendationAdapter = CodiBottomRecommendationAdapter(categoryList)
-        bottom_rv.adapter = codiBottomCategoryAdapter
+        codiBottomRecommendationAdapter = CodiBottomRecommendationAdapter(combiCodiclothes)
+
+        if (combiCodiclothes.isEmpty()) {
+            bottom_rv.adapter = codiBottomCategoryAdapter
+        } else {
+            bottom_rv.adapter = codiBottomRecommendationAdapter
+        }
         switchLayoutManager()
     }
 
@@ -150,11 +159,8 @@ class AddCodiActivity : AppCompatActivity() {
             codiBottomClothesLinearAdapter -> {
                 LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             }
-            codiBottomRecommendationAdapter -> {
-                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-            }
             else -> {
-                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             }
         }
     }
@@ -209,6 +215,50 @@ class AddCodiActivity : AppCompatActivity() {
                     if (codiClothesList.contains(data)) {
                         Toast.makeText(this@AddCodiActivity, "중복 불가", Toast.LENGTH_SHORT).show()
                     } else {
+                        if (codiClothesList.isEmpty()) {
+                            codiClothesList.add(data)
+                            Fbase.db.collection("clothes")
+                                .whereEqualTo("uid", Fbase.auth.uid)
+                                .get()
+                                .addOnSuccessListener { documents -> // 내 옷장에 있는 옷들
+                                    for (document in documents)
+                                        myClothes.add(Fbase.getClothes(document))
+                                    isClothesLoading.value = true
+                                }
+
+                            if (codiClothesList.isEmpty()) {
+                                // 옷을 하나 이상 선택한 후에 코디 추천 받도록 함
+                                // 옷 선택 안했을 경우 옷을 선택하라는 문구 나오도록 UI 수정
+                            }
+                            inputClothes = codiClothesList[0]
+                            getCodiFirebaseDocument(inputClothes)
+                        } else {
+                            codiClothesList.add(data)
+                        }
+
+                        var addImgView = ImageView(this@AddCodiActivity)
+                        addImgView.layoutParams = ConstraintLayout.LayoutParams(450, 450)
+
+                        Glide.with(this@AddCodiActivity)
+                            .load(data.imgUri)
+                            .into(addImgView)
+                        codi_canvas.addView(addImgView)
+                        dragAndDrop(addImgView)
+                    }
+                }
+            }
+
+        codiBottomRecommendationAdapter.itemClickListener =
+            object : CodiBottomRecommendationAdapter.OnItemClickListener {
+                override fun OnClickItem(
+                    holder: CodiBottomRecommendationAdapter.ItemHolder,
+                    view: View,
+                    data: Clothes,
+                    position: Int
+                ) {
+                    if (codiClothesList.contains(data)) {
+                        Toast.makeText(this@AddCodiActivity, "중복 불가", Toast.LENGTH_SHORT).show()
+                    } else {
                         codiClothesList.add(data)
                         var addImgView = ImageView(this@AddCodiActivity)
                         addImgView.layoutParams = ConstraintLayout.LayoutParams(450, 450)
@@ -220,25 +270,10 @@ class AddCodiActivity : AppCompatActivity() {
                         dragAndDrop(addImgView)
                     }
                 }
-
             }
 
         toolbar_codi_bottom.randomCodiBtn.setOnClickListener {
             toolbar_codi_bottom.tv_titile.text = "추천 아이템"
-            Fbase.db.collection("clothes")
-                .whereEqualTo("uid", Fbase.auth.uid)
-                .get()
-                .addOnSuccessListener { documents -> // 내 옷장에 있는 옷들
-                    for (document in documents)
-                        myClothes.add(Fbase.getClothes(document))
-                    isClothesLoading.value = true
-                }
-
-            if (codiClothesList.isEmpty()) inputClothes = myClothes[Random().nextInt(myClothes.size)]
-            else inputClothes = codiClothesList[0]
-
-            getCodiFirebaseDocument(inputClothes)
-
             bottom_rv.adapter = codiBottomRecommendationAdapter
             switchLayoutManager()
         }
@@ -267,28 +302,27 @@ class AddCodiActivity : AppCompatActivity() {
             }
         })
         isCodiRecmLodaing.observe(this, Observer {
-            if (isCodiRecmLodaing.value!!) {
-                Log.d("추천된 코디 개수: ", recommendItemsList.size.toString())
+            isCodiRecmLodaing.value?.let {
+                if (it) {
+                    Log.d("추천된 코디 개수: ", recommendItemsList.size.toString())
+                    recommendItemsList.sortWith(Comparator { vo1, vo2 -> vo1.size - vo2.size })
+                    combiCodiclothes.clear()
+                    for(item in recommendItemsList[0]){
+                        combiCodiclothes.add(item)
+                    }
+                    codiBottomRecommendationAdapter.notifyDataSetChanged()
+                }
             }
         })
     }
 
     private fun codiRecommend() {
-        /*
-        * 0 : 상의
-        * 1 : 하의
-        * 2 : 드레스
-        * 3 : 아우터
-        * 4 : 신발
-        * 5 : 액세서리
-        * */
-
-        Log.e("codiClothesID", codiClothesID.size.toString())
+        Log.e("input과 유사한 코디 수", codiClothesID.size.toString())
         for ((index, codiID) in codiClothesID.withIndex()) {
             recommendItems.clear()
             recommendItems.add(inputClothes)
             Log.d("현재 검색중인 codiID", codiID.toString())
-            Fbase.db.collection("clothes_test")
+            Fbase.CODI_ITEMS_REF
                 .whereEqualTo("codiId", codiID)
                 .get()
                 .addOnSuccessListener { documents ->
@@ -350,12 +384,12 @@ class AddCodiActivity : AppCompatActivity() {
     private fun getCodiFirebaseDocument(inputClothes: Clothes) {
         codiClothesID.clear()
         var allClothes: ArrayList<String> = arrayListOf()
-        Fbase.db.collection("clothes_test").get().addOnSuccessListener { documents ->
+        Fbase.CODI_ITEMS_REF.get().addOnSuccessListener { documents ->
             for (document in documents)
                 allClothes.add(document["codiId"].toString())
         }
 
-        Fbase.db.collection("clothes_test")
+        Fbase.CODI_ITEMS_REF
             .whereEqualTo("category", inputClothes.category)
             .whereEqualTo("subCategory", inputClothes.subCategory)
             .whereGreaterThanOrEqualTo("color_h", inputClothes.color_h - 10)
@@ -368,7 +402,7 @@ class AddCodiActivity : AppCompatActivity() {
                 isHLoading.value = true
             }
 
-        Fbase.db.collection("clothes_test")
+        Fbase.CODI_ITEMS_REF
             .whereEqualTo("category", inputClothes.category)
             .whereEqualTo("subCategory", inputClothes.subCategory)
             .whereGreaterThanOrEqualTo("color_s", inputClothes.color_s - 10)
@@ -381,7 +415,7 @@ class AddCodiActivity : AppCompatActivity() {
                 isSLoading.value = true
             }
 
-        Fbase.db.collection("clothes_test")
+        Fbase.CODI_ITEMS_REF
             .whereEqualTo("category", inputClothes.category)
             .whereEqualTo("subCategory", inputClothes.subCategory)
             .whereGreaterThanOrEqualTo("color_v", inputClothes.color_v - 10)

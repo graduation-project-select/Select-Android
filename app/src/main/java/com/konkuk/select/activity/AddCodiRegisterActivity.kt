@@ -14,6 +14,7 @@ import com.google.firebase.storage.StorageReference
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagCheckboxListAdapter
 import com.konkuk.select.model.Clothes
+import com.konkuk.select.model.CodiItem
 import com.konkuk.select.model.CodiTag
 import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.activity_add_codi_register.*
@@ -152,7 +153,6 @@ class AddCodiRegisterActivity : AppCompatActivity() {
                 val imgUri = uri.toString()
                 val codiObj = CodiRequest(
                     tags = checkTagRefArray,
-                    items = codiClothesList,
                     itemsIds = codiClothesIdList,
                     public = open_switch.isChecked,
                     date = Timestamp.now(),
@@ -173,7 +173,6 @@ class AddCodiRegisterActivity : AppCompatActivity() {
 
     data class CodiRequest(
         val tags:ArrayList<DocumentReference>,
-        val items:ArrayList<Clothes>,
         val itemsIds:ArrayList<String>,
         val public:Boolean,
         val date:Timestamp,
@@ -181,6 +180,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         val uid: String
     )
 
+    // 옷장공유 시 친구가 추천해 준 코디
     data class CodiRcmd(
         val rcmdId:String,
         val itemsIds:ArrayList<String>,
@@ -200,10 +200,28 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
                 updateUserCodiTagList(codiRequest.tags)
+                insertCodiItems(documentReference.id, codiClothesList)
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
             }
+    }
+
+    private fun insertCodiItems(codiId:String, codiClothesList:ArrayList<Clothes>){
+        for(item in codiClothesList){
+            val codiItemObj = CodiItem(
+                codiId = codiId,
+                clothesId = item.id,
+                category = item.category,
+                subCategory = item.subCategory,
+                texture = item.texture,
+                color_h = item.color_h,
+                color_s = item.color_s,
+                color_v = item.color_v
+            )
+            Fbase.CODI_ITEMS_REF.add(codiItemObj)
+        }
+
     }
 
     private fun updateUserCodiTagList(codiTagList:ArrayList<DocumentReference>) {
