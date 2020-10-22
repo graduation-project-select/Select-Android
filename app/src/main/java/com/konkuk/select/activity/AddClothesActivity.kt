@@ -25,6 +25,7 @@ import com.konkuk.select.fragment.BottomSheetSingleListDialog
 import com.konkuk.select.model.ClothesProp
 import com.konkuk.select.network.Fbase
 import com.konkuk.select.network.RetrofitClient
+import com.konkuk.select.utils.ColorConverter
 import com.konkuk.select.utils.ImageManager
 import kotlinx.android.synthetic.main.activity_add_clothes.*
 import okhttp3.MediaType
@@ -51,7 +52,7 @@ class AddClothesActivity : AppCompatActivity(),
     private lateinit var imageFile: File
 
     var season: ArrayList<Boolean> = arrayListOf(false, false, false, false)
-    lateinit var clothesRGB:ArrayList<Int>
+    var colorRGB = IntArray(3)
     lateinit var category:String
     lateinit var subCategory: String
     lateinit var texture:String
@@ -60,7 +61,9 @@ class AddClothesActivity : AppCompatActivity(),
         val category: String,
         val subCategory: String,
         val texture:String,
-        val color:ArrayList<Int>,
+        val color_h:Int,
+        val color_s:Int,
+        val color_v:Int,
         val season:ArrayList<Boolean>,
         val imgUri:String,
         val uid: String
@@ -118,7 +121,9 @@ class AddClothesActivity : AppCompatActivity(),
                     category = it.category
                     subCategory = it.subCategory
                     texture = it.texture
-                    clothesRGB = arrayListOf(it.R, it.G, it.B)
+                    colorRGB[0] = it.R
+                    colorRGB[1] = it.G
+                    colorRGB[2] = it.B
                     initClothesPropView()
                 }
                 Toast.makeText(
@@ -134,7 +139,9 @@ class AddClothesActivity : AppCompatActivity(),
                 category = "error"
                 subCategory = "error"
                 texture = "error"
-                clothesRGB = arrayListOf(0,0,0)
+                colorRGB[0] = 0
+                colorRGB[1] = 0
+                colorRGB[2] = 0
                 initClothesPropView()
             }
 
@@ -144,7 +151,7 @@ class AddClothesActivity : AppCompatActivity(),
     fun initClothesPropView() {
         category_tv.text = category
         categorySub_tv.text = subCategory
-        val hex = java.lang.String.format("#%02x%02x%02x",  clothesRGB[0], clothesRGB[1], clothesRGB[2]) // RGB -> #0000 형식으로 변환
+        val hex = java.lang.String.format("#%02x%02x%02x",  colorRGB[0], colorRGB[1], colorRGB[2]) // RGB -> #0000 형식으로 변환
         colorCircle.setBackgroundColor(Color.parseColor(hex));
     }
 
@@ -189,7 +196,19 @@ class AddClothesActivity : AppCompatActivity(),
         uploadTask?.addOnSuccessListener {
             imagesRef?.downloadUrl?.addOnSuccessListener {uri->
                 val imgUri = uri.toString()
-                var clothesObj = ClothesRequest(category, subCategory, texture, clothesRGB, season, imgUri, Fbase.auth.uid.toString())
+                val colorHSV = ColorConverter.convertRGBtoHSV(colorRGB)
+
+                var clothesObj = ClothesRequest(
+                    category = category,
+                    subCategory = subCategory,
+                    texture = texture,
+                    color_h = colorHSV[0],
+                    color_s = colorHSV[1],
+                    color_v = colorHSV[2],
+                    season = season,
+                    imgUri = imgUri,
+                    uid = Fbase.auth.uid.toString()
+                )
                 insertClothes(clothesObj)
             }
         }?.addOnProgressListener { taskSnapshot ->
@@ -201,6 +220,8 @@ class AddClothesActivity : AppCompatActivity(),
             Log.d(TAG, "firebaseError: ${it.message}")
         }
     }
+
+
 
     private fun insertClothes(clothes: ClothesRequest) {
         Log.d(TAG, "insertClothest: ${clothes}")
@@ -220,8 +241,10 @@ class AddClothesActivity : AppCompatActivity(),
     override fun getSelectedCategory(_category: String, _subCategory: String) {
         category = _category
         subCategory = _subCategory
-        texture = "none"
-        clothesRGB = arrayListOf(0,0,0)
+//        texture = "none"
+//        colorRGB[0] = 0
+//        colorRGB[1] = 0
+//        colorRGB[2] = 0
 
         initClothesPropView()
     }

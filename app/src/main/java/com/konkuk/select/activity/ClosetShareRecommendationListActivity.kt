@@ -10,4 +10,5 @@ class ClosetShareRecommendationListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_closet_share_recommendation_list)
     }
+
 }

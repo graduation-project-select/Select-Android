@@ -7,7 +7,9 @@ data class Clothes(
     val category: String,
     val subCategory: String,
     val texture:String,
-    val color: ArrayList<Int>,
+    val color_h:Int,
+    val color_s:Int,
+    val color_v:Int,
     val season:ArrayList<Boolean>,
     val imgUri:String,
     val uid: String

@@ -55,6 +55,8 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             intent.getStringExtra("senderUid")?.let{
                 senderUid = it
             }
+            // TODO 추천시는 태그 선택할 필요 x, 메세지를 첨부할 수 있도록 변경
+            // TODO 추천 코디 저장만 하면 됨 (구조 쫌만 더 생각 -> 필터링 어떻게 해야할지)
         }
     }
 
@@ -183,9 +185,15 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         val rcmdId:String,
         val itemsIds:ArrayList<String>,
         val imgUri:String,
+        val message:String,
         val ownerUid: String,
-        val senderUid: String
+        val senderUid: String,
+        val date:Timestamp
     )
+    // TODO 필드 결정하기
+    // select -> rcmdId로
+    // ownerUid ->
+    // senderUid -> 알림 시 누가 추천했는지 알려주기 위해
 
     private fun insetCodi(codiRequest:CodiRequest){
         Fbase.CODI_REF.add(codiRequest)

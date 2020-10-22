@@ -29,8 +29,6 @@ object Fbase {
     fun getClothes(document:DocumentSnapshot):Clothes{
         val clothesObj = JSONObject(document.data)
 
-        val color = clothesObj.getJSONArray("color")
-        val colorArray = Array(color.length()) { color.getInt(it) }
         val season = clothesObj.getJSONArray("season")
         val seasonArray = Array(season.length()) { season.getBoolean(it) }
 
@@ -39,7 +37,9 @@ object Fbase {
             category = clothesObj["category"] as String,
             subCategory = clothesObj["subCategory"] as String,
             texture = clothesObj["texture"] as String,
-            color = colorArray.toCollection(ArrayList<Int>()),
+            color_h = clothesObj.getInt("color_h"),
+            color_s = clothesObj.getInt("color_s"),
+            color_v = clothesObj.getInt("color_v"),
             season = seasonArray.toCollection(ArrayList<Boolean>()),
             imgUri = clothesObj["imgUri"] as String,
             uid = clothesObj["uid"] as String

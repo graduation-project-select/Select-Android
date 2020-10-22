@@ -16,6 +16,7 @@ import com.konkuk.select.adpater.CodiItemAdapter
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
+import com.konkuk.select.utils.ColorConverter
 import kotlinx.android.synthetic.main.activity_add_clothes.*
 import kotlinx.android.synthetic.main.activity_detail_clothes.*
 import kotlinx.android.synthetic.main.activity_detail_clothes.categorySub_tv
@@ -98,13 +99,18 @@ class DetailClothesActivity : AppCompatActivity() {
     private fun getDataFromIntent() {
         clothesObj = intent.getSerializableExtra("clothesObj") as Clothes
         Log.d("TAG", clothesObj.toString())
-        initView(clothesObj.category, clothesObj.subCategory, clothesObj.color, clothesObj.season, clothesObj.imgUri)
+        val colorHSV = IntArray(3)
+        colorHSV[0] = clothesObj.color_h
+        colorHSV[1] = clothesObj.color_s
+        colorHSV[2] = clothesObj.color_v
+        val colorRGB = ColorConverter.convertHSVtoRGB(colorHSV)
+        initView(clothesObj.category, clothesObj.subCategory, colorRGB, clothesObj.season, clothesObj.imgUri)
     }
 
     private fun initView(
         category: String,
         subCategory: String,
-        clothesRGB: ArrayList<Int>,
+        colorRGB: IntArray,
         season: ArrayList<Boolean>,
         imgUri: String
     ) {
@@ -113,9 +119,9 @@ class DetailClothesActivity : AppCompatActivity() {
 
         val hex = java.lang.String.format(
             "#%02x%02x%02x",
-            clothesRGB[0],
-            clothesRGB[1],
-            clothesRGB[2]
+            colorRGB[0],
+            colorRGB[1],
+            colorRGB[2]
         )
         colorCircle.setBackgroundColor(Color.parseColor(hex))
 
