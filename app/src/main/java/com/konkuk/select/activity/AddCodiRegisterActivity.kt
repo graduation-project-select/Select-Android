@@ -179,6 +179,14 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         val uid: String
     )
 
+    data class CodiRcmd(
+        val rcmdId:String,
+        val itemsIds:ArrayList<String>,
+        val imgUri:String,
+        val ownerUid: String,
+        val senderUid: String
+    )
+
     private fun insetCodi(codiRequest:CodiRequest){
         Fbase.CODI_REF.add(codiRequest)
             .addOnSuccessListener { documentReference ->
