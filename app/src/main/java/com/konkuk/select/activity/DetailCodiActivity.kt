@@ -33,9 +33,9 @@ class DetailCodiActivity : AppCompatActivity() {
 
     fun setToolBar() {
         toolbar.title_tv.text = "코디 상세보기"
-        toolbar.left_iv.setImageResource(0)
+        toolbar.left_iv.setImageResource(R.drawable.back)
         toolbar.right_iv.setImageResource(R.drawable.x)
-
+        toolbar.left_iv.setOnClickListener { finish() }
         toolbar.right_iv.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

@@ -27,20 +27,35 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     var codiTagList = ArrayList<CodiTag>()
 
     var checkTagRefArray = arrayListOf<DocumentReference>()
-    lateinit var imgUri:String
 
     private lateinit var codiImgByte: ByteArray
     private var codiClothesList = ArrayList<Clothes>()
     private var codiClothesIdList = ArrayList<String>()
 
+    private var isSharing:Boolean = false
+    private var ownerUid:String = ""
+    private var senderUid:String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_codi_register)
+        checkSharing()
         getDataFromIntent()
         settingToolBar()
         getTagList()
         settingAdapter()
+    }
+
+    private fun checkSharing(){
+        if(intent.hasExtra("isSharing") && intent.getBooleanExtra("isSharing", false)){
+            isSharing = intent.getBooleanExtra("isSharing", false)
+            intent.getStringExtra("ownerUid")?.let{
+                ownerUid = it
+            }
+            intent.getStringExtra("senderUid")?.let{
+                senderUid = it
+            }
+        }
     }
 
     private fun settingToolBar() {
@@ -54,7 +69,11 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             finish()
         }
         toolbar.right_tv.setOnClickListener {
-            uploadImage(codiImgByte)
+            if(isSharing){
+//                uploadImage(codiImgByte, Fbase.TEMP_STORAGE_ROOT_NAME)
+            }else{
+                Fbase.uid?.let { it1 -> uploadImage(codiImgByte, it1) }
+            }
             finish()
             // TODO 방금 올린 코디 상세 페이지로 이동
         }
@@ -119,28 +138,27 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     }
 
 
-    private fun uploadImage(codiImgByte: ByteArray){
-
+    private fun uploadImage(codiImgByte: ByteArray, rootFolderName:String){
         var storageRef = Fbase.storage.reference
         var filename = "codi_"+Timestamp.now().nanoseconds.toString()
-        var imagesRef: StorageReference? =
-            Fbase.auth.uid?.let { storageRef.child(it).child("codi").child(filename) }
+        var imagesRef: StorageReference? = storageRef.child(rootFolderName).child("codi").child(filename)
 
         var uploadTask = imagesRef?.putBytes(codiImgByte)
         uploadTask?.addOnSuccessListener {
-            Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
-//            val imgUrl = it.uploadSessionUri
-            imgUri = "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/${Fbase.uid}%2Fcodi%2F${filename}?alt=media"
-            val codiObj = CodiRequest(
-                tags = checkTagRefArray,
-                items = codiClothesList,
-                itemsIds = codiClothesIdList,
-                public = open_switch.isChecked,
-                date = Timestamp.now(),
-                imgUri = imgUri,
-                uid = Fbase.auth.uid.toString()
-            )
-            insetCodi(codiObj)
+            imagesRef?.downloadUrl?.addOnSuccessListener {uri ->
+                Log.d(TAG, "downloadUrl: $uri")
+                val imgUri = uri.toString()
+                val codiObj = CodiRequest(
+                    tags = checkTagRefArray,
+                    items = codiClothesList,
+                    itemsIds = codiClothesIdList,
+                    public = open_switch.isChecked,
+                    date = Timestamp.now(),
+                    imgUri = imgUri,
+                    uid = Fbase.auth.uid.toString()
+                )
+                insetCodi(codiObj)
+            }
         }?.addOnProgressListener { taskSnapshot ->
             val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
             Log.d(TAG, "Upload is $progress% done")

@@ -55,8 +55,6 @@ class AddClothesActivity : AppCompatActivity(),
     lateinit var category:String
     lateinit var subCategory: String
     lateinit var texture:String
-    lateinit var imgUri:String
-
 
     data class ClothesRequest(
         val category: String,
@@ -187,17 +185,13 @@ class AddClothesActivity : AppCompatActivity(),
         var imagesRef: StorageReference? = Fbase.uid?.let { storageRef.child(it).child("clothes").child(filename) }
 
         val stream = FileInputStream(file)
-
         var uploadTask = imagesRef?.putStream(stream)
         uploadTask?.addOnSuccessListener {
-            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
-            Log.d(TAG, "it.uploadSessionUri: ${it.uploadSessionUri}")
-//            Log.d(TAG, "imagesRef: ${imagesRef}")
-            imgUri = "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/${Fbase.uid}%2Fclothes%2F${filename}?alt=media"
-//            "https://firebasestorage.googleapis.com/v0/b/select-4cfa6.appspot.com/o/9B4rtDTEWwYU7XKSZozL1o2aB9Z2%2F405000000_309466447.png?alt=media"
-
-            var clothesObj = ClothesRequest(category, subCategory, texture, clothesRGB, season, imgUri, Fbase.auth.uid.toString())
-            insertClothes(clothesObj)
+            imagesRef?.downloadUrl?.addOnSuccessListener {uri->
+                val imgUri = uri.toString()
+                var clothesObj = ClothesRequest(category, subCategory, texture, clothesRGB, season, imgUri, Fbase.auth.uid.toString())
+                insertClothes(clothesObj)
+            }
         }?.addOnProgressListener { taskSnapshot ->
             val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
             Log.d(TAG, "Upload is $progress% done")

@@ -14,14 +14,14 @@ class ClosetClothesHorizontalItemAdapter(var clothesList:ArrayList<Clothes>): Re
     var itemClickListener:OnItemClickListener?=null
 
     interface OnItemClickListener {
-        fun OnClickItem(holder: ImageHolder, view: View, data:Clothes, position: Int)
+        fun onClickItem(holder: ImageHolder, view: View, data:Clothes, position: Int)
     }
 
     inner class ImageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var clothesImg: ImageView = itemView.findViewById(R.id.iv_clothesImg)
         init {
             clothesImg.setOnClickListener {
-                itemClickListener?.OnClickItem(this, it, clothesList[adapterPosition], adapterPosition)
+                itemClickListener?.onClickItem(this, it, clothesList[adapterPosition], adapterPosition)
             }
         }
     }

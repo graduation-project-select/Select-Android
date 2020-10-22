@@ -24,6 +24,8 @@ object Fbase {
     val CODI_REF = db.collection("codi")
     val CODITAG_REF = db.collection("codiTag")
 
+    val TEMP_STORAGE_ROOT_NAME = "tempImgs"
+
     fun getClothes(document:DocumentSnapshot):Clothes{
         val clothesObj = JSONObject(document.data)
 

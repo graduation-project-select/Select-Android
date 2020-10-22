@@ -29,27 +29,47 @@ class DetailClothesActivity : AppCompatActivity() {
 
     lateinit var clothesObj: Clothes
     lateinit var codiItemAdapter: CodiItemAdapter
-    var codiList:ArrayList<Codi> = arrayListOf()
+    var codiList: ArrayList<Codi> = arrayListOf()
+
+    var isSharing: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_clothes)
+        checkSharing()
         settingToolBar()
         settingAdapter()
         settingClickListener()
         getDataFromIntent()
-        getCodiList()
+        if(!isSharing) getCodiList()
+    }
+
+    private fun checkSharing() {
+        if (intent.hasExtra("isSharing")) {
+            isSharing = intent.getBooleanExtra("isSharing", false)
+            if(isSharing){
+                codi_tv.visibility = View.GONE
+                codi_rv.visibility = View.GONE
+            }
+        }
     }
 
     private fun settingToolBar() {
         toolbar.title_tv.text = "옷 상세보기"
-        toolbar.left_iv.setImageResource(0)
-        toolbar.right_iv.setImageResource(R.drawable.x)
+        toolbar.left_iv.setImageResource(R.drawable.back)
+        toolbar.left_iv.setOnClickListener {
+            finish()
+        }
 
-        toolbar.right_iv.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finishAffinity()
+        if(isSharing){
+            toolbar.right_iv.visibility = View.INVISIBLE
+        }else{
+            toolbar.right_iv.setImageResource(R.drawable.x)
+            toolbar.right_iv.setOnClickListener {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finishAffinity()
+            }
         }
     }
 
@@ -99,16 +119,16 @@ class DetailClothesActivity : AppCompatActivity() {
         )
         colorCircle.setBackgroundColor(Color.parseColor(hex))
 
-        val seasonText:ArrayList<String> = arrayListOf("봄", "여름", "가을", "겨울")
+        val seasonText: ArrayList<String> = arrayListOf("봄", "여름", "가을", "겨울")
         var seasonStr = ""
         for ((i, s) in season.withIndex()) {
             if (s) {
-                if(seasonStr != "") seasonStr += ","
+                if (seasonStr != "") seasonStr += ","
                 seasonStr += seasonText[i]
             }
             if (i == 3 && seasonStr != "") seasonStr += " 용"
         }
-        if(seasonStr == "") seasonStr = "계절을 등록해주세요"
+        if (seasonStr == "") seasonStr = "계절을 등록해주세요"
         season_tv.text = seasonStr
 
         Glide.with(this)
@@ -117,13 +137,13 @@ class DetailClothesActivity : AppCompatActivity() {
     }
 
 
-    private fun getCodiList(){
+    private fun getCodiList() {
         Fbase.CODI_REF
             .whereEqualTo("uid", Fbase.uid)
             .whereArrayContains("itemsIds", clothesObj.id)
-            .get().addOnSuccessListener {documents ->
+            .get().addOnSuccessListener { documents ->
                 codiList.clear()
-                for(document in documents){
+                for (document in documents) {
                     val codiObj = Fbase.getCodi(document)
                     codiList.add(codiObj)
                 }

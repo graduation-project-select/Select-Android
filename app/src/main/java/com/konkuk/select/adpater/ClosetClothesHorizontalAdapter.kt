@@ -1,5 +1,6 @@
 package com.konkuk.select.adpater
 
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.konkuk.select.R
+import com.konkuk.select.activity.DetailClothesActivity
 import com.konkuk.select.model.Category
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.network.Fbase
@@ -33,6 +35,16 @@ class ClosetClothesHorizontalAdapter(var categoryList:ArrayList<Category>, priva
             closetClothesHorizontalItemAdapterList.add(arrayListOf())
             closetClothesHorizontalItemAdapter.add(ClosetClothesHorizontalItemAdapter(closetClothesHorizontalItemAdapterList[index]))
             fetchClothesData(c.label, index, closetId, uid)
+            closetClothesHorizontalItemAdapter[index].itemClickListener = object:ClosetClothesHorizontalItemAdapter.OnItemClickListener{
+                override fun onClickItem(holder: ClosetClothesHorizontalItemAdapter.ImageHolder, view: View, data: Clothes, position: Int) {
+                    var intent = Intent(view.context, DetailClothesActivity::class.java)
+                    intent.putExtra("clothesObj", data)
+//                    intent.putExtra("isSharing", true)
+                    view.context.startActivity(intent)
+                }
+
+            }
+
         }
     }
 

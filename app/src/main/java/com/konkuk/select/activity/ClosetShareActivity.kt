@@ -17,16 +17,16 @@ import kotlinx.android.synthetic.main.toolbar.view.*
 class ClosetShareActivity : AppCompatActivity() {
 
     var closetId = "2PEmGmU41ZZhvRENoCr0"
-    var uid = "bMYknEYE6RPK4JEOdiBrTc7vAs33"    // 고서영
+    var ownerUid = "bMYknEYE6RPK4JEOdiBrTc7vAs33"    // ex) 고서영 (옷장 주인)
 
-    var myUid = "enmKDWEYDxgE2GxTmTSd5BFVHyp1"  // 최서희
+    var senderUid = "enmKDWEYDxgE2GxTmTSd5BFVHyp1"  // ex) 최서희
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_closet_share)
         settingToolBar()
-        initViews(closetId)
-        settingFragment(closetId, uid)
+        initViews(closetId, ownerUid)
+        settingFragment(closetId, ownerUid)
         settingOnClickListener()
     }
 
@@ -49,7 +49,7 @@ class ClosetShareActivity : AppCompatActivity() {
 //        }
     }
 
-    private fun initViews(closetId: String) {
+    private fun initViews(closetId: String, uid:String) {
         Fbase.CLOSETS_REF.document(closetId)
             .get().addOnSuccessListener {
                 val closetObj = Fbase.getCloset(it)
@@ -65,16 +65,18 @@ class ClosetShareActivity : AppCompatActivity() {
     private fun settingFragment(closetId: String, uid: String) {
         supportFragmentManager.beginTransaction().replace(
             R.id.closet_container,
-            ClothesListFragment.newInstance(closetId, uid)
+            ClothesListFragment.newInstance(closetId, uid, isSharing = true)
         ).commit()
     }
 
     private fun settingOnClickListener() {
+        // 코디 추가
         addCodiBtn.setOnClickListener {
             var nextIntent = Intent(this, AddCodiActivity::class.java)
-            nextIntent.putExtra("isSahring", true)
+            nextIntent.putExtra("isSharing", true)
             nextIntent.putExtra("closetId", closetId)
-            nextIntent.putExtra("currentUid", uid)
+            nextIntent.putExtra("ownerUid", ownerUid)
+            nextIntent.putExtra("senderUid", senderUid)
             startActivity(nextIntent)
         }
     }

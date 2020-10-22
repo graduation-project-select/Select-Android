@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.fragment_clothes_list.*
 // Params
 private const val CLOSET_ID_PARAM = "closetId"
 private const val USER_ID_PARAM = "userId"
+private const val IS_SHARING_PARAM = "isSharing"
 
 // Log tags
 private const val CLOSET_TAG = "closet"
@@ -36,14 +37,16 @@ private const val FIREBASE_TAG = "firebase"
 class ClothesListFragment : Fragment() {
     private var closetId: String = ""
     private var uid: String = ""
+    private var isSharing: Boolean = false
 
     companion object {
         @JvmStatic
-        fun newInstance(closetId: String, uid: String) =
+        fun newInstance(closetId: String, uid: String, isSharing:Boolean = false) =
             ClothesListFragment().apply {
                 arguments = Bundle().apply {
                     putString(CLOSET_ID_PARAM, closetId)
                     putString(USER_ID_PARAM, uid)
+                    putBoolean(IS_SHARING_PARAM, isSharing)
                 }
             }
     }
@@ -53,6 +56,7 @@ class ClothesListFragment : Fragment() {
         arguments?.let {
             closetId = it.getString(CLOSET_ID_PARAM).toString()
             uid = it.getString(USER_ID_PARAM).toString()
+            isSharing = it.getBoolean(IS_SHARING_PARAM)
         }
     }
 
@@ -187,6 +191,7 @@ class ClothesListFragment : Fragment() {
                 ) {
                     var intent = Intent(activity, DetailClothesActivity::class.java)
                     intent.putExtra("clothesObj", data)
+                    intent.putExtra("isSharing", isSharing)
                     startActivity(intent)
                 }
             }

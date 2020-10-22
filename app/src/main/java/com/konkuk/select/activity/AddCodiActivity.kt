@@ -64,13 +64,37 @@ class AddCodiActivity : AppCompatActivity() {
     var oldXvalue: Float = 0.0f
     var oldYvalue: Float = 0.0f
 
+    var isSharing:Boolean = false
+    var closetId:String = ""
+    var ownerUid:String = ""
+    var senderUid:String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_codi)
+        checkSharing()
         settingToolBar()
         settingAdapter()
         setClickListener()
         setObserver()
+    }
+
+    private fun checkSharing(){
+        if(intent.hasExtra("isSharing")){
+            isSharing = intent.getBooleanExtra("isSharing", false)
+            intent.getStringExtra("closetId")?.let {
+                closetId = it
+            }
+            intent.getStringExtra("ownerUid")?.let{
+                ownerUid = it
+            }
+            intent.getStringExtra("senderUid")?.let{
+                senderUid = it
+            }
+        }
+        if(isSharing){
+            toolbar_codi_bottom.randomCodiBtn.visibility = View.GONE
+        }
     }
 
     private fun settingToolBar() {
@@ -84,11 +108,17 @@ class AddCodiActivity : AppCompatActivity() {
             finish()
         }
 
+        // 완료 버튼
         toolbar.right_tv.setOnClickListener {
             val imgByte = captureScreen(codi_canvas)
             var nextIntent = Intent(this, AddCodiRegisterActivity::class.java)
             nextIntent.putExtra("codiClothesList", codiClothesList)
             nextIntent.putExtra("codiImage", imgByte)
+            if(isSharing){
+                nextIntent.putExtra("isSharing", true)
+                nextIntent.putExtra("ownerUid", ownerUid)
+                nextIntent.putExtra("senderUid", senderUid)
+            }
             startActivity(nextIntent)
             finish() // TODO 뒤로가기 해야되니깐 finish 하면 안되는데 일단..!
         }
@@ -119,11 +149,12 @@ class AddCodiActivity : AppCompatActivity() {
         }
     }
 
-    private fun initClothesList(category: String) {
-        Fbase.db.collection("clothes")
+    private fun initClothesList(category: String, uid:String, closetId:String = "") {
+        var clothesRef = Fbase.CLOTHES_REF
             .whereEqualTo("category", category)
-            .whereEqualTo("uid", Fbase.auth.uid)
-            .get()
+            .whereEqualTo("uid", uid)
+        if(closetId != "") clothesRef = clothesRef.whereArrayContains("closet", closetId)
+        clothesRef.get()
             .addOnSuccessListener { documents ->
                 codiBottomClothesList.clear()
                 for (document in documents) {
@@ -143,11 +174,15 @@ class AddCodiActivity : AppCompatActivity() {
                 override fun OnClickItem(
                     holder: CodiBottomCategoryAdapter.ItemHolder,
                     view: View,
-                    data: String,
+                    category: String,
                     position: Int
                 ) {
-                    toolbar_codi_bottom.tv_titile.text = data
-                    initClothesList(data) // clothesList 변경 (temp data)
+                    toolbar_codi_bottom.tv_titile.text = category
+                    if(isSharing){
+                        initClothesList(category, uid = ownerUid, closetId = closetId)
+                    }else{
+                        Fbase.uid?.let { initClothesList(category, uid = it) }
+                    }
                     bottom_rv.adapter = codiBottomClothesLinearAdapter
                     switchLayoutManager()
                 }
