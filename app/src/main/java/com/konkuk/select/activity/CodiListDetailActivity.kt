@@ -54,8 +54,8 @@ class CodiListDetailActivity : AppCompatActivity() {
                 data: Codi,
                 position: Int
             ) {
-                Toast.makeText(this@CodiListDetailActivity, "${data.id} click", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@CodiListDetailActivity, DetailCodiActivity::class.java)
+                intent.putExtra("codiId", data.id)
                 startActivity(intent)
             }
         }

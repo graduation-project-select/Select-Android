@@ -54,9 +54,8 @@ class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>):Recyc
                     data: Codi,
                     position: Int
                 ) {
-                    Toast.makeText(view.context, "${data.id} click", Toast.LENGTH_SHORT).show()
                     val intent = Intent(view.context, DetailCodiActivity::class.java)
-                    intent.putExtra("codiId", data.id)    // TODO 여기서 ERROR
+                    intent.putExtra("codiId", data.id)
                     view.context.startActivity(intent)
                 }
             }
