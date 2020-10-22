@@ -11,7 +11,8 @@ import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Clothes
 
-class CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>): RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {
+class CodiBottomClothesLinearAdapter(val clothesList:ArrayList<Clothes>):
+    RecyclerView.Adapter<CodiBottomClothesLinearAdapter.ItemHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
