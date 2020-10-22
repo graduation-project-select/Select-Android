@@ -83,7 +83,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
 
     private fun getDataFromIntent(){
         intent.getByteArrayExtra("codiImage")?.let {
-            codiImgByte =it
+            codiImgByte = it
             settingCodiImage(codiImgByte)
         }
         (intent.getSerializableExtra("codiClothesList") as ArrayList<Clothes>).let{

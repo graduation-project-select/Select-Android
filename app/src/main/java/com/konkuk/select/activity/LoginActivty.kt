@@ -40,7 +40,7 @@ class LoginActivty : AppCompatActivity() {
     // TODO 로그아웃: 로그아웃 + sharedPref 정보 clear
     private fun checkLoginStatus(){
         if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
-            Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
             gotoMainPage()
         }
     }
