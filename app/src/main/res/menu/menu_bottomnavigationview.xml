@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/closetItem"
-        android:icon="@android:drawable/ic_menu_help"
+        android:icon="@drawable/menu_closet"
         android:title="옷장" />
     <item
         android:id="@+id/codiItem"
