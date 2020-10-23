@@ -90,6 +90,7 @@ class AddClothesActivity : AppCompatActivity(),
         getClothesAttribute()
     }
 
+    var tryCount = 2
     private fun getClothesAttribute() {
         val requestFile: RequestBody =
             imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
@@ -110,32 +111,46 @@ class AddClothesActivity : AppCompatActivity(),
 
                 val clothesProp = response.body()
                 clothesProp?.let {
-                    category = it.category
-                    subCategory = it.subCategory
-                    texture = it.texture
-                    colorRGB[0] = it.R
-                    colorRGB[1] = it.G
-                    colorRGB[2] = it.B
-                    imageByteArray = Base64.decode(it.encodedImage, 0)
-                    Log.d(TAG, "imageByteArray: $imageByteArray")
-                    initClothesPropView()
-                    imageByteArray?.let { setClothesImage(it) }
+                    if(it.success){
+                        category = it.category
+                        subCategory = it.subCategory
+                        texture = it.texture
+                        colorRGB[0] = it.R
+                        colorRGB[1] = it.G
+                        colorRGB[2] = it.B
+                        imageByteArray = Base64.decode(it.encodedImage, 0)
+                        Log.d(TAG, "imageByteArray: $imageByteArray")
+                        initClothesPropView()
+                        imageByteArray?.let { setClothesImage(it) }
+                    }else{
+                        Log.e(TAG, "success: False")
+                        onFailureGetClothesProps()
+                    }
                 }
             }
 
             override fun onFailure(call: Call<ClothesProp>, t: Throwable) {
-                Log.d(TAG, "Error: " + t.message)
-                // TODO 디폴트값 설정
-                category = "error"
-                subCategory = "error"
-                texture = "error"
-                colorRGB[0] = 0
-                colorRGB[1] = 0
-                colorRGB[2] = 0
-                initClothesPropView()
+                Log.e(TAG, "Error: " + t.message)
+                onFailureGetClothesProps()
             }
 
         })
+    }
+
+    fun onFailureGetClothesProps(){
+        if(tryCount > 0){   // 실패시 2번 더 요청
+            Log.e(TAG, "시도 횟수: $tryCount")
+            getClothesAttribute()
+            tryCount--
+        }
+        // TODO 디폴트값 설정
+        category = "error"
+        subCategory = "error"
+        texture = "error"
+        colorRGB[0] = 0
+        colorRGB[1] = 0
+        colorRGB[2] = 0
+        initClothesPropView()
     }
 
     fun initClothesPropView() {
