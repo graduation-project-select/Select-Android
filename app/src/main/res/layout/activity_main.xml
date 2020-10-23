@@ -29,7 +29,7 @@
         app:elevation="0dp"
         android:clickable="false"
         android:contextClickable="false"
-        app:itemIconTint="@color/colorPrimary"
+
         app:labelVisibilityMode="labeled"
         app:itemTextAppearanceActive="@style/navTextActive"
         app:itemTextAppearanceInactive="@style/navTextInactive"

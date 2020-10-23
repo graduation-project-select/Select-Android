@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/closetItem"
-        android:icon="@drawable/menu_closet"
+        android:icon="@drawable/ic_menu_closet_icon"
         android:title="옷장" />
     <item
         android:id="@+id/codiItem"
-        android:icon="@android:drawable/ic_menu_help"
+        android:icon="@drawable/ic_menu_codi_icon"
         android:title="코디" />
     <item
         android:id="@+id/addItem_hidden"
@@ -14,10 +14,10 @@
         android:title="" />
     <item
         android:id="@+id/communityItem"
-        android:icon="@android:drawable/ic_menu_help"
+        android:icon="@drawable/ic_menu_sns_icon"
         android:title="피드" />
     <item
         android:id="@+id/MyPageItem"
-        android:icon="@android:drawable/ic_menu_help"
+        android:icon="@drawable/ic_menu_mypage_icon"
         android:title="마이페이지" />
 </menu>

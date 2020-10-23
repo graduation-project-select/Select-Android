@@ -24,7 +24,6 @@ class CodiBottomRecommendationAdapter(var rcmdList: ArrayList<Clothes>):
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var tv_category_label: TextView = itemView.findViewById(R.id.tv_category_label)
         var iv_clothes_imgae: ImageView = itemView.findViewById(R.id.iv_img)
-        var reloadBtn: ImageView = itemView.findViewById(R.id.reloadBtn)
         init {
             itemView.setOnClickListener {
                 itemClickListener?.OnClickItem(this, it, rcmdList[adapterPosition], adapterPosition)
