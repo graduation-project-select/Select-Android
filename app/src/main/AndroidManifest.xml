@@ -14,9 +14,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ClosetShareRecommendationListActivity"></activity>
+        <activity android:name=".activity.CodiSuggestionListActivity"></activity>
+        <activity android:name=".activity.ClosetShareRecommendationListActivity" />
         <activity android:name=".activity.ClosetShareActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".activity.ClothesCheckListActivity" />
         <activity android:name=".activity.ClosetListActivity" />
@@ -28,13 +33,7 @@
         <activity android:name=".activity.AddCodiActivity" />
         <activity android:name=".activity.DetailClothesActivity" />
         <activity android:name=".activity.DetailCodiActivity" />
-        <activity android:name=".activity.LoginActivty">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".activity.LoginActivty"></activity>
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

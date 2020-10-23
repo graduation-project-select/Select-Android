@@ -131,6 +131,7 @@ class AddCodiActivity : AppCompatActivity() {
             nextIntent.putExtra("codiImage", imgByte)
             if (isSharing) {
                 nextIntent.putExtra("isSharing", true)
+                nextIntent.putExtra("closetId", closetId)
                 nextIntent.putExtra("ownerUid", ownerUid)
                 nextIntent.putExtra("senderUid", senderUid)
             }

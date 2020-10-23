@@ -12,6 +12,7 @@ import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.model.Closet
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
+import com.konkuk.select.model.CodiSuggestion
 import org.json.JSONObject
 
 object Fbase {
@@ -26,6 +27,9 @@ object Fbase {
     val CODI_REF = db.collection("codi")
     val CODI_ITEMS_REF = db.collection("codiItems")
     val CODITAG_REF = db.collection("codiTag")
+    val CODI_SUGGESTION_REF = db.collection("codiSuggestion")
+    val NOTIFICATION_REF = db.collection("notification")    // TODO 이것은 실시간 데이터베이스로 변경하기
+    val CODISUG_NOTI_REF = db.collection("codiSugNoti") // codi suggestion notification
 
     val TEMP_STORAGE_ROOT_NAME = "tempImgs"
 
@@ -79,4 +83,20 @@ object Fbase {
         )
     }
 
+    fun getCodiSuggestion(document: DocumentSnapshot):CodiSuggestion{
+        val codiObj = JSONObject(document.data)
+
+        val itemsIds = codiObj.getJSONArray("itemsIds")
+        val itemsIdsArray = Array(itemsIds.length()){itemsIds.getString(it)}
+
+        return CodiSuggestion(
+            id = document.id,
+            itemsIds = itemsIdsArray.toCollection(ArrayList<String>()),
+            imgUri = codiObj["imgUri"] as String,
+            message = codiObj["message"] as String,
+            closetId = codiObj["closetId"] as String,
+            ownerUid = codiObj["ownerUid"] as String,
+            senderUid = codiObj["senderUid"] as String
+        )
+    }
 }

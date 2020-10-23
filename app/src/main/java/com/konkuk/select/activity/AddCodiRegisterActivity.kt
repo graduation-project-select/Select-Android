@@ -15,6 +15,7 @@ import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagCheckboxListAdapter
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.CodiItem
+import com.konkuk.select.model.CodiSuggestion
 import com.konkuk.select.model.CodiTag
 import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.activity_add_codi_register.*
@@ -33,9 +34,10 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     private var codiClothesList = ArrayList<Clothes>()
     private var codiClothesIdList = ArrayList<String>()
 
-    private var isSharing:Boolean = false
-    private var ownerUid:String = ""
-    private var senderUid:String = ""
+    private var isSharing: Boolean = false
+    private var closetId: String = ""
+    private var ownerUid: String = ""
+    private var senderUid: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,17 +49,27 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         settingAdapter()
     }
 
-    private fun checkSharing(){
-        if(intent.hasExtra("isSharing") && intent.getBooleanExtra("isSharing", false)){
+    private fun checkSharing() {
+        if (intent.hasExtra("isSharing") && intent.getBooleanExtra("isSharing", false)) {
             isSharing = intent.getBooleanExtra("isSharing", false)
-            intent.getStringExtra("ownerUid")?.let{
+            intent.getStringExtra("closetId")?.let {
+                closetId = it
+            }
+            intent.getStringExtra("ownerUid")?.let {
                 ownerUid = it
             }
-            intent.getStringExtra("senderUid")?.let{
+            intent.getStringExtra("senderUid")?.let {
                 senderUid = it
             }
-            // TODO 추천시는 태그 선택할 필요 x, 메세지를 첨부할 수 있도록 변경
-            // TODO 추천 코디 저장만 하면 됨 (구조 쫌만 더 생각 -> 필터링 어떻게 해야할지)
+
+            // 뷰 조정 : 추천시는 태그 선택할 필요 x, 메세지를 첨부할 수 있도록 변경
+            open_tv.visibility = View.INVISIBLE
+            open_switch.visibility = View.INVISIBLE
+            hashtag_iv.visibility = View.INVISIBLE
+            tag_tv.visibility = View.INVISIBLE
+            codiTag_rv.visibility = View.GONE
+            message_tv.visibility = View.VISIBLE
+            // TODO 이렇게 많이 바귈꺼면 activity를 새로 만드는게 나을듯
         }
     }
 
@@ -72,33 +84,34 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             finish()
         }
         toolbar.right_tv.setOnClickListener {
-            if(isSharing){
-//                uploadImage(codiImgByte, Fbase.TEMP_STORAGE_ROOT_NAME)
-            }else{
+            if (isSharing) {
+                uploadImage(codiImgByte, Fbase.TEMP_STORAGE_ROOT_NAME)
+                // TODO  insert CodiAlarm
+            } else {
                 Fbase.uid?.let { it1 -> uploadImage(codiImgByte, it1) }
+                // TODO 방금 올린 코디 상세 페이지로 이동
             }
             finish()
-            // TODO 방금 올린 코디 상세 페이지로 이동
         }
     }
 
-    private fun getDataFromIntent(){
+    private fun getDataFromIntent() {
         intent.getByteArrayExtra("codiImage")?.let {
             codiImgByte = it
             settingCodiImage(codiImgByte)
         }
-        (intent.getSerializableExtra("codiClothesList") as ArrayList<Clothes>).let{
+        (intent.getSerializableExtra("codiClothesList") as ArrayList<Clothes>).let {
             codiClothesList.clear()
             codiClothesList.addAll(it)
 
             codiClothesIdList.clear()
-            for(codi in it){
+            for (codi in it) {
                 codiClothesIdList.add(codi.id)
             }
         }
     }
 
-    private fun settingCodiImage(codiImgByte:ByteArray) {
+    private fun settingCodiImage(codiImgByte: ByteArray) {
         val codiImgDecoding = BitmapFactory.decodeByteArray(codiImgByte, 0, codiImgByte!!.size)
         codiDetailImg.setImageBitmap(codiImgDecoding)
     }
@@ -120,46 +133,78 @@ class AddCodiRegisterActivity : AppCompatActivity() {
                 position: Int
             ) {
                 val isChecked = (view as CheckBox).isChecked
-                if(isChecked) {
-                    if(!checkTagRefArray.contains(data.ref)) checkTagRefArray.add(data.ref)
+                if (isChecked) {
+                    if (!checkTagRefArray.contains(data.ref)) checkTagRefArray.add(data.ref)
                 } else {
-                    if(checkTagRefArray.contains(data.ref)) checkTagRefArray.remove(data.ref)
+                    if (checkTagRefArray.contains(data.ref)) checkTagRefArray.remove(data.ref)
                 }
                 Log.d(TAG, "checkTagArray: $checkTagRefArray")
             }
         }
     }
 
-    private fun getTagList(){
+    private fun getTagList() {
         Fbase.CODITAG_REF.get().addOnSuccessListener {
             codiTagList.clear()
-            for(document in it.documents){
+            for (document in it.documents) {
                 codiTagList.add(CodiTag(document.reference, document.get("name").toString()))
             }
             codiTagCheckboxListAdapter.notifyDataSetChanged()
         }
     }
 
+    data class CodiRequest(
+        val tags: ArrayList<DocumentReference>,
+        val itemsIds: ArrayList<String>,
+        val public: Boolean,
+        val date: Timestamp,
+        val imgUri: String,
+        val uid: String
+    )
 
-    private fun uploadImage(codiImgByte: ByteArray, rootFolderName:String){
+    data class CodiSuggestionRequest(
+        val itemsIds: ArrayList<String>,
+        val imgUri: String,
+        val message: String,
+        val closetId: String,
+        val ownerUid: String,
+        val senderUid: String
+    )
+
+    private fun uploadImage(codiImgByte: ByteArray, rootFolderName: String) {
         var storageRef = Fbase.storage.reference
-        var filename = "codi_"+Timestamp.now().nanoseconds.toString()
+        var filename = "codi_" + Timestamp.now().nanoseconds.toString()
         var imagesRef: StorageReference? = storageRef.child(rootFolderName).child("codi").child(filename)
 
         var uploadTask = imagesRef?.putBytes(codiImgByte)
         uploadTask?.addOnSuccessListener {
-            imagesRef?.downloadUrl?.addOnSuccessListener {uri ->
+            imagesRef?.downloadUrl?.addOnSuccessListener { uri ->
                 Log.d(TAG, "downloadUrl: $uri")
                 val imgUri = uri.toString()
-                val codiObj = CodiRequest(
-                    tags = checkTagRefArray,
-                    itemsIds = codiClothesIdList,
-                    public = open_switch.isChecked,
-                    date = Timestamp.now(),
-                    imgUri = imgUri,
-                    uid = Fbase.auth.uid.toString()
-                )
-                insetCodi(codiObj)
+                if (isSharing) {
+                    // TODO CodiSuggestion인 경우는 uri가 아닌 imagesRef를 저장해야하나?
+                    //  일정기한 만료 시 tempStorage의 이미지들은 지워야 공간 최적화가 되므로
+                    //  -> uri로 저장하면 지웠을 때 이미지 링크에 접근이 불가능한 문제 발생
+                    val codiSuggestionObj = CodiSuggestionRequest(
+                        itemsIds = codiClothesIdList,
+                        imgUri = imgUri,
+                        message = message_tv.text.toString(),
+                        closetId = closetId,
+                        ownerUid = ownerUid,
+                        senderUid = senderUid
+                    )
+                    Fbase.CODI_SUGGESTION_REF.add(codiSuggestionObj)
+                } else {
+                    val codiObj = CodiRequest(
+                        tags = checkTagRefArray,
+                        itemsIds = codiClothesIdList,
+                        public = open_switch.isChecked,
+                        date = Timestamp.now(),
+                        imgUri = imgUri,
+                        uid = Fbase.auth.uid.toString()
+                    )
+                    insetCodi(codiObj)
+                }
             }
         }?.addOnProgressListener { taskSnapshot ->
             val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
@@ -171,31 +216,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         }
     }
 
-    data class CodiRequest(
-        val tags:ArrayList<DocumentReference>,
-        val itemsIds:ArrayList<String>,
-        val public:Boolean,
-        val date:Timestamp,
-        val imgUri:String,
-        val uid: String
-    )
-
-    // 옷장공유 시 친구가 추천해 준 코디
-    data class CodiRcmd(
-        val rcmdId:String,
-        val itemsIds:ArrayList<String>,
-        val imgUri:String,
-        val message:String,
-        val ownerUid: String,
-        val senderUid: String,
-        val date:Timestamp
-    )
-    // TODO 필드 결정하기
-    // select -> rcmdId로
-    // ownerUid ->
-    // senderUid -> 알림 시 누가 추천했는지 알려주기 위해
-
-    private fun insetCodi(codiRequest:CodiRequest){
+    private fun insetCodi(codiRequest: CodiRequest) {
         Fbase.CODI_REF.add(codiRequest)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
@@ -207,9 +228,9 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             }
     }
 
-    private fun insertCodiItems(codiId:String, codiClothesList:ArrayList<Clothes>){
+    private fun insertCodiItems(codiId: String, codiClothesList: ArrayList<Clothes>) {
         Log.e("insertCodiItems", "insert")
-        for(item in codiClothesList){
+        for (item in codiClothesList) {
             val codiItemObj = CodiItem(
                 codiId = codiId,
                 clothesId = item.id,
@@ -222,12 +243,11 @@ class AddCodiRegisterActivity : AppCompatActivity() {
             )
             Fbase.CODI_ITEMS_REF.add(codiItemObj)
         }
-
     }
 
-    private fun updateUserCodiTagList(codiTagList:ArrayList<DocumentReference>) {
+    private fun updateUserCodiTagList(codiTagList: ArrayList<DocumentReference>) {
         Fbase.uid?.let {
-            for(tag in codiTagList){
+            for (tag in codiTagList) {
                 Fbase.USERS_REF.document(it)
                     .update("codiTagList", FieldValue.arrayUnion(tag))
             }

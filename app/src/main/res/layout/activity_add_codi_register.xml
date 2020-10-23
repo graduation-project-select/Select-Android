@@ -43,18 +43,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/open_tv" />
 
-    <!--    <view-->
-    <!--        android:id="@+id/line"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="1dp"-->
-    <!--        android:layout_marginStart="16dp"-->
-    <!--        android:layout_marginTop="16dp"-->
-    <!--        android:layout_marginEnd="16dp"-->
-    <!--        android:background="#aaaaaa"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/open_switch" />-->
-
     <ImageView
         android:id="@+id/hashtag_iv"
         android:layout_width="20dp"
@@ -88,5 +76,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/hashtag_iv" />
 
+    <EditText
+        android:visibility="gone"
+        android:id="@+id/message_tv"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginHorizontal="24dp"
+        android:padding="10dp"
+        android:background="#eee"
+        android:hint="코디에 대한 설명을 덫붙여보세요"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hashtag_iv" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
