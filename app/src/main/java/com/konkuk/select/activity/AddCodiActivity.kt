@@ -57,7 +57,8 @@ class AddCodiActivity : AppCompatActivity() {
 
     lateinit var inputClothes: Clothes // 코디 추천에 input으로 준 옷
     var combiCodiclothes: ArrayList<Clothes> = arrayListOf() // 이 조합으로 코디하기에서 넘어옷 코디
-    val myClothes: ArrayList<Clothes> = arrayListOf() // 내 옷들
+    var myClothes: ArrayList<Clothes> = arrayListOf() // 내 옷들
+    var myInputCodi: ArrayList<String> = arrayListOf() // 내가 input으로 준 코디 -> 추천 받지 않기 위함
     var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID
     var recommendItemsList: ArrayList<ArrayList<Clothes>> = arrayListOf() // 추천된 코디들
     var recommendItems: ArrayList<Clothes> = arrayListOf() // 코디 추천 옷들
@@ -297,14 +298,26 @@ class AddCodiActivity : AppCompatActivity() {
         })
         isAllLoading.observe(this, Observer {
             if (isAllLoading.value!! && isClothesLoading.value!!) {
-                for (h in hBool) if (sBool.contains(h) && vBool.contains(h)) codiClothesID.add(h)
-                codiRecommend()
+                Fbase.CODI_ITEMS_REF
+                    .whereEqualTo("clothesId", inputClothes.id)
+                    .get().addOnSuccessListener { documents ->
+                        for (document in documents)
+                            myInputCodi.add(document["codiId"].toString())
+                        for (h in hBool) {
+                            if (sBool.contains(h) && vBool.contains(h)) {
+                                if(myInputCodi.contains(h)) continue
+                                codiClothesID.add(h)
+                            }
+                        }
+                        codiRecommend()
+                    }
             }
         })
         isCodiRecmLodaing.observe(this, Observer {
             isCodiRecmLodaing.value?.let {
                 if (it) {
                     Log.d("추천된 코디 개수: ", recommendItemsList.size.toString())
+                    Toast.makeText(this@AddCodiActivity, "Background : 코디 추천 완료", Toast.LENGTH_SHORT).show()
                     recommendItemsList.sortWith(Comparator { vo1, vo2 -> vo1.size - vo2.size })
                     combiCodiclothes.clear()
                     for(item in recommendItemsList[0]){

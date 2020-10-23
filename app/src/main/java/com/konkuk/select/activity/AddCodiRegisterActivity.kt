@@ -208,6 +208,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     }
 
     private fun insertCodiItems(codiId:String, codiClothesList:ArrayList<Clothes>){
+        Log.e("insertCodiItems", "insert")
         for(item in codiClothesList){
             val codiItemObj = CodiItem(
                 codiId = codiId,
