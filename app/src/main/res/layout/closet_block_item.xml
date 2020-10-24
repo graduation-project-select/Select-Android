@@ -55,7 +55,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/tv_count"
         app:layout_constraintTop_toBottomOf="@+id/iv_img"
-        app:srcCompat="?attr/actionModeShareDrawable" />
+        app:srcCompat="@drawable/sharing_btn" />
 
     <ImageView
         android:id="@+id/iv_settingbtn"
