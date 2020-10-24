@@ -29,6 +29,7 @@ import com.konkuk.select.network.Fbase
 import com.konkuk.select.utils.StaticValues
 import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.android.synthetic.main.toolbar_codi_bottom.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -60,8 +61,10 @@ class AddCodiActivity : AppCompatActivity() {
     var myClothes: ArrayList<Clothes> = arrayListOf() // 내 옷들
     var myInputCodi: ArrayList<String> = arrayListOf() // 내가 input으로 준 코디 -> 추천 받지 않기 위함
     var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID
-    var recommendItems: ArrayList<Clothes> = arrayListOf() // 코디 추천 옷들
+
+    //    var recommendItems: ArrayList<Clothes> = arrayListOf() // 코디 추천 옷들
     var recommendItemsList: ArrayList<ArrayList<Clothes>> = arrayListOf() // 추천된 코디들
+    var rcmiIndex = 0 // 코디 추천 index
 
     var hBool: MutableSet<String> = mutableSetOf()
     var sBool: MutableSet<String> = mutableSetOf()
@@ -276,6 +279,7 @@ class AddCodiActivity : AppCompatActivity() {
             }
 
         toolbar_codi_bottom.randomCodiBtn.setOnClickListener {
+            codiReloadBtn.visibility = View.VISIBLE
             if (toolbar_codi_bottom.tv_titile.text == "코디 아이템 목록")
                 combiCodiclothes.clear()
             toolbar_codi_bottom.tv_titile.text = "추천 아이템"
@@ -284,9 +288,22 @@ class AddCodiActivity : AppCompatActivity() {
         }
 
         toolbar_codi_bottom.categoryListBtn.setOnClickListener {
+            codiReloadBtn.visibility = View.INVISIBLE
             toolbar_codi_bottom.tv_titile.text = "카테고리"
             bottom_rv.adapter = codiBottomCategoryAdapter
             switchLayoutManager()
+        }
+
+        codiReloadBtn.setOnClickListener {
+            combiCodiclothes.clear()
+            if (recommendItemsList.isNotEmpty()) {
+                if (++rcmiIndex < recommendItemsList.size)
+                else rcmiIndex = 0
+                for (item in recommendItemsList.get(rcmiIndex))
+                    combiCodiclothes.add(item)
+            }
+
+            codiBottomRecommendationAdapter.notifyDataSetChanged()
         }
     }
 
@@ -324,28 +341,19 @@ class AddCodiActivity : AppCompatActivity() {
         Log.e("input과 유사한 코디 수", codiClothesID.size.toString())
         if (codiClothesID.isEmpty())
             Toast.makeText(this@AddCodiActivity, "Background : input과 유사한 코디 없음", Toast.LENGTH_SHORT).show()
+        recommendItemsList.clear()  // TODO
         for ((index, codiID) in codiClothesID.withIndex()) {
             // Log.d("현재 검색중인 codiID", codiID.toString())
             Fbase.CODI_ITEMS_REF
                 .whereEqualTo("codiId", codiID)
                 .get()
                 .addOnSuccessListener { documents ->
+                    var recommendItems: ArrayList<Clothes> = arrayListOf()
+                    recommendItems.clear() // TODO
                     recommendItems.add(inputClothes)
                     for (clothes in myClothes) {
                         for (document in documents) {
-                            val clothesObj = JSONObject(document.data)
-                            val codiClothes = Clothes(
-                                id = "",
-                                category = clothesObj["category"] as String,
-                                subCategory = clothesObj["subCategory"] as String,
-                                texture = clothesObj["texture"] as String,
-                                color_h = clothesObj.getInt("color_h"),
-                                color_s = clothesObj.getInt("color_s"),
-                                color_v = clothesObj.getInt("color_v"),
-                                season = arrayListOf<Boolean>(),
-                                imgUri = "",
-                                uid = ""
-                            )
+                            val codiClothes = Fbase.getClothes(document, idDefaultCodiItem = true)
                             if (codiClothes.category != inputClothes.category) {
                                 if (compareClothes(clothes, codiClothes)) {
                                     recommendItems.add(clothes)
@@ -353,30 +361,32 @@ class AddCodiActivity : AppCompatActivity() {
                             }
                         }
                     }
+
                     var onepiece = false
                     var twopiece: Array<Boolean> = arrayOf(false, false)
+                    var validCodi = false
                     for (clothes in recommendItems) {
-                        // 상의 하의 또는 드레스는 무조건 있어야함!!
+                        // (상의,하의) 또는 (드레스)는 무조건 있어야함!!
                         if (clothes.category == "top") {
                             twopiece[0] = true
                         } else if (clothes.category == "bottom") {
                             twopiece[1] = true
                         } else if (clothes.category == "dress")
                             onepiece = true
+
+                        if (onepiece || (twopiece[0] && twopiece[1])) {
+                            validCodi = true
+                            break;
+                        };
                     }
-                    if (onepiece || (twopiece[0] && twopiece[1])) {
-                        Log.d("추천 코디의 codiID", codiID.toString())
-                        Log.d("추천 코디 안의 옷 개수 : ", recommendItems.size.toString())
-                        val rc : ArrayList<Clothes> = recommendItems
-                        recommendItemsList.add(rc)
-                        for (rcmi in recommendItems) {
-                            Log.d("rcmi.id", rcmi.id)
-                        }
+
+                    if (validCodi) {
+                        Log.d("추천 코디의 codiID", codiID)
+                        Log.d("추천 코디 recommendItems 안의 옷 개수 : ", recommendItems.size.toString())
+                        for (rcmi in recommendItems) Log.d("rcmi.id", rcmi.id)
+                        recommendItemsList.add(recommendItems)
 
                     }
-                    for ((r, rcmi) in recommendItemsList.withIndex())
-                        Log.e("recommendItemsList[i].size", r.toString() + " : " + rcmi.size.toString())
-                    recommendItems.clear()
 
                     if (index == codiClothesID.size - 1) {
                         Log.d("추천된 코디 개수: ", recommendItemsList.size.toString())
@@ -386,15 +396,11 @@ class AddCodiActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
 
-//                        for ((index, rcmi) in recommendItemsList.withIndex())
-//                            Log.e("recommendItemsList[i].size", index.toString() + " : " + rcmi.size.toString())
-                        recommendItemsList.sortWith(Comparator { vo1, vo2 -> vo1.size - vo2.size })
-//                        for ((index, rcmi) in recommendItemsList.withIndex())
-//                            Log.e("recommendItemsList[i].size", index.toString() + " : " + rcmi.size.toString())
+                        recommendItemsList.sortWith(Comparator { vo1, vo2 -> vo2.size - vo1.size })
 
                         combiCodiclothes.clear()
                         if (recommendItemsList.isNotEmpty())
-                            for (item in recommendItemsList.get(0))
+                            for (item in recommendItemsList.get(rcmiIndex))
                                 combiCodiclothes.add(item)
                         codiBottomRecommendationAdapter.notifyDataSetChanged()
                     }
