@@ -3,13 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="#fff"
     android:layout_width="match_parent"
     android:layout_height="70dp">
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_marginStart="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,10 +21,10 @@
         android:id="@+id/tv_senderName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="최서희"
+        android:text=" - "
         android:textSize="16sp"
         android:textColor="@color/colorPrimary"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="12dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/imageView" />
@@ -58,6 +59,8 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:paddingHorizontal="8dp"
+        android:background="#5CD3D3D3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

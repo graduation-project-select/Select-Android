@@ -26,7 +26,7 @@
         <activity android:name=".activity.CodiListDetailActivity" />
         <activity android:name=".activity.AddClosetActivity" />
         <activity android:name=".activity.AddClothesActivity" />
-        <activity android:name=".activity.AddCodiRegisterActivity" />
+        <activity android:name=".activity.AddCodiRegisterActivity"/>
         <activity android:name=".activity.AddCodiActivity" />
         <activity android:name=".activity.DetailClothesActivity" />
         <activity android:name=".activity.DetailCodiActivity" />

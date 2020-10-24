@@ -29,7 +29,6 @@
         app:elevation="0dp"
         android:clickable="false"
         android:contextClickable="false"
-
         app:labelVisibilityMode="labeled"
         app:itemTextAppearanceActive="@style/navTextActive"
         app:itemTextAppearanceInactive="@style/navTextInactive"

@@ -90,7 +90,7 @@ class AddClothesActivity : AppCompatActivity(),
         getClothesAttribute()
     }
 
-    var tryCount = 2
+    var tryCount = 3
     private fun getClothesAttribute() {
         val requestFile: RequestBody =
             imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
@@ -138,19 +138,20 @@ class AddClothesActivity : AppCompatActivity(),
     }
 
     fun onFailureGetClothesProps(){
-        if(tryCount > 0){   // 실패시 2번 더 요청
+        if(tryCount > 0){   // 실패시 3번 더 요청
             Log.e(TAG, "시도 횟수: $tryCount")
             getClothesAttribute()
             tryCount--
+        }else{
+            // TODO 디폴트값 설정
+            category = " - "
+            subCategory = " - "
+            texture = "none"
+            colorRGB[0] = 0
+            colorRGB[1] = 0
+            colorRGB[2] = 0
+            initClothesPropView()
         }
-        // TODO 디폴트값 설정
-        category = "error"
-        subCategory = "error"
-        texture = "error"
-        colorRGB[0] = 0
-        colorRGB[1] = 0
-        colorRGB[2] = 0
-        initClothesPropView()
     }
 
     fun initClothesPropView() {

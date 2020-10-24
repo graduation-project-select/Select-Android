@@ -43,6 +43,9 @@ class ClosetCategoryListAdapter(var categoryList: ArrayList<Category>): Recycler
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
         holder.cb_category.text = categoryList[position].label
+        if(categoryList[position].checked){
+        }else{
+        }
         holder.cb_category.isChecked = categoryList[position].checked
     }
 

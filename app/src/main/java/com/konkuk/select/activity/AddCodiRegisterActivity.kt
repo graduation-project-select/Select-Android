@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.CheckBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -86,7 +87,6 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         toolbar.right_tv.setOnClickListener {
             if (isSharing) {
                 uploadImage(codiImgByte, Fbase.TEMP_STORAGE_ROOT_NAME)
-                // TODO  insert CodiAlarm
             } else {
                 Fbase.uid?.let { it1 -> uploadImage(codiImgByte, it1) }
                 // TODO 방금 올린 코디 상세 페이지로 이동
@@ -96,17 +96,19 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     }
 
     private fun getDataFromIntent() {
-        intent.getByteArrayExtra("codiImage")?.let {
-            codiImgByte = it
-            settingCodiImage(codiImgByte)
-        }
-        (intent.getSerializableExtra("codiClothesList") as ArrayList<Clothes>).let {
-            codiClothesList.clear()
-            codiClothesList.addAll(it)
+        if(intent.hasExtra("codiImage") && intent.hasExtra("codiClothesList")){
+            intent.getByteArrayExtra("codiImage")?.let {
+                codiImgByte = it
+                settingCodiImage(codiImgByte)
+            }
+            (intent.getSerializableExtra("codiClothesList") as ArrayList<Clothes>).let {
+                codiClothesList.clear()
+                codiClothesList.addAll(it)
 
-            codiClothesIdList.clear()
-            for (codi in it) {
-                codiClothesIdList.add(codi.id)
+                codiClothesIdList.clear()
+                for (codi in it) {
+                    codiClothesIdList.add(codi.id)
+                }
             }
         }
     }
@@ -117,7 +119,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     }
 
     private fun settingAdapter() {
-        codiTag_rv.layoutManager = GridLayoutManager(this, 2)
+        codiTag_rv.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.HORIZONTAL)
         codiTagCheckboxListAdapter = CodiTagCheckboxListAdapter(this, codiTagList)
         codiTag_rv.adapter = codiTagCheckboxListAdapter
 

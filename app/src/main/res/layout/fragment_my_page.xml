@@ -9,10 +9,15 @@
     tools:context=".fragment.MyPageFragment">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="마이페이지"
-        android:textColor="@color/colorText"
+        android:id="@+id/tv_signOutBtn"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:text="로그아웃"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:background="@drawable/border_more_round"
+        android:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
