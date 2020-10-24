@@ -83,8 +83,8 @@ class LoginActivty : AppCompatActivity() {
 
     // 일반 로그인 (이메일, 비밀번호)
     private fun login(email: String, password: String){
+        Fbase.signOut()
         Log.d(LOGIN_TAG, "login: $email")
-
         Fbase.auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -100,6 +100,7 @@ class LoginActivty : AppCompatActivity() {
 
     // 소셜 로그인 (구글)
     private fun socialLogin(type: String){
+        Fbase.signOut()
         when(type){
             GOOGLE -> {
                 // Configure Google Sign In
@@ -136,6 +137,7 @@ class LoginActivty : AppCompatActivity() {
         Fbase.auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    Fbase.initUid()
                     // Sign in success
                     Log.d(LOGIN_TAG, "signInWithCredential:success")
                     Fbase.auth.currentUser?.let { loginSuccess(it) }
@@ -148,10 +150,12 @@ class LoginActivty : AppCompatActivity() {
 
     // 일반 회원가입 (이메일, 비밀번호)
     private fun signUp(email: String, password: String){
+        Fbase.signOut()
         Fbase.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success
+                    Fbase.initUid()
                     Log.d(SIGNUP_TAG, "createUserWithEmail:success")
                     Log.d(SIGNUP_TAG, "new user id: ${Fbase.uid}")
                     clearField()
@@ -167,6 +171,7 @@ class LoginActivty : AppCompatActivity() {
     // 로그인 성공
     private fun loginSuccess(user: FirebaseUser){
         loginSharedPrefManager.saveUid(user.uid)
+        Fbase.initUid()
         gotoMainPage()
     }
 

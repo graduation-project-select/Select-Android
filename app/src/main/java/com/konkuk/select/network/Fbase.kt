@@ -15,7 +15,7 @@ import org.json.JSONObject
 
 object Fbase {
     val auth: FirebaseAuth = Firebase.auth
-    val uid = auth.currentUser?.uid
+    var uid = auth.currentUser?.uid
     val db = FirebaseFirestore.getInstance()
     val storage = Firebase.storage
 
@@ -121,5 +121,13 @@ object Fbase {
             senderUid =  document.get("senderUid") as String,
             timestamp =  document.get("timestamp") as Timestamp
         )
+    }
+
+    fun initUid(){
+        uid = auth.currentUser?.uid
+    }
+
+    fun signOut(){
+        Firebase.auth.signOut()
     }
 }
