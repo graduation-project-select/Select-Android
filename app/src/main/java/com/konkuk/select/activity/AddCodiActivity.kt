@@ -306,7 +306,7 @@ class AddCodiActivity : AppCompatActivity() {
                             myInputCodi.add(document["codiId"].toString())
                         for (h in hBool) {
                             if (sBool.contains(h) && vBool.contains(h)) {
-                                if(myInputCodi.contains(h)) continue
+                                if (myInputCodi.contains(h)) continue
                                 codiClothesID.add(h)
                             }
                         }
@@ -319,11 +319,16 @@ class AddCodiActivity : AppCompatActivity() {
                 if (it) {
                     Log.d("추천된 코디 개수: ", recommendItemsList.size.toString())
                     Toast.makeText(this@AddCodiActivity, "Background : 코디 추천 완료", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@AddCodiActivity,
+                        "Background : 추천된 코디 개수(" + recommendItemsList.size.toString() + ")",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     recommendItemsList.sortWith(Comparator { vo1, vo2 -> vo1.size - vo2.size })
                     combiCodiclothes.clear()
-                    for(item in recommendItemsList[0]){
-                        combiCodiclothes.add(item)
-                    }
+                    if (recommendItemsList.isNotEmpty())
+                        for (item in recommendItemsList[0])
+                            combiCodiclothes.add(item)
                     codiBottomRecommendationAdapter.notifyDataSetChanged()
                 }
             }
@@ -332,6 +337,8 @@ class AddCodiActivity : AppCompatActivity() {
 
     private fun codiRecommend() {
         Log.e("input과 유사한 코디 수", codiClothesID.size.toString())
+        if (codiClothesID.isEmpty())
+            Toast.makeText(this@AddCodiActivity, "Background : input과 유사한 코디 없음", Toast.LENGTH_SHORT).show()
         for ((index, codiID) in codiClothesID.withIndex()) {
             recommendItems.clear()
             recommendItems.add(inputClothes)
@@ -389,9 +396,9 @@ class AddCodiActivity : AppCompatActivity() {
 
     private fun compareClothes(input1: Clothes, input2: Clothes): Boolean {
         if (input1.category == input2.category && input1.subCategory == input2.subCategory && input1.texture == input2.texture) {
-            return (input1.color_h >= (input2.color_h - 10) && input1.color_h <= (input2.color_h + 10)) &&
-                    (input1.color_s >= (input2.color_s - 10) && input1.color_s <= (input2.color_s + 10)) &&
-                    (input1.color_v >= (input2.color_v - 10) && input1.color_v <= (input2.color_v + 10))
+            return (input1.color_h >= (input2.color_h - 15) && input1.color_h <= (input2.color_h + 15)) &&
+                    (input1.color_s >= (input2.color_s - 15) && input1.color_s <= (input2.color_s + 15)) &&
+                    (input1.color_v >= (input2.color_v - 15) && input1.color_v <= (input2.color_v + 15))
         } else return false
     }
 
