@@ -60,8 +60,8 @@ class AddCodiActivity : AppCompatActivity() {
     var myClothes: ArrayList<Clothes> = arrayListOf() // 내 옷들
     var myInputCodi: ArrayList<String> = arrayListOf() // 내가 input으로 준 코디 -> 추천 받지 않기 위함
     var codiClothesID: MutableSet<String> = mutableSetOf() // input으로 준 옷과 유사한 코디들 ID
-    var recommendItemsList: ArrayList<ArrayList<Clothes>> = arrayListOf() // 추천된 코디들
     var recommendItems: ArrayList<Clothes> = arrayListOf() // 코디 추천 옷들
+    var recommendItemsList: ArrayList<ArrayList<Clothes>> = arrayListOf() // 추천된 코디들
 
     var hBool: MutableSet<String> = mutableSetOf()
     var sBool: MutableSet<String> = mutableSetOf()
@@ -72,7 +72,6 @@ class AddCodiActivity : AppCompatActivity() {
     var isSLoading: MutableLiveData<Boolean> = MutableLiveData(false)
     var isVLoading: MutableLiveData<Boolean> = MutableLiveData(false)
     var isAllLoading: MutableLiveData<Boolean> = MutableLiveData(false)
-    var isCodiRecmLodaing: MutableLiveData<Boolean> = MutableLiveData(false)
 
     var oldXvalue: Float = 0.0f
     var oldYvalue: Float = 0.0f
@@ -85,8 +84,10 @@ class AddCodiActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_codi)
-        if (intent.hasExtra("combiCodiClothesList"))
+        if (intent.hasExtra("combiCodiClothesList")) {
             combiCodiclothes = intent.getSerializableExtra("combiCodiClothesList") as ArrayList<Clothes>
+            toolbar_codi_bottom.tv_titile.text = "코디 아이템 목록"
+        }
         checkSharing()
         settingToolBar()
         settingAdapter()
@@ -275,6 +276,8 @@ class AddCodiActivity : AppCompatActivity() {
             }
 
         toolbar_codi_bottom.randomCodiBtn.setOnClickListener {
+            if (toolbar_codi_bottom.tv_titile.text == "코디 아이템 목록")
+                combiCodiclothes.clear()
             toolbar_codi_bottom.tv_titile.text = "추천 아이템"
             bottom_rv.adapter = codiBottomRecommendationAdapter
             switchLayoutManager()
@@ -302,6 +305,7 @@ class AddCodiActivity : AppCompatActivity() {
                 Fbase.CODI_ITEMS_REF
                     .whereEqualTo("clothesId", inputClothes.id)
                     .get().addOnSuccessListener { documents ->
+                        codiClothesID.clear()
                         for (document in documents)
                             myInputCodi.add(document["codiId"].toString())
                         for (h in hBool) {
@@ -314,25 +318,6 @@ class AddCodiActivity : AppCompatActivity() {
                     }
             }
         })
-        isCodiRecmLodaing.observe(this, Observer {
-            isCodiRecmLodaing.value?.let {
-                if (it) {
-                    Log.d("추천된 코디 개수: ", recommendItemsList.size.toString())
-                    Toast.makeText(this@AddCodiActivity, "Background : 코디 추천 완료", Toast.LENGTH_SHORT).show()
-                    Toast.makeText(
-                        this@AddCodiActivity,
-                        "Background : 추천된 코디 개수(" + recommendItemsList.size.toString() + ")",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    recommendItemsList.sortWith(Comparator { vo1, vo2 -> vo1.size - vo2.size })
-                    combiCodiclothes.clear()
-                    if (recommendItemsList.isNotEmpty())
-                        for (item in recommendItemsList[0])
-                            combiCodiclothes.add(item)
-                    codiBottomRecommendationAdapter.notifyDataSetChanged()
-                }
-            }
-        })
     }
 
     private fun codiRecommend() {
@@ -340,29 +325,27 @@ class AddCodiActivity : AppCompatActivity() {
         if (codiClothesID.isEmpty())
             Toast.makeText(this@AddCodiActivity, "Background : input과 유사한 코디 없음", Toast.LENGTH_SHORT).show()
         for ((index, codiID) in codiClothesID.withIndex()) {
-            recommendItems.clear()
-            recommendItems.add(inputClothes)
-            Log.d("현재 검색중인 codiID", codiID.toString())
+            // Log.d("현재 검색중인 codiID", codiID.toString())
             Fbase.CODI_ITEMS_REF
                 .whereEqualTo("codiId", codiID)
                 .get()
                 .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        val clothesObj = JSONObject(document.data)
-                        val codiClothes = Clothes(
-                            id = "",
-                            category = clothesObj["category"] as String,
-                            subCategory = clothesObj["subCategory"] as String,
-                            texture = clothesObj["texture"] as String,
-                            color_h = clothesObj.getInt("color_h"),
-                            color_s = clothesObj.getInt("color_s"),
-                            color_v = clothesObj.getInt("color_v"),
-                            season = arrayListOf<Boolean>(),
-                            imgUri = "",
-                            uid = ""
-                        )
-
-                        for (clothes in myClothes) {
+                    recommendItems.add(inputClothes)
+                    for (clothes in myClothes) {
+                        for (document in documents) {
+                            val clothesObj = JSONObject(document.data)
+                            val codiClothes = Clothes(
+                                id = "",
+                                category = clothesObj["category"] as String,
+                                subCategory = clothesObj["subCategory"] as String,
+                                texture = clothesObj["texture"] as String,
+                                color_h = clothesObj.getInt("color_h"),
+                                color_s = clothesObj.getInt("color_s"),
+                                color_v = clothesObj.getInt("color_v"),
+                                season = arrayListOf<Boolean>(),
+                                imgUri = "",
+                                uid = ""
+                            )
                             if (codiClothes.category != inputClothes.category) {
                                 if (compareClothes(clothes, codiClothes)) {
                                     recommendItems.add(clothes)
@@ -384,26 +367,51 @@ class AddCodiActivity : AppCompatActivity() {
                     if (onepiece || (twopiece[0] && twopiece[1])) {
                         Log.d("추천 코디의 codiID", codiID.toString())
                         Log.d("추천 코디 안의 옷 개수 : ", recommendItems.size.toString())
-                        recommendItemsList.add(recommendItems)
+                        val rc : ArrayList<Clothes> = recommendItems
+                        recommendItemsList.add(rc)
+                        for (rcmi in recommendItems) {
+                            Log.d("rcmi.id", rcmi.id)
+                        }
+
                     }
+                    for ((r, rcmi) in recommendItemsList.withIndex())
+                        Log.e("recommendItemsList[i].size", r.toString() + " : " + rcmi.size.toString())
+                    recommendItems.clear()
 
                     if (index == codiClothesID.size - 1) {
-                        isCodiRecmLodaing.value = true
+                        Log.d("추천된 코디 개수: ", recommendItemsList.size.toString())
+                        Toast.makeText(
+                            this@AddCodiActivity,
+                            "Background : 추천된 코디 개수(" + recommendItemsList.size.toString() + ")",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+//                        for ((index, rcmi) in recommendItemsList.withIndex())
+//                            Log.e("recommendItemsList[i].size", index.toString() + " : " + rcmi.size.toString())
+                        recommendItemsList.sortWith(Comparator { vo1, vo2 -> vo1.size - vo2.size })
+//                        for ((index, rcmi) in recommendItemsList.withIndex())
+//                            Log.e("recommendItemsList[i].size", index.toString() + " : " + rcmi.size.toString())
+
+                        combiCodiclothes.clear()
+                        if (recommendItemsList.isNotEmpty())
+                            for (item in recommendItemsList.get(0))
+                                combiCodiclothes.add(item)
+                        codiBottomRecommendationAdapter.notifyDataSetChanged()
                     }
+
                 }
         }
     }
 
     private fun compareClothes(input1: Clothes, input2: Clothes): Boolean {
         if (input1.category == input2.category && input1.subCategory == input2.subCategory && input1.texture == input2.texture) {
-            return (input1.color_h >= (input2.color_h - 15) && input1.color_h <= (input2.color_h + 15)) &&
-                    (input1.color_s >= (input2.color_s - 15) && input1.color_s <= (input2.color_s + 15)) &&
-                    (input1.color_v >= (input2.color_v - 15) && input1.color_v <= (input2.color_v + 15))
+            return (input1.color_h >= (input2.color_h - 20) && input1.color_h <= (input2.color_h + 20)) &&
+                    (input1.color_s >= (input2.color_s - 20) && input1.color_s <= (input2.color_s + 20)) &&
+                    (input1.color_v >= (input2.color_v - 20) && input1.color_v <= (input2.color_v + 20))
         } else return false
     }
 
     private fun getCodiFirebaseDocument(inputClothes: Clothes) {
-        codiClothesID.clear()
         var allClothes: ArrayList<String> = arrayListOf()
         Fbase.CODI_ITEMS_REF.get().addOnSuccessListener { documents ->
             for (document in documents)
@@ -413,8 +421,8 @@ class AddCodiActivity : AppCompatActivity() {
         Fbase.CODI_ITEMS_REF
             .whereEqualTo("category", inputClothes.category)
             .whereEqualTo("subCategory", inputClothes.subCategory)
-            .whereGreaterThanOrEqualTo("color_h", inputClothes.color_h - 10)
-            .whereLessThanOrEqualTo("color_h", inputClothes.color_h + 10)
+            .whereGreaterThanOrEqualTo("color_h", inputClothes.color_h - 20)
+            .whereLessThanOrEqualTo("color_h", inputClothes.color_h + 20)
             .get()
             .addOnSuccessListener { documents ->
                 hBool.clear()
@@ -426,8 +434,8 @@ class AddCodiActivity : AppCompatActivity() {
         Fbase.CODI_ITEMS_REF
             .whereEqualTo("category", inputClothes.category)
             .whereEqualTo("subCategory", inputClothes.subCategory)
-            .whereGreaterThanOrEqualTo("color_s", inputClothes.color_s - 10)
-            .whereLessThanOrEqualTo("color_s", inputClothes.color_s + 10)
+            .whereGreaterThanOrEqualTo("color_s", inputClothes.color_s - 20)
+            .whereLessThanOrEqualTo("color_s", inputClothes.color_s + 20)
             .get()
             .addOnSuccessListener { documents ->
                 sBool.clear()
@@ -439,8 +447,8 @@ class AddCodiActivity : AppCompatActivity() {
         Fbase.CODI_ITEMS_REF
             .whereEqualTo("category", inputClothes.category)
             .whereEqualTo("subCategory", inputClothes.subCategory)
-            .whereGreaterThanOrEqualTo("color_v", inputClothes.color_v - 10)
-            .whereLessThanOrEqualTo("color_v", inputClothes.color_v + 10)
+            .whereGreaterThanOrEqualTo("color_v", inputClothes.color_v - 20)
+            .whereLessThanOrEqualTo("color_v", inputClothes.color_v + 20)
             .get()
             .addOnSuccessListener { documents ->
                 vBool.clear()
