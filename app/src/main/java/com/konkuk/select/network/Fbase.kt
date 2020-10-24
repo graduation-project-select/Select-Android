@@ -8,6 +8,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.konkuk.select.model.*
@@ -31,8 +32,22 @@ object Fbase {
 
     val TEMP_STORAGE_ROOT_NAME = "tempImgs"
 
-    fun getClothes(document:DocumentSnapshot):Clothes{
+    fun getClothes(document: DocumentSnapshot, idDefaultCodiItem: Boolean = false): Clothes {
         val clothesObj = JSONObject(document.data)
+        if (idDefaultCodiItem) {
+            return Clothes(
+                id = "",
+                category = clothesObj["category"] as String,
+                subCategory = clothesObj["subCategory"] as String,
+                texture = clothesObj["texture"] as String,
+                color_h = clothesObj.getInt("color_h"),
+                color_s = clothesObj.getInt("color_s"),
+                color_v = clothesObj.getInt("color_v"),
+                season = arrayListOf<Boolean>(),
+                imgUri = "",
+                uid = ""
+            )
+        }
 
         val season = clothesObj.getJSONArray("season")
         val seasonArray = Array(season.length()) { season.getBoolean(it) }
@@ -51,11 +66,11 @@ object Fbase {
         )
     }
 
-    fun getCodi(document: DocumentSnapshot):Codi{
+    fun getCodi(document: DocumentSnapshot): Codi {
         val codiObj = JSONObject(document.data)
 
         val itemsIds = codiObj.getJSONArray("itemsIds")
-        val itemsIdsArray = Array(itemsIds.length()){itemsIds.getString(it)}
+        val itemsIdsArray = Array(itemsIds.length()) { itemsIds.getString(it) }
 
         return Codi(
             id = document.id,
@@ -68,7 +83,7 @@ object Fbase {
         )
     }
 
-    fun getCloset(document:DocumentSnapshot):Closet{
+    fun getCloset(document: DocumentSnapshot): Closet {
         val name = document["name"].toString()
         val count = document["count"].toString().toInt()
         val uid = document["uid"].toString()
@@ -81,11 +96,11 @@ object Fbase {
         )
     }
 
-    fun getCodiSuggestion(document: DocumentSnapshot):CodiSuggestion{
+    fun getCodiSuggestion(document: DocumentSnapshot): CodiSuggestion {
         val codiObj = JSONObject(document.data)
 
         val itemsIds = codiObj.getJSONArray("itemsIds")
-        val itemsIdsArray = Array(itemsIds.length()){itemsIds.getString(it)}
+        val itemsIdsArray = Array(itemsIds.length()) { itemsIds.getString(it) }
 
         return CodiSuggestion(
             id = document.id,
@@ -98,7 +113,7 @@ object Fbase {
         )
     }
 
-    fun getNotification(document: DocumentSnapshot):Notification{
+    fun getNotification(document: DocumentSnapshot): Notification {
         return Notification(
             id = document.id,
             uid = document.get("uid") as String,
@@ -107,27 +122,28 @@ object Fbase {
         )
     }
 
-    fun getCodiSugNoti(document: DocumentSnapshot):CodiSugNoti{
+    fun getCodiSugNoti(document: DocumentSnapshot): CodiSugNoti {
         val codiSugNotiObj = JSONObject(document.data)
 
         val itemsIds = codiSugNotiObj.getJSONArray("codiIds")
-        val itemsIdsArray = Array(itemsIds.length()){itemsIds.getString(it)}
+        val itemsIdsArray = Array(itemsIds.length()) { itemsIds.getString(it) }
 
         return CodiSugNoti(
             id = document.id,
             codiIds = itemsIdsArray.toCollection(ArrayList<String>()),
-            closetId =  document.get("closetId") as String,
-            ownerUid =  document.get("ownerUid") as String,
-            senderUid =  document.get("senderUid") as String,
-            timestamp =  document.get("timestamp") as Timestamp
+            closetId = document.get("closetId") as String,
+            ownerUid = document.get("ownerUid") as String,
+            senderUid = document.get("senderUid") as String,
+            timestamp = document.get("timestamp") as Timestamp
         )
     }
 
-    fun initUid(){
+
+    fun initUid() {
         uid = auth.currentUser?.uid
     }
 
-    fun signOut(){
+    fun signOut() {
         Firebase.auth.signOut()
     }
 }

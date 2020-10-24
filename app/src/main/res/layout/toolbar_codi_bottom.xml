@@ -35,6 +35,16 @@
         app:layout_constraintTop_toBottomOf="@+id/view3" />
 
     <ImageView
+        android:id="@+id/codiReloadBtn"
+        android:layout_width="20dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="4dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/tv_titile"
+        app:srcCompat="@drawable/reload"
+        tools:layout_editor_absoluteY="10dp" />
+
+    <ImageView
         android:id="@+id/randomCodiBtn"
         android:layout_width="20dp"
         android:layout_height="match_parent"
