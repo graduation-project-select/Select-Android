@@ -81,12 +81,14 @@ class CodiTagListActivity : AppCompatActivity() {
     private fun getUserCodiTagList() {
         Fbase.uid?.let {
             Fbase.USERS_REF.document(it).get().addOnSuccessListener {
-                val codiTagList = it.get("codiTagList") as ArrayList<DocumentReference>
-                myTagList.clear()
-                for (tagRef in codiTagList) {
-                    tagRef.get().addOnSuccessListener {tagObj ->
-                        myTagList.add(CodiTag(tagRef, tagObj["name"].toString()))
-                        codiTagAdapter.notifyDataSetChanged()
+                if(it.get("codiTagList") != null) {
+                    val codiTagList = it.get("codiTagList") as ArrayList<DocumentReference>
+                    myTagList.clear()
+                    for (tagRef in codiTagList) {
+                        tagRef.get().addOnSuccessListener {tagObj ->
+                            myTagList.add(CodiTag(tagRef, tagObj["name"].toString()))
+                            codiTagAdapter.notifyDataSetChanged()
+                        }
                     }
                 }
             }

@@ -89,12 +89,15 @@ class CodiFragment : Fragment() {
     private fun getUserCodiTagList() {
         Fbase.uid?.let {
             Fbase.USERS_REF.document(it).get().addOnSuccessListener {
-                val codiTagList = it.get("codiTagList") as ArrayList<DocumentReference>
-                myTagList.clear()
-                for (tag in codiTagList) {
-                    myTagList.add(tag)
+                if(it.get("codiTagList") != null){
+                    val codiTagList = it.get("codiTagList") as ArrayList<DocumentReference>
+                    myTagList.clear()
+                    for (tag in codiTagList) {
+                        myTagList.add(tag)
+                    }
+                    codiMainListAdapter.notifyDataSetChanged()
                 }
-                codiMainListAdapter.notifyDataSetChanged()
+
             }
         }
     }

@@ -38,10 +38,18 @@ class LoginActivty : AppCompatActivity() {
     // 자동로그인 확인
     // TODO id, 비번 저장되어있으면 로그인하기로 변경
     private fun checkLoginStatus(){
-        if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
-//            Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
-            gotoMainPage()
+        val pref_email = loginSharedPrefManager.email
+        val pref_password = loginSharedPrefManager.password
+        if(pref_email != "" && pref_password != ""
+            && pref_email != null && pref_password != null){
+            email = pref_email
+            password = pref_password
+            login(email, password)
         }
+//        if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
+////            Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
+//            gotoMainPage()
+//        }
     }
 
     private fun clearField(){
@@ -137,7 +145,6 @@ class LoginActivty : AppCompatActivity() {
         Fbase.auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Fbase.initUid()
                     // Sign in success
                     Log.d(LOGIN_TAG, "signInWithCredential:success")
                     Fbase.auth.currentUser?.let { loginSuccess(it) }
@@ -158,9 +165,10 @@ class LoginActivty : AppCompatActivity() {
                     Fbase.initUid()
                     Log.d(SIGNUP_TAG, "createUserWithEmail:success")
                     Log.d(SIGNUP_TAG, "new user id: ${Fbase.uid}")
-                    clearField()
+
                     // TODO: 회원가입 후 추가 정보 DB에 저장
-                    Fbase.uid?.let { addAditionalInfo(it,"고서영", "man", 1998) }
+                    Fbase.uid?.let { addAditionalInfo(it,email, "female", 1998) }
+                    clearField()
                 } else {
                     // Sign in fails
                     Log.w(SIGNUP_TAG, "createUserWithEmail:failure", task.exception)
@@ -171,6 +179,7 @@ class LoginActivty : AppCompatActivity() {
     // 로그인 성공
     private fun loginSuccess(user: FirebaseUser){
         loginSharedPrefManager.saveUid(user.uid)
+        loginSharedPrefManager.saveLoginInfo(email, password)
         Fbase.initUid()
         gotoMainPage()
     }
