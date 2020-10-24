@@ -66,14 +66,15 @@
             app:layout_constraintEnd_toStartOf="@+id/colorCircle"
             app:layout_constraintTop_toTopOf="@+id/colorCircle" />
 
-        <View
+        <androidx.cardview.widget.CardView
             android:id="@+id/colorCircle"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            app:cardCornerRadius="13dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            app:cardBackgroundColor="@color/colorLightGray"
             android:layout_marginTop="8dp"
-            android:background="@color/colorLightGray"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageView
             android:id="@+id/clothesImg"
@@ -90,10 +91,15 @@
 
         <CheckBox
             android:id="@+id/checkBox_spring"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="48dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/border_more_round"
+            android:backgroundTint="@color/category_list_btn_bg"
+            android:button="@null"
             android:text="봄"
+            android:textAlignment="center"
+            android:textColor="@color/category_list_btn_text"
             app:layout_constraintEnd_toStartOf="@+id/checkBox_summer"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
@@ -101,9 +107,14 @@
 
         <CheckBox
             android:id="@+id/checkBox_summer"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:text="여름"
+            android:background="@drawable/border_more_round"
+            android:backgroundTint="@color/category_list_btn_bg"
+            android:textColor="@color/category_list_btn_text"
+            android:textAlignment="center"
+            android:button="@null"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_spring"
             app:layout_constraintEnd_toStartOf="@+id/checkBox_fall"
             app:layout_constraintHorizontal_bias="0.5"
@@ -112,9 +123,14 @@
 
         <CheckBox
             android:id="@+id/checkBox_fall"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:text="가을"
+            android:background="@drawable/border_more_round"
+            android:backgroundTint="@color/category_list_btn_bg"
+            android:textColor="@color/category_list_btn_text"
+            android:textAlignment="center"
+            android:button="@null"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_summer"
             app:layout_constraintEnd_toStartOf="@+id/checkBox_winter"
             app:layout_constraintHorizontal_bias="0.5"
@@ -123,9 +139,14 @@
 
         <CheckBox
             android:id="@+id/checkBox_winter"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:text="겨울"
+            android:background="@drawable/border_more_round"
+            android:backgroundTint="@color/category_list_btn_bg"
+            android:textColor="@color/category_list_btn_text"
+            android:textAlignment="center"
+            android:button="@null"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_fall"
             app:layout_constraintEnd_toStartOf="@+id/all_check_tv"
             app:layout_constraintHorizontal_bias="0.5"

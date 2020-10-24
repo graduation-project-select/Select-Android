@@ -158,7 +158,7 @@ class AddClothesActivity : AppCompatActivity(),
         category_tv.text = category
         categorySub_tv.text = subCategory
         val hex = java.lang.String.format("#%02x%02x%02x", colorRGB[0], colorRGB[1], colorRGB[2]) // RGB -> #0000 형식으로 변환
-        colorCircle.setBackgroundColor(Color.parseColor(hex));
+        colorCircle.setCardBackgroundColor(Color.parseColor(hex))
     }
 
     private fun setClothesImage(imageByteArray: ByteArray) {

@@ -37,7 +37,6 @@ class LoginActivty : AppCompatActivity() {
 
     // 자동로그인 확인
     // TODO id, 비번 저장되어있으면 로그인하기로 변경
-    // TODO 로그아웃: 로그아웃 + sharedPref 정보 clear
     private fun checkLoginStatus(){
         if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
 //            Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
@@ -72,7 +71,7 @@ class LoginActivty : AppCompatActivity() {
         signupBtn.setOnClickListener {
             initLoginField()
             if(email.isNotEmpty() && password.isNotEmpty()) {
-                signup(email, password)
+                signUp(email, password)
             }
         }
     }
@@ -148,15 +147,14 @@ class LoginActivty : AppCompatActivity() {
     }
 
     // 일반 회원가입 (이메일, 비밀번호)
-    private fun signup(email: String, password: String){
+    private fun signUp(email: String, password: String){
         Fbase.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success
                     Log.d(SIGNUP_TAG, "createUserWithEmail:success")
-                    Log.d(SIGNUP_TAG, "new user id: ${Fbase.auth.currentUser?.uid}")
+                    Log.d(SIGNUP_TAG, "new user id: ${Fbase.uid}")
                     clearField()
-                    Toast.makeText(this, "회원가입 완료, 로그인하세요", Toast.LENGTH_SHORT).show()
                     // TODO: 회원가입 후 추가 정보 DB에 저장
                     Fbase.uid?.let { addAditionalInfo(it,"고서영", "man", 1998) }
                 } else {
@@ -189,9 +187,10 @@ class LoginActivty : AppCompatActivity() {
         )
 
         // Add a new document with a generated ID
-        Fbase.db.collection("users").document(uid).set(user)
+        Fbase.USERS_REF.document(uid).set(user)
             .addOnSuccessListener { documentReference ->
                 Log.d(SIGNUP_TAG, "DocumentSnapshot successfully written!")
+                Toast.makeText(this, "회원가입 완료, 로그인하세요", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
                 Log.w(SIGNUP_TAG, "Error adding document", e)

@@ -123,7 +123,7 @@ class DetailClothesActivity : AppCompatActivity() {
             colorRGB[1],
             colorRGB[2]
         )
-        colorCircle.setBackgroundColor(Color.parseColor(hex))
+        colorCircle.setCardBackgroundColor(Color.parseColor(hex))
 
         val seasonText: ArrayList<String> = arrayListOf("봄", "여름", "가을", "겨울")
         var seasonStr = ""

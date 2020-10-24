@@ -31,7 +31,7 @@
             android:backgroundTint="@color/colorPrimary"
             android:paddingHorizontal="18dp"
             android:paddingVertical="2dp"
-            android:text="하의"
+            android:text="로딩중"
             android:textColor="@color/colorBackGround"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="긴바지"
+            android:text="로딩중"
             app:layout_constraintBottom_toBottomOf="@+id/tv_token"
             app:layout_constraintStart_toEndOf="@+id/tv_token"
             app:layout_constraintTop_toTopOf="@+id/tv_token" />
@@ -60,20 +60,21 @@
             android:id="@+id/colorTag_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="12dp"
             android:text="# Color"
             app:layout_constraintBottom_toBottomOf="@+id/colorCircle"
             app:layout_constraintEnd_toStartOf="@+id/colorCircle"
             app:layout_constraintTop_toTopOf="@+id/colorCircle" />
 
-        <View
+        <androidx.cardview.widget.CardView
             android:id="@+id/colorCircle"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            app:cardCornerRadius="13dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            app:cardBackgroundColor="@color/colorLightGray"
             android:layout_marginTop="8dp"
-            android:background="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/season_tv"

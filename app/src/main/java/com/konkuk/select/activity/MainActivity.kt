@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.toolbar.view.*
 
 private const val CLOSET_ID_MESSAGE = "closetId"
 private const val CLOSET_NAME_MESSAGE = "closetName"
+private const val SIGN_OUT_MESSAGE = "signOut"
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,12 +25,7 @@ class MainActivity : AppCompatActivity() {
             initClosetMenuFragment(null, null)
         }
 
-        // 옷장 선택한 경우
-        if(intent.hasExtra(CLOSET_ID_MESSAGE) && intent.hasExtra(CLOSET_NAME_MESSAGE)){
-            val closetId = intent.getStringExtra(CLOSET_ID_MESSAGE)
-            val closetName = intent.getStringExtra(CLOSET_NAME_MESSAGE)
-            initClosetMenuFragment(closetId, closetName)
-        }
+        getDataFromIntent()
 
         navigationView.setOnNavigationItemSelectedListener {
             initFragment(it.itemId)
@@ -39,6 +35,15 @@ class MainActivity : AppCompatActivity() {
             showBottomSheetMainBtnDialogFragment()
         }
 
+    }
+
+    private fun getDataFromIntent(){
+        // 옷장 선택한 경우
+        if(intent.hasExtra(CLOSET_ID_MESSAGE) && intent.hasExtra(CLOSET_NAME_MESSAGE)){
+            val closetId = intent.getStringExtra(CLOSET_ID_MESSAGE)
+            val closetName = intent.getStringExtra(CLOSET_NAME_MESSAGE)
+            initClosetMenuFragment(closetId, closetName)
+        }
     }
 
     private fun initFragment(menuItem: Int):Boolean {

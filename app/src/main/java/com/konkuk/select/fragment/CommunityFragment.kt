@@ -58,7 +58,4 @@ class CommunityFragment : Fragment() {
             }
     }
 
-    fun showView() { ll.visibility = View.VISIBLE }
-
-    fun hideView() { ll.visibility = View.GONE }
 }

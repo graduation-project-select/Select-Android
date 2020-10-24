@@ -1,11 +1,15 @@
 package com.konkuk.select.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.konkuk.select.R
+import com.konkuk.select.activity.LoginActivty
+import com.konkuk.select.network.Fbase
+import com.konkuk.select.storage.SharedPrefManager
 import kotlinx.android.synthetic.main.fragment_my_page.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -31,6 +35,7 @@ class MyPageFragment : Fragment() {
         }
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,6 +43,21 @@ class MyPageFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_my_page, container, false)
     }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        tv_signOutBtn.setOnClickListener {
+            signOut()
+        }
+    }
+
+    fun signOut(){
+        Fbase.auth.signOut()
+        SharedPrefManager.getInstance(tv_signOutBtn.context).clear()
+        startActivity(Intent(activity, LoginActivty::class.java))
+    }
+
+
 
     companion object {
         /**
@@ -58,8 +78,4 @@ class MyPageFragment : Fragment() {
                 }
             }
     }
-
-    fun showView() { ll.visibility = View.VISIBLE }
-
-    fun hideView() { ll.visibility = View.GONE }
 }
