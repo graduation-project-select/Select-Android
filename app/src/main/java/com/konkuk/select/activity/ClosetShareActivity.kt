@@ -19,9 +19,11 @@ const val NOTI_TYPE = "CLOSET_SHARE"
 
 class ClosetShareActivity : AppCompatActivity() {
 
-    var closetId = "BxsTo6sPSG8PpBRF2mcu"
-    var ownerUid = "bMYknEYE6RPK4JEOdiBrTc7vAs33"    // ex) 고서영 (옷장 주인)
-    var senderUid = "KEX3pWvkmKZuMD3aipyP0HzORmE2"  // ex) 최서희
+    var closetId = "BxsTo6sPSG8PpBRF2mcu"           // 링크에서 전달받은 값
+    var ownerUid = "bMYknEYE6RPK4JEOdiBrTc7vAs33"    // 링크에서 전달받은 값 ex) 고서영 (옷장 주인)
+    var senderUid = "Np4U7KQ3nNRVCDUkMHeWex6Atrz1"  // 현재 사용자 (Fbase.uid)
+    // ex) 사연진 (KEX3pWvkmKZuMD3aipyP0HzORmE2), 최서희(Np4U7KQ3nNRVCDUkMHeWex6Atrz1)
+
     var codiIds = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         toolbar.right_tv.visibility = View.GONE
         toolbar.right_iv.setImageResource(R.drawable.alarm)
         toolbar.right_iv.setOnClickListener {
-            Toast.makeText(this, "알림 클릭", Toast.LENGTH_SHORT).show()
+            moveToNotification()
         }
     }
 
@@ -98,6 +98,11 @@ class MainActivity : AppCompatActivity() {
         toolbar.left_iv.setImageResource(R.drawable.hashtag)
         toolbar.left_iv.setOnClickListener {
             startActivity(Intent(this, CodiTagListActivity::class.java))
+        }
+        toolbar.right_tv.visibility = View.GONE
+        toolbar.right_iv.setImageResource(R.drawable.alarm)
+        toolbar.right_iv.setOnClickListener {
+            moveToNotification()
         }
     }
 
@@ -117,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         toolbar.right_tv.visibility = View.GONE
         toolbar.right_iv.setImageResource(R.drawable.alarm)
         toolbar.right_iv.setOnClickListener {
-            Toast.makeText(this, "알림 클릭", Toast.LENGTH_SHORT).show()
+            moveToNotification()
         }
     }
 
@@ -137,8 +142,14 @@ class MainActivity : AppCompatActivity() {
         toolbar.right_tv.visibility = View.GONE
         toolbar.right_iv.setImageResource(R.drawable.alarm)
         toolbar.right_iv.setOnClickListener {
-            Toast.makeText(this, "알림 클릭", Toast.LENGTH_SHORT).show()
+            moveToNotification()
         }
+    }
+
+    private fun moveToNotification(){
+        Toast.makeText(this, "알림 클릭", Toast.LENGTH_SHORT).show()
+        var nextIntent = Intent(this, NotificationListActivity::class.java)
+        startActivity(nextIntent)
     }
 
     private fun showBottomSheetMainBtnDialogFragment() {

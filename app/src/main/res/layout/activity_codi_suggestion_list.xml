@@ -11,17 +11,29 @@
         layout="@layout/toolbar" />
 
     <TextView
-        android:id="@+id/text_tv"
+        android:id="@+id/tv_senderName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
-        android:text="내가 조합한 추천 코디 목록"
+        android:text="()"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <TextView
+        android:id="@+id/text_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="님이 조합한 추천 코디 목록"
+        app:layout_constraintBottom_toBottomOf="@id/tv_senderName"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/tv_senderName"
+        app:layout_constraintTop_toTopOf="@id/tv_senderName"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_codiSuggestion"

@@ -1,6 +1,6 @@
 package com.konkuk.select.model
 
-import java.security.Timestamp
+import com.google.firebase.Timestamp
 
 data class CodiSugNoti(
     val id:String,

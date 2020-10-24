@@ -1,5 +1,6 @@
 package com.konkuk.select.network
 
+import android.util.JsonReader
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -9,10 +10,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.konkuk.select.model.Closet
-import com.konkuk.select.model.Clothes
-import com.konkuk.select.model.Codi
-import com.konkuk.select.model.CodiSuggestion
+import com.konkuk.select.model.*
 import org.json.JSONObject
 
 object Fbase {
@@ -97,6 +95,31 @@ object Fbase {
             closetId = codiObj["closetId"] as String,
             ownerUid = codiObj["ownerUid"] as String,
             senderUid = codiObj["senderUid"] as String
+        )
+    }
+
+    fun getNotification(document: DocumentSnapshot):Notification{
+        return Notification(
+            id = document.id,
+            uid = document.get("uid") as String,
+            type = document.get("type") as String,
+            notiRef = document.get("notiRef") as DocumentReference
+        )
+    }
+
+    fun getCodiSugNoti(document: DocumentSnapshot):CodiSugNoti{
+        val codiSugNotiObj = JSONObject(document.data)
+
+        val itemsIds = codiSugNotiObj.getJSONArray("codiIds")
+        val itemsIdsArray = Array(itemsIds.length()){itemsIds.getString(it)}
+
+        return CodiSugNoti(
+            id = document.id,
+            codiIds = itemsIdsArray.toCollection(ArrayList<String>()),
+            closetId =  document.get("closetId") as String,
+            ownerUid =  document.get("ownerUid") as String,
+            senderUid =  document.get("senderUid") as String,
+            timestamp =  document.get("timestamp") as Timestamp
         )
     }
 }
