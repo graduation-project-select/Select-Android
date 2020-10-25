@@ -19,7 +19,11 @@
         <activity android:name=".activity.CodiSuggestionListActivity" />
         <activity android:name=".activity.ClosetShareRecommendationListActivity" />
         <activity android:name=".activity.ClosetShareActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".activity.ClothesCheckListActivity" />
         <activity android:name=".activity.ClosetListActivity" />
