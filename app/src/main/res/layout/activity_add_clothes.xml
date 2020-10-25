@@ -165,6 +165,16 @@
             app:layout_constraintStart_toEndOf="@+id/checkBox_winter"
             app:layout_constraintTop_toTopOf="@+id/checkBox_winter" />
 
+        <TextView
+            android:id="@+id/tv_texture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="(texture)"
+            app:layout_constraintBottom_toBottomOf="@+id/categorySub_tv"
+            app:layout_constraintStart_toEndOf="@+id/categorySub_tv"
+            app:layout_constraintTop_toTopOf="@+id/categorySub_tv" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
