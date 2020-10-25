@@ -83,7 +83,7 @@ class ClothesListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        Toast.makeText(activity, closetId + ", " + uid, Toast.LENGTH_SHORT).show()
+        Log.e("closetId, uid", "$closetId, $uid")
         init()
         settingAdapter()
         settingObserver()
