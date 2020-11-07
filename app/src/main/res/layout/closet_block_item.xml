@@ -13,12 +13,12 @@
         android:id="@+id/iv_img"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="15dp"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/colorLightGray"
-        app:srcCompat="@android:drawable/ic_menu_gallery" />
+        android:background="@drawable/codi_test" />
 
     <TextView
         android:id="@+id/tv_title"
@@ -35,7 +35,7 @@
         android:id="@+id/tv_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
         android:text="12"
         android:textColor="@color/colorText"
         android:paddingHorizontal="10dp"

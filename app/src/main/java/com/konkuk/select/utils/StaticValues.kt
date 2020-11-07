@@ -6,7 +6,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 object StaticValues {
-    val categoryList:ArrayList<String> = arrayListOf("top", "bottom", "dress", "outer", "shoes", "accessory")
+    val categoryList:ArrayList<String> = arrayListOf("top", "bottom", "dress", "outer", "shoes", "bag", "accessory")
 
     val categoryListTop:ArrayList<Category> = arrayListOf<Category>(
         Category(0, "top", true),
@@ -14,7 +14,8 @@ object StaticValues {
         Category(2, "dress", false),
         Category(3, "outer", false),
         Category(4, "shoes", false),
-        Category(5, "accessory", false)
+        Category(5, "bag", false),
+        Category(6, "accessory", false)
     )
 
     val subCategoryList:HashMap<String, ArrayList<String>> = hashMapOf(

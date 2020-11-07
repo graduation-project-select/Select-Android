@@ -1,7 +1,6 @@
 package com.konkuk.select.activity
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -13,7 +12,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.MutableLiveData
@@ -31,19 +29,7 @@ import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
-import org.json.JSONObject
 import java.io.ByteArrayOutputStream
-import java.util.Random
-import kotlin.Array
-import kotlin.Boolean
-import kotlin.ByteArray
-import kotlin.Comparator
-import kotlin.Float
-import kotlin.Int
-import kotlin.String
-import kotlin.arrayOf
-import kotlin.let
-import kotlin.toString
 
 
 class AddCodiActivity : AppCompatActivity() {
@@ -219,7 +205,7 @@ class AddCodiActivity : AppCompatActivity() {
                     position: Int
                 ) {
                     if (codiClothesList.contains(data)) {
-                        Toast.makeText(this@AddCodiActivity, "중복 불가", Toast.LENGTH_SHORT).show()
+                        Log.d("codiBottomClothesLinearAdapter","중복불가")
                     } else {
                         if (codiClothesList.isEmpty()) {
                             codiClothesList.add(data)
@@ -263,7 +249,7 @@ class AddCodiActivity : AppCompatActivity() {
                     position: Int
                 ) {
                     if (codiClothesList.contains(data)) {
-                        Toast.makeText(this@AddCodiActivity, "중복 불가", Toast.LENGTH_SHORT).show()
+                        Log.d("codiBottomClothesLinearAdapter","중복불가")
                     } else {
                         codiClothesList.add(data)
                         var addImgView = ImageView(this@AddCodiActivity)
@@ -340,7 +326,7 @@ class AddCodiActivity : AppCompatActivity() {
     private fun codiRecommend() {
         Log.e("input과 유사한 코디 수", codiClothesID.size.toString())
         if (codiClothesID.isEmpty())
-            Toast.makeText(this@AddCodiActivity, "Background : input과 유사한 코디 없음", Toast.LENGTH_SHORT).show()
+            Log.e("Background :", "input과 유사한 코디 없음")
         recommendItemsList.clear()  // TODO
         for ((index, codiID) in codiClothesID.withIndex()) {
             // Log.d("현재 검색중인 codiID", codiID.toString())
@@ -389,12 +375,7 @@ class AddCodiActivity : AppCompatActivity() {
                     }
 
                     if (index == codiClothesID.size - 1) {
-                        Log.d("추천된 코디 개수: ", recommendItemsList.size.toString())
-                        Toast.makeText(
-                            this@AddCodiActivity,
-                            "Background : 추천된 코디 개수(" + recommendItemsList.size.toString() + ")",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Log.e("추천된 코디 개수: ", recommendItemsList.size.toString())
 
                         recommendItemsList.sortWith(Comparator { vo1, vo2 -> vo2.size - vo1.size })
 
