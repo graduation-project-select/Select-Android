@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.Query
 import com.konkuk.select.R
 import com.konkuk.select.adpater.NotificationListAdapter
 import com.konkuk.select.model.Notification
@@ -53,6 +54,7 @@ class NotificationListActivity : AppCompatActivity() {
     fun getNotiList(){
         Fbase.NOTIFICATION_REF
             .whereEqualTo("uid", Fbase.uid)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .get().addOnSuccessListener {
                 notiList.clear()
                 for(noti in it){

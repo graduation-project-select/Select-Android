@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.annotation.GlideModule
 import com.google.firebase.Timestamp
@@ -100,6 +101,8 @@ class AddClothesActivity : AppCompatActivity(),
             requestFile
         )
 
+        Log.d("getClothesAttribute", imageFile.name)
+
         // 서버에서 정보 가져옴
         RetrofitClient.instance.predictClothesProp(imageFile.name, multipartBody).enqueue(object :
             Callback<ClothesProp> {
@@ -108,25 +111,29 @@ class AddClothesActivity : AppCompatActivity(),
                 response: Response<ClothesProp>
             ) {
                 Log.d(TAG, response.body().toString())
-
-                val clothesProp = response.body()
-                clothesProp?.let {
-                    if(it.success){
-                        category = it.category
-                        subCategory = it.subCategory
-                        texture = it.texture
-                        colorRGB[0] = it.R
-                        colorRGB[1] = it.G
-                        colorRGB[2] = it.B
-                        imageByteArray = Base64.decode(it.encodedImage, 0)
-                        Log.d(TAG, "imageByteArray: $imageByteArray")
-                        initClothesPropView()
-                        imageByteArray?.let { setClothesImage(it) }
-                    }else{
-                        Log.e(TAG, "success: False")
-                        onFailureGetClothesProps()
+                if (response.body().toString() != null) {
+                    val clothesProp = response.body()
+                    clothesProp?.let {
+                        if (it.success) {
+                            category = it.category
+                            subCategory = it.subCategory
+                            texture = it.texture
+                            colorRGB[0] = it.R
+                            colorRGB[1] = it.G
+                            colorRGB[2] = it.B
+                            imageByteArray = Base64.decode(it.encodedImage, 0)
+                            Log.d(TAG, "imageByteArray: $imageByteArray")
+                            initClothesPropView()
+                            imageByteArray?.let { setClothesImage(it) }
+                        } else {
+                            Log.e(TAG, "success: False")
+                            onFailureGetClothesProps()
+                        }
                     }
+                } else {
+                    Log.d(TAG, "response.body() is empty")
                 }
+
             }
 
             override fun onFailure(call: Call<ClothesProp>, t: Throwable) {
@@ -137,12 +144,12 @@ class AddClothesActivity : AppCompatActivity(),
         })
     }
 
-    fun onFailureGetClothesProps(){
-        if(tryCount > 0){   // 실패시 3번 더 요청
+    fun onFailureGetClothesProps() {
+        if (tryCount > 0) {   // 실패시 3번 더 요청
             Log.e(TAG, "시도 횟수: $tryCount")
             getClothesAttribute()
             tryCount--
-        }else{
+        } else {
             // TODO 디폴트값 설정
             category = " - "
             subCategory = " - "
@@ -157,13 +164,14 @@ class AddClothesActivity : AppCompatActivity(),
     fun initClothesPropView() {
         category_tv.text = category
         categorySub_tv.text = subCategory
+        tv_texture.text = "($texture)"
         val hex = java.lang.String.format("#%02x%02x%02x", colorRGB[0], colorRGB[1], colorRGB[2]) // RGB -> #0000 형식으로 변환
         colorCircle.setCardBackgroundColor(Color.parseColor(hex))
     }
 
     private fun setClothesImage(imageByteArray: ByteArray) {
         Log.d(TAG, "setClothesImage")
-        imageByteArray?.let{
+        imageByteArray?.let {
             val clothesImageDecoding = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.size)
             clothesImg.setImageBitmap(clothesImageDecoding)
         }
@@ -196,7 +204,8 @@ class AddClothesActivity : AppCompatActivity(),
 
         // 카테고리 변경
         category_tv.setOnClickListener {
-            val bottomSheetFragment = BottomSheetSingleListDialog(this)
+            Toast.makeText(this, "카테고리 변경", Toast.LENGTH_SHORT).show()
+            val bottomSheetFragment = BottomSheetSingleListDialog()
             supportFragmentManager?.let {
                 bottomSheetFragment.show(it, bottomSheetFragment.getTag())
             }
@@ -213,7 +222,7 @@ class AddClothesActivity : AppCompatActivity(),
         val stream = FileInputStream(file)
 
         var uploadTask =
-            if (imageByteArray != null) imageByteArray?.let{ imagesRef?.putBytes(it) }
+            if (imageByteArray != null) imageByteArray?.let { imagesRef?.putBytes(it) }
             else imagesRef?.putStream(stream)
 
         uploadTask?.addOnSuccessListener {

@@ -118,7 +118,8 @@ object Fbase {
             id = document.id,
             uid = document.get("uid") as String,
             type = document.get("type") as String,
-            notiRef = document.get("notiRef") as DocumentReference
+            notiRef = document.get("notiRef") as DocumentReference,
+            timestamp = document.get("timestamp") as Timestamp
         )
     }
 

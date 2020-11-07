@@ -24,6 +24,7 @@ object StaticValues {
         "dress" to arrayListOf("dress"),
         "outer" to arrayListOf("cardigan&vest", "coat", "jacket", "jumper"),
         "shoes" to arrayListOf("shoes"),
+        "bag" to arrayListOf("bag"),
         "accessory" to arrayListOf("accessory")
     )
 }

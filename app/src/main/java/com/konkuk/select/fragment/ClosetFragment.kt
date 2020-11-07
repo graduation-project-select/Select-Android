@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.konkuk.select.R
 import com.konkuk.select.network.Fbase
@@ -76,7 +74,6 @@ class ClosetFragment : Fragment() {
     private fun settingOnClickListener() {
         tv_closet_name.setOnClickListener {
             // 아래에서 셀렉리스트 나오기
-            Toast.makeText(activity, "클릭!!", Toast.LENGTH_SHORT).show()
             showBottomSheetDialogFragment()
         }
     }

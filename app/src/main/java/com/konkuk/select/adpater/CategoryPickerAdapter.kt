@@ -12,7 +12,7 @@ import com.konkuk.select.R
 import com.konkuk.select.utils.StaticValues
 
 
-class CategoryPickerAdapter(var ctx: Context, var categoryList: ArrayList<String>): RecyclerView.Adapter<CategoryPickerAdapter.ItemHolder>() {
+class CategoryPickerAdapter(var categoryList: ArrayList<String>): RecyclerView.Adapter<CategoryPickerAdapter.ItemHolder>() {
 
     var itemClickListener:OnItemClickListener?=null
 
@@ -69,7 +69,7 @@ class CategoryPickerAdapter(var ctx: Context, var categoryList: ArrayList<String
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
         holder.tv_category.text = categoryList[position]
-        holder.rv_subCategory.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
+        holder.rv_subCategory.layoutManager = LinearLayoutManager(holder.tv_category.context, LinearLayoutManager.VERTICAL, false)
         holder.rv_subCategory.adapter = subCategoryPickerAdapterArray[position]
     }
 

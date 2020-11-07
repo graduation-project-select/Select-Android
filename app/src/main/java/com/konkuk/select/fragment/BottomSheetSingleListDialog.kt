@@ -14,7 +14,7 @@ import com.konkuk.select.adpater.CodiBottomCategoryAdapter
 import com.konkuk.select.utils.StaticValues
 import kotlinx.android.synthetic.main.fragment_bottom_sheet_closetlist_dialog.*
 
-class BottomSheetSingleListDialog(var ctx: Context) : BottomSheetDialogFragment() {
+class BottomSheetSingleListDialog() : BottomSheetDialogFragment() {
 
     lateinit var codiBottomCategoryAdapter: CategoryPickerAdapter   // 카테고리 목록
 
@@ -29,8 +29,8 @@ class BottomSheetSingleListDialog(var ctx: Context) : BottomSheetDialogFragment(
         super.onActivityCreated(savedInstanceState)
         tv_title.text = "카테고리 선택"
 
-        rv_closet_list.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.VERTICAL, false)
-        codiBottomCategoryAdapter = CategoryPickerAdapter(ctx, StaticValues.categoryList)
+        rv_closet_list.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        codiBottomCategoryAdapter = CategoryPickerAdapter(StaticValues.categoryList)
         rv_closet_list.adapter = codiBottomCategoryAdapter
 
         codiBottomCategoryAdapter.itemClickListener =

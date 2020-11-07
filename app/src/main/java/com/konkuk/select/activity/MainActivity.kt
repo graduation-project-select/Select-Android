@@ -152,7 +152,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun moveToNotification(){
-        Toast.makeText(this, "알림 클릭", Toast.LENGTH_SHORT).show()
         var nextIntent = Intent(this, NotificationListActivity::class.java)
         startActivity(nextIntent)
     }
