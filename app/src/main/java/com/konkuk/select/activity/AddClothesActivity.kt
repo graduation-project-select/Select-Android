@@ -44,9 +44,9 @@ class AddClothesActivity : AppCompatActivity(),
 
     var season: ArrayList<Boolean> = arrayListOf(false, false, false, false)
     var colorRGB = IntArray(3)
-    lateinit var category: String
-    lateinit var subCategory: String
-    lateinit var texture: String
+    var category: String = ""
+    var subCategory: String = ""
+    var texture: String = ""
     var imageByteArray: ByteArray? = null
 
     data class ClothesRequest(
@@ -167,6 +167,7 @@ class AddClothesActivity : AppCompatActivity(),
         tv_texture.text = "($texture)"
         val hex = java.lang.String.format("#%02x%02x%02x", colorRGB[0], colorRGB[1], colorRGB[2]) // RGB -> #0000 형식으로 변환
         colorCircle.setCardBackgroundColor(Color.parseColor(hex))
+        tryCount = 0
     }
 
     private fun setClothesImage(imageByteArray: ByteArray) {
