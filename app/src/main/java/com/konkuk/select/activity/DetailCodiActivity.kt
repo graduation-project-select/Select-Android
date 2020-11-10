@@ -3,6 +3,7 @@ package com.konkuk.select.activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -13,6 +14,7 @@ import com.konkuk.select.adpater.ClothesItemAdapter
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
+import com.konkuk.select.network.Fbase.CODI_REF
 import kotlinx.android.synthetic.main.activity_detail_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import java.text.SimpleDateFormat
@@ -69,6 +71,14 @@ class DetailCodiActivity : AppCompatActivity() {
             intent.putExtra("combiCodiClothesList", codiItemList)
             startActivity(intent)
         }
+        deleteButton.setOnClickListener {
+            CODI_REF.document(codiObj.id).delete().addOnSuccessListener {
+                Toast.makeText(this, "Codi ${codiObj.id} 삭제",Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finishAffinity()
+            }
+        }
     }
 
     private fun getDataFromIntent() {
@@ -107,8 +117,10 @@ class DetailCodiActivity : AppCompatActivity() {
             Fbase.CLOTHES_REF.document(id)
                 .get().addOnSuccessListener {
                     val clothesObj = Fbase.getClothes(it)
-                    codiItemList.add(clothesObj)
-                    clothesItemAdapter.notifyDataSetChanged()
+                    if(clothesObj != null){
+                        codiItemList.add(clothesObj)
+                        clothesItemAdapter.notifyDataSetChanged()
+                    }
                 }
         }
     }

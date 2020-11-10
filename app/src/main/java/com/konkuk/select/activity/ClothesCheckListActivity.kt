@@ -68,8 +68,9 @@ class ClothesCheckListActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
                 clothesListVertical.clear()
                 for (document in documents) {
-                    val clothesObj = Fbase.getClothes(document)
-                    clothesListVertical.add(clothesObj)
+                    Fbase.getClothes(document)?.let {
+                        clothesListVertical.add(it)
+                    }
                 }
                 closetClothesVerticalAdapter.notifyDataSetChanged()
             }

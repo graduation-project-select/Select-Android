@@ -74,17 +74,17 @@
     <Button
         android:id="@+id/loginBtn"
         android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:background="@drawable/border_round"
         android:text="Login"
         android:textColor="#fff"
+        style="?attr/materialButtonOutlinedStyle"
+        app:strokeColor = "#fff"
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="@+id/password_et"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/password_et"
         app:layout_constraintTop_toBottomOf="@+id/password_et" />
-
     <View
         android:id="@+id/view"
         android:layout_width="0dp"
@@ -135,21 +135,21 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:text="Sign in Google"
+        android:text="@string/sign_in_google"
         app:layout_constraintBottom_toTopOf="@+id/signupBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view" />
 
-
     <Button
         android:id="@+id/signupBtn"
         android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:background="@drawable/border_round"
         android:text="Sign up"
         android:textColor="#fff"
+        style="?attr/materialButtonOutlinedStyle"
+        app:strokeColor = "#fff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/signInGoogleBtn"
         app:layout_constraintStart_toStartOf="@+id/signInGoogleBtn"

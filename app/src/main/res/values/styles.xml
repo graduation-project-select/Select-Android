@@ -1,25 +1,11 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/colorPrimary</item>
-    </style>
-
-    <!--  하단 메뉴 (비)활성화 시  -->
-    <style name="navTextInactive">
-        <item name="android:textSize">11sp</item>
-        <item name="android:textColor">@color/colorText</item>
-        <item name="android:color">@color/colorText</item>
-    </style>
-
-    <style name="navTextActive">
-        <item name="android:textSize">11sp</item>
-        <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:color">@color/colorPrimary</item>
-
     </style>
 </resources>

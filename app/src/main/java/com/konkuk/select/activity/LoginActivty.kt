@@ -36,7 +36,6 @@ class LoginActivty : AppCompatActivity() {
     }
 
     // 자동로그인 확인
-    // TODO id, 비번 저장되어있으면 로그인하기로 변경
     private fun checkLoginStatus(){
         val pref_email = loginSharedPrefManager.email
         val pref_password = loginSharedPrefManager.password
@@ -46,10 +45,6 @@ class LoginActivty : AppCompatActivity() {
             password = pref_password
             login(email, password)
         }
-//        if(loginSharedPrefManager.uid != "" && loginSharedPrefManager.uid != null){
-////            Toast.makeText(this, "uid: ${loginSharedPrefManager.uid}", Toast.LENGTH_SHORT).show()
-//            gotoMainPage()
-//        }
     }
 
     private fun clearField(){

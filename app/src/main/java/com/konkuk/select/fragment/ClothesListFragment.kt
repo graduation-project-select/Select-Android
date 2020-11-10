@@ -219,7 +219,7 @@ class ClothesListFragment : Fragment() {
                 clothesListVertical.clear()
                 for (document in documents) {
                     val clothesObj = Fbase.getClothes(document)
-                    clothesListVertical.add(clothesObj)
+                    clothesObj?.let{ clothesListVertical.add(it) }
                 }
                 closetClothesVerticalAdapter.notifyDataSetChanged()
             }

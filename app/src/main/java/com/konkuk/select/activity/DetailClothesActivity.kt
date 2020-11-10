@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.konkuk.select.R
@@ -16,6 +17,7 @@ import com.konkuk.select.adpater.CodiItemAdapter
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
+import com.konkuk.select.network.Fbase.CLOTHES_REF
 import com.konkuk.select.utils.ColorConverter
 import kotlinx.android.synthetic.main.activity_add_clothes.*
 import kotlinx.android.synthetic.main.activity_detail_clothes.*
@@ -92,7 +94,15 @@ class DetailClothesActivity : AppCompatActivity() {
                 intent.putExtra("codiId", data.id)
                 startActivity(intent)
             }
+        }
 
+        deleteButton.setOnClickListener {
+            CLOTHES_REF.document(clothesObj.id).delete().addOnSuccessListener {
+                Toast.makeText(this, "Clothes ${clothesObj.id} 삭제",Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finishAffinity()
+            }
         }
     }
 

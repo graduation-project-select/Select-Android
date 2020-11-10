@@ -32,7 +32,11 @@ object Fbase {
 
     val TEMP_STORAGE_ROOT_NAME = "tempImgs"
 
-    fun getClothes(document: DocumentSnapshot, idDefaultCodiItem: Boolean = false): Clothes {
+    fun getClothes(document: DocumentSnapshot, idDefaultCodiItem: Boolean = false): Clothes? {
+        if(document.data == null) {
+            return null
+        }
+
         val clothesObj = JSONObject(document.data)
         if (idDefaultCodiItem) {
             return Clothes(

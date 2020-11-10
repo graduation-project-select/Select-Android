@@ -10,22 +10,33 @@
         layout="@layout/toolbar"
         android:id="@+id/toolbar" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
+        android:overScrollMode="never"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/colorPrimaryDark"
-        android:paddingHorizontal="@dimen/activity_horizontal_padding"
-        android:paddingVertical="@dimen/activity_vertical_padding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingHorizontal="@dimen/activity_horizontal_padding"
+        android:paddingVertical="@dimen/activity_vertical_padding"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:id="@+id/codiTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="#데이트룩 #데일리룩 #나들이룩"
+            android:textColor="@color/colorGray"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,7 +44,7 @@
             android:id="@+id/codiDetailImg"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/style_roundbox_black"
             android:padding="20dp"
             app:layout_constraintDimensionRatio="w,1:1.1"
@@ -49,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="이 코디를 사용한 아이템을 확인해보세요"
+            android:textColor="@color/colorGray"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/codiDetailImg" />
 
@@ -57,6 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="최근 착용 날짜 : "
+            android:textColor="@color/colorText"
             app:layout_constraintBottom_toBottomOf="@+id/CombiDoCodi"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/CombiDoCodi" />
@@ -66,30 +79,69 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2020.09.12"
+            android:textColor="@color/colorText"
             app:layout_constraintTop_toTopOf="@id/lastWearDate_text"
-            app:layout_constraintBottom_toBottomOf="@id/lastWearDate_text"
             app:layout_constraintStart_toEndOf="@id/lastWearDate_text" />
 
         <Button
             android:id="@+id/CombiDoCodi"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:background="@drawable/border_more_round"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
             android:paddingHorizontal="16dp"
             android:text="이 조합으로 코디하기"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:textColor="#ffffff"
+            app:cornerRadius="15dp"
+            app:layout_constraintBottom_toBottomOf="@id/lastWearDate_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/codiItem_rv" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/codiItem_rv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
+            app:layout_constraintDimensionRatio="3:1"
             app:layout_constraintBottom_toTopOf="@+id/lastWearDate"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/codiItem_tv" />
 
+        <Button
+            android:id="@+id/editButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="Edit"
+            android:textColor="@color/colorGray"
+            app:icon="@drawable/ic_edit_24px"
+            app:iconSize="20dp"
+            app:iconTint="@color/colorGray"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/deleteButton"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/CombiDoCodi" />
+
+        <Button
+            android:id="@+id/deleteButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="Delete"
+            android:textColor="#FF6262"
+            app:icon="@drawable/ic_delete_24px"
+            app:iconSize="20dp"
+            app:iconTint="#FF6262"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/editButton"
+            app:layout_constraintTop_toTopOf="@+id/editButton" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -74,7 +74,7 @@ class ClosetClothesHorizontalAdapter(var categoryList:ArrayList<Category>, priva
                 closetClothesHorizontalItemAdapterList[index].clear()
                 for (document in documents) {
                     val clothesObj = Fbase.getClothes(document)
-                    closetClothesHorizontalItemAdapterList[index].add(clothesObj)
+                    clothesObj?.let { closetClothesHorizontalItemAdapterList[index].add(it) }
                 }
                 closetClothesHorizontalItemAdapter[index].notifyDataSetChanged()
             }

@@ -167,7 +167,9 @@ class AddCodiActivity : AppCompatActivity() {
                 codiBottomClothesList.clear()
                 for (document in documents) {
                     val clothesObj = Fbase.getClothes(document)
-                    codiBottomClothesList.add(clothesObj)
+                    if(clothesObj != null){
+                        codiBottomClothesList.add(clothesObj)
+                    }
                 }
                 codiBottomClothesLinearAdapter.notifyDataSetChanged()
             }
@@ -214,7 +216,9 @@ class AddCodiActivity : AppCompatActivity() {
                                 .get()
                                 .addOnSuccessListener { documents -> // 내 옷장에 있는 옷들
                                     for (document in documents)
-                                        myClothes.add(Fbase.getClothes(document))
+                                        Fbase.getClothes(document)?.let {
+                                            myClothes.add(it)
+                                        }
                                     isClothesLoading.value = true
                                 }
 
@@ -340,11 +344,14 @@ class AddCodiActivity : AppCompatActivity() {
                     for (clothes in myClothes) {
                         for (document in documents) {
                             val codiClothes = Fbase.getClothes(document, idDefaultCodiItem = true)
-                            if (codiClothes.category != inputClothes.category) {
-                                if (compareClothes(clothes, codiClothes)) {
-                                    recommendItems.add(clothes)
+                            codiClothes?.let {
+                                if (it.category != inputClothes.category) {
+                                    if (compareClothes(clothes, it)) {
+                                        recommendItems.add(clothes)
+                                    }
                                 }
                             }
+
                         }
                     }
 
