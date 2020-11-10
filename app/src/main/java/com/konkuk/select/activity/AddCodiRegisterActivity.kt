@@ -1,11 +1,14 @@
 package com.konkuk.select.activity
 
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.CheckBox
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.Timestamp
@@ -19,6 +22,7 @@ import com.konkuk.select.model.CodiItem
 import com.konkuk.select.model.CodiSuggestion
 import com.konkuk.select.model.CodiTag
 import com.konkuk.select.network.Fbase
+import com.konkuk.select.utils.KeyboardVisibilityUtils
 import kotlinx.android.synthetic.main.activity_add_codi_register.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
@@ -48,6 +52,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         settingToolBar()
         getTagList()
         settingAdapter()
+        settingKebordTouch()
     }
 
     private fun checkSharing() {
@@ -134,6 +139,10 @@ class AddCodiRegisterActivity : AppCompatActivity() {
                 data: CodiTag,
                 position: Int
             ) {
+                tag_tv.clearFocus()
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(tag_tv.windowToken, 0)
+
                 val isChecked = (view as CheckBox).isChecked
                 if (isChecked) {
                     if (!checkTagRefArray.contains(data.ref)) checkTagRefArray.add(data.ref)
@@ -253,6 +262,21 @@ class AddCodiRegisterActivity : AppCompatActivity() {
                 Fbase.USERS_REF.document(it)
                     .update("codiTagList", FieldValue.arrayUnion(tag))
             }
+        }
+    }
+
+    private fun settingKebordTouch() {
+        KeyboardVisibilityUtils(window,
+            onShowKeyboard = { keyboardHeight ->
+                sv_root.run {
+                    smoothScrollTo(scrollX, scrollY + keyboardHeight)
+                }
+            })
+
+        layout_codi_tag.setOnClickListener {
+            tag_tv.clearFocus()
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(tag_tv.windowToken, 0)
         }
     }
 

@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:context=".activity.AddCodiRegisterActivity"
+    android:id="@+id/sv_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activity.AddCodiRegisterActivity">
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_codi_tag"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <include
         android:id="@+id/toolbar"
@@ -53,16 +60,19 @@
         app:layout_constraintTop_toBottomOf="@id/open_tv"
         app:srcCompat="@drawable/hashtag" />
 
-    <TextView
+    <EditText
         android:id="@+id/tag_tv"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="코디 태그를 선택해주세요"
+        android:layout_marginEnd="24dp"
+        android:hint="코디 태그를 선택해주세요"
+        android:textSize="16dp"
         app:layout_constraintBottom_toBottomOf="@id/hashtag_iv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/hashtag_iv"
-        app:layout_constraintTop_toTopOf="@id/hashtag_iv"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="@id/hashtag_iv" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/codiTag_rv"
@@ -93,5 +103,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/hashtag_iv" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
