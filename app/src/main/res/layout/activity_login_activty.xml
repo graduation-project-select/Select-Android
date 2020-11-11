@@ -50,7 +50,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/signIn_tv"
-        app:layout_constraintTop_toBottomOf="@+id/signIn_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/signIn_tv"
+        android:visibility="visible"/>
 
     <EditText
         android:id="@+id/password_et"
