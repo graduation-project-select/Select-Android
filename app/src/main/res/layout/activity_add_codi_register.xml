@@ -68,6 +68,8 @@
         android:layout_marginEnd="24dp"
         android:hint="코디 태그를 선택해주세요"
         android:textSize="16dp"
+        android:imeOptions="actionDone"
+        android:inputType="text"
         app:layout_constraintBottom_toBottomOf="@id/hashtag_iv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

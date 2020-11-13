@@ -5,11 +5,10 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.CheckBox
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.getSystemService
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
@@ -19,7 +18,6 @@ import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiTagCheckboxListAdapter
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.model.CodiItem
-import com.konkuk.select.model.CodiSuggestion
 import com.konkuk.select.model.CodiTag
 import com.konkuk.select.network.Fbase
 import com.konkuk.select.utils.KeyboardVisibilityUtils
@@ -101,7 +99,7 @@ class AddCodiRegisterActivity : AppCompatActivity() {
     }
 
     private fun getDataFromIntent() {
-        if(intent.hasExtra("codiImage") && intent.hasExtra("codiClothesList")){
+        if (intent.hasExtra("codiImage") && intent.hasExtra("codiClothesList")) {
             intent.getByteArrayExtra("codiImage")?.let {
                 codiImgByte = it
                 settingCodiImage(codiImgByte)
@@ -139,10 +137,6 @@ class AddCodiRegisterActivity : AppCompatActivity() {
                 data: CodiTag,
                 position: Int
             ) {
-                tag_tv.clearFocus()
-                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(tag_tv.windowToken, 0)
-
                 val isChecked = (view as CheckBox).isChecked
                 if (isChecked) {
                     if (!checkTagRefArray.contains(data.ref)) checkTagRefArray.add(data.ref)
@@ -265,6 +259,10 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         }
     }
 
+    data class CodiTagNameClass(
+        val name: String
+    )
+
     private fun settingKebordTouch() {
         KeyboardVisibilityUtils(window,
             onShowKeyboard = { keyboardHeight ->
@@ -273,10 +271,21 @@ class AddCodiRegisterActivity : AppCompatActivity() {
                 }
             })
 
-        layout_codi_tag.setOnClickListener {
-            tag_tv.clearFocus()
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(tag_tv.windowToken, 0)
+        tag_tv.setOnEditorActionListener{ textView, action, event ->
+            var handled = false
+            if (action == EditorInfo.IME_ACTION_DONE) {
+                tag_tv.clearFocus()
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(tag_tv.windowToken, 0)
+                if (tag_tv.text.isNotEmpty()) {
+                    val tag = CodiTagNameClass(name = tag_tv.text.toString())
+                    Fbase.CODITAG_REF.add(tag)
+                        .addOnSuccessListener { documentReference -> getTagList() }
+                    tag_tv.text.clear()
+                }
+                handled = true
+            }
+            handled
         }
     }
 
