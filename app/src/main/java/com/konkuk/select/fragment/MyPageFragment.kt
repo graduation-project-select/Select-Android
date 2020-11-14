@@ -12,14 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.konkuk.select.R
+import com.konkuk.select.network.Fbase
+import com.konkuk.select.network.Fbase.USERS_REF
 import kotlinx.android.synthetic.main.fragment_my_page.*
 
 
 class MyPageFragment : Fragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +25,11 @@ class MyPageFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_my_page, container, false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getUserInfo()
     }
 
 
@@ -86,6 +89,43 @@ class MyPageFragment : Fragment() {
         }
     }
 
+    fun getUserInfo(){
+        Fbase.uid?.let {
+            USERS_REF.document(it).get().addOnSuccessListener {userObj ->
+                if(userObj.exists()){
+                    userObj.get("name")?.let {
+                        tv_userNickname.text = it.toString()
+                    }
+
+                    userObj.get("tag1")?.let{
+                        if(it.toString() != ""){
+                            mytag1.text = "# $it"
+                        }else{
+                            mytag1.text = ""
+                        }
+                    }
+                    userObj.get("tag2")?.let{
+                        if(it.toString() != ""){
+                            mytag2.text = "# $it"
+                        }else{
+                            mytag2.text = ""
+                        }
+                    }
+                    if(mytag1.text == "" && mytag2.text == ""){
+                        mytag1.text = "#_나의_대표_스타일_태그를_추가해보세요"
+                    }
+                    if(userObj.get("tag1") == null){
+                        mytag1.text = ""
+                    }
+                    if(userObj.get("tag2") == null){
+                        mytag2.text = ""
+                    }
+
+                }
+            }
+        }
+    }
+
 
     private inner class ScreenSlidePagerAdapter(fa: Fragment) : FragmentStateAdapter(fa) {
         override fun getItemCount(): Int = 3
@@ -98,8 +138,6 @@ class MyPageFragment : Fragment() {
                 else->MypageFeedFragment()
             }
         }
-
-
     }
 
 }

@@ -15,11 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity.EditClosetActivity"></activity>
+        <activity android:name=".activity.EditProfileActivity"></activity>
+        <activity android:name=".activity.EditClosetActivity" />
         <activity android:name=".activity.NotificationListActivity" />
         <activity android:name=".activity.CodiSuggestionListActivity" />
         <activity android:name=".activity.ClosetShareRecommendationListActivity" />
-        <activity android:name=".activity.ClosetShareActivity"></activity>
+        <activity android:name=".activity.ClosetShareActivity" />
         <activity android:name=".activity.ClothesCheckListActivity" />
         <activity android:name=".activity.ClosetListActivity" />
         <activity android:name=".activity.CodiTagListActivity" />

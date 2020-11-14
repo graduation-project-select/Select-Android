@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.konkuk.select.R
 import com.konkuk.select.model.Feed
 
@@ -29,8 +30,9 @@ class CommunityFeedAdapter(val item: ArrayList<Feed>) : RecyclerView.Adapter<Com
     override fun onBindViewHolder(holder: CommunityFeedAdapter.ItemHolder, position: Int) {
         holder.feedID.text = item[position].id
         holder.feedUserTag.text = item[position].tag
-//        holder.feedImg.setImageDrawable()
         holder.heartCount.text = "좋아요 " + item[position].heartCount + "개"
-
+        Glide.with(holder.feedImg.context)
+            .load(item[position].img)
+            .into(holder.feedImg)
     }
 }

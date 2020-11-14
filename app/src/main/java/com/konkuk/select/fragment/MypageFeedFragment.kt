@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 import com.konkuk.select.R
 import com.konkuk.select.adpater.MyPageFeedAdapter
+import com.konkuk.select.network.Fbase
 import kotlinx.android.synthetic.main.fragment_mypage_feed.*
 
 
@@ -28,11 +29,21 @@ class MypageFeedFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        for(i in 0..20)
-            feedList.add("")
+        getFeedList()
         MyPageFeedAdapter = MyPageFeedAdapter(feedList)
         rv_feeds.layoutManager = GridLayoutManager(activity, 3, GridLayoutManager.VERTICAL, false)
         rv_feeds.adapter = MyPageFeedAdapter
+    }
+
+    fun getFeedList(){
+        Fbase.db.collection("feedImgUri")
+            .get().addOnSuccessListener {
+                feedList.clear()
+                for(doc in it.documents){
+                    feedList.add(doc["uri"].toString())
+                }
+                MyPageFeedAdapter.notifyDataSetChanged()
+            }
     }
 
 }

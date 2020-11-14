@@ -146,16 +146,11 @@ class MainActivity : AppCompatActivity() {
         toolbar.right_tv.visibility = View.GONE
         toolbar.right_iv.setImageResource(R.drawable.ic_settings_24px)
         toolbar.right_iv.setOnClickListener {
-            Toast.makeText(this, "회원정보 수정 -> 임시로 로그아웃", Toast.LENGTH_SHORT).show()
-            signOut()
+            startActivity(Intent(this, EditProfileActivity::class.java))
         }
     }
 
-    fun signOut(){
-        Fbase.auth.signOut()
-        SharedPrefManager.getInstance(this).clear()
-        startActivity(Intent(this, LoginActivty::class.java))
-    }
+
 
     private fun moveToNotification(){
         var nextIntent = Intent(this, NotificationListActivity::class.java)

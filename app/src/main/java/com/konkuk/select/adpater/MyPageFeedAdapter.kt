@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.konkuk.select.R
 
 class MyPageFeedAdapter(var items:ArrayList<String>): RecyclerView.Adapter<MyPageFeedAdapter.ImageHolder>() {
@@ -30,7 +31,9 @@ class MyPageFeedAdapter(var items:ArrayList<String>): RecyclerView.Adapter<MyPag
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
-        holder.feedImg.setImageResource(R.drawable.temp_mypage_bg)
+        Glide.with(holder.feedImg.context)
+            .load(items[position])
+            .into(holder.feedImg)
     }
 
     override fun getItemCount(): Int {

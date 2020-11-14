@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.EditProfileActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cv_profileImg"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="24dp"
+        app:cardCornerRadius="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/outlinedTextField"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.22000003"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <ImageView
+            android:id="@+id/iv_profileImg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/kakao_default_profile_image" />
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/outlinedTextField"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:hint="닉네임"
+        app:layout_constraintBottom_toTopOf="@+id/outlinedTextField2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cv_profileImg">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_nickname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/outlinedTextField2"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="174dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="성별"
+        app:layout_constraintBottom_toTopOf="@+id/outlinedTextField4"
+        app:layout_constraintStart_toStartOf="@+id/outlinedTextField"
+        app:layout_constraintTop_toBottomOf="@+id/outlinedTextField">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/outlinedTextField3"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="출생년도"
+        app:layout_constraintEnd_toEndOf="@+id/outlinedTextField"
+        app:layout_constraintStart_toEndOf="@+id/outlinedTextField2"
+        app:layout_constraintTop_toTopOf="@+id/outlinedTextField2">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_born"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/outlinedTextField4"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="174dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="대표태그1"
+        app:layout_constraintBottom_toTopOf="@+id/logout_button"
+        app:layout_constraintStart_toStartOf="@+id/outlinedTextField2"
+        app:layout_constraintTop_toBottomOf="@+id/outlinedTextField2">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_tag1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/outlinedTextField5"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="대표태그2"
+        app:layout_constraintEnd_toEndOf="@id/outlinedTextField"
+        app:layout_constraintStart_toEndOf="@+id/outlinedTextField4"
+        app:layout_constraintTop_toTopOf="@+id/outlinedTextField4">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_tag2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/logout_button"
+        android:text="로그아웃"
+        android:textColor="#FFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/outlinedTextField4" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
