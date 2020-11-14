@@ -26,7 +26,7 @@ class CommunityFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        myFeedUser.add(Feed("syoung", "#미니멀룩 #베이직룩", "", 126))
+        myFeedUser.add(Feed("syoung125", "#미니멀룩 #베이직룩", "", 126))
         myFeedUser.add(Feed("leeesun", "#캠퍼스룩 #미니멀룩", "", 320))
         settingAdapter()
     }
