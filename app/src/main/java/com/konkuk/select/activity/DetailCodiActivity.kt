@@ -82,6 +82,9 @@ class DetailCodiActivity : AppCompatActivity() {
                 startActivity(intent)
                 finishAffinity()
             }
+
+            // TODO: storage에서 사진도 삭제해야 함
+            // Fbase.storage.reference.child(storage레퍼런스가 들어가야함) -> 코디 업로드시 레퍼런스 저장해야 가능해짐
         }
 
         // Edit

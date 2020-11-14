@@ -102,7 +102,11 @@ class DetailClothesActivity : AppCompatActivity() {
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finishAffinity()
+                
+                clothesObj.imgUri
             }
+            // TODO:: storage의 사진도 지워줘야 함
+            // Fbase.storage.reference.child(storage레퍼런스가 들어가야함) -> 옷 업로드시 레퍼런스 저장해야 가능해짐
         }
     }
 
