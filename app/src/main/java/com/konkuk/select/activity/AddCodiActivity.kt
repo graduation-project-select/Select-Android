@@ -3,6 +3,7 @@ package com.konkuk.select.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -18,18 +19,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.github.chrisbanes.photoview.PhotoView
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiBottomCategoryAdapter
 import com.konkuk.select.adpater.CodiBottomClothesLinearAdapter
 import com.konkuk.select.adpater.CodiBottomRecommendationAdapter
 import com.konkuk.select.model.Clothes
 import com.konkuk.select.network.Fbase
+import com.konkuk.select.utils.ImageMoveUtils
 import com.konkuk.select.utils.StaticValues
 import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
+import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 class AddCodiActivity : AppCompatActivity() {
@@ -167,7 +174,7 @@ class AddCodiActivity : AppCompatActivity() {
                 codiBottomClothesList.clear()
                 for (document in documents) {
                     val clothesObj = Fbase.getClothes(document)
-                    if(clothesObj != null){
+                    if (clothesObj != null) {
                         codiBottomClothesList.add(clothesObj)
                     }
                 }
@@ -207,7 +214,7 @@ class AddCodiActivity : AppCompatActivity() {
                     position: Int
                 ) {
                     if (codiClothesList.contains(data)) {
-                        Log.d("codiBottomClothesLinearAdapter","중복불가")
+                        Log.d("codiBottomClothesLinearAdapter", "중복불가")
                     } else {
                         if (codiClothesList.isEmpty()) {
                             codiClothesList.add(data)
@@ -239,7 +246,14 @@ class AddCodiActivity : AppCompatActivity() {
                             .load(data.imgUri)
                             .into(addImgView)
                         codi_canvas.addView(addImgView)
-                        dragAndDrop(addImgView)
+                        var MU = ImageMoveUtils()
+                        addImgView.setOnTouchListener(object : View.OnTouchListener {
+                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                                MU.TouchProcess(v, event)
+                                v?.bringToFront()
+                                return true
+                            }
+                        })
                     }
                 }
             }
@@ -253,7 +267,7 @@ class AddCodiActivity : AppCompatActivity() {
                     position: Int
                 ) {
                     if (codiClothesList.contains(data)) {
-                        Log.d("codiBottomClothesLinearAdapter","중복불가")
+                        Log.d("codiBottomClothesLinearAdapter", "중복불가")
                     } else {
                         codiClothesList.add(data)
                         var addImgView = ImageView(this@AddCodiActivity)
@@ -263,7 +277,14 @@ class AddCodiActivity : AppCompatActivity() {
                             .load(data.imgUri)
                             .into(addImgView)
                         codi_canvas.addView(addImgView)
-                        dragAndDrop(addImgView)
+                        var MU = ImageMoveUtils()
+                        addImgView.setOnTouchListener(object : View.OnTouchListener {
+                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                                MU.TouchProcess(v, event)
+                                v?.bringToFront()
+                                return true
+                            }
+                        })
                     }
                 }
             }
@@ -450,58 +471,6 @@ class AddCodiActivity : AppCompatActivity() {
                     vBool.add(document["codiId"] as String)
                 isVLoading.value = true
             }
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun dragAndDrop(iv: ImageView) {
-        iv.setOnTouchListener(object : View.OnTouchListener {
-            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                val width = (v?.parent as ViewGroup).width - v.width
-                val height = (v?.parent as ViewGroup).height - v.height
-                if (event?.action == MotionEvent.ACTION_DOWN) {
-                    oldXvalue = event.x
-                    oldYvalue = event.y
-                    //  Log.i("Tag1", "Action Down X" + event.getX() + "," + event.getY());
-                    Log.i("Tag1", "Action Down rX " + event.rawX + "," + event.rawY)
-                } else if (event?.action == MotionEvent.ACTION_MOVE) {
-                    v.x = event.rawX - oldXvalue
-                    v.y = event.rawY - (oldYvalue + v.height / 2)
-                    //  Log.i("Tag2", "Action Down " + me.getRawX() + "," + me.getRawY());
-                } else if (event?.action == MotionEvent.ACTION_UP) {
-                    if (v.x > width && v.y > height) {
-                        v.x = width.toFloat()
-                        v.y = height.toFloat()
-                    } else if (v.x < 0 && v.y > height) {
-                        v.x = 0f
-                        v.y = height.toFloat()
-                    } else if (v.x > width && v.y < 0) {
-                        v.x = width.toFloat()
-                        v.y = 0f
-                    } else if (v.x < 0 && v.y < 0) {
-                        v.x = 0f
-                        v.y = 0f
-                    } else if (v.x < 0 || v.x > width) {
-                        if (v.x < 0) {
-                            v.x = 0f
-                            v.y = event.rawY - oldYvalue - v.height
-                        } else {
-                            v.x = width.toFloat()
-                            v.y = event.rawY - oldYvalue - v.height
-                        }
-                    } else if (v.y < 0 || v.y > height) {
-                        if (v.y < 0) {
-                            v.x = event.rawX - oldXvalue
-                            v.y = 0f
-                        } else {
-                            v.x = event.rawX - oldXvalue
-                            v.y = height.toFloat()
-                        }
-                    }
-                }
-                v.bringToFront()
-                return true
-            }
-        })
     }
 
     private fun captureScreen(v: View): ByteArray {
