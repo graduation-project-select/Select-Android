@@ -18,6 +18,7 @@ class ClosetListBlockAdapter(val closetList:ArrayList<Closet>):
     interface OnItemClickListener {
         fun onClickItem(holder: ItemHolder, view: View, data: Closet, position: Int)
         fun onClickShareBtn(holder: ItemHolder, view: View, data: Closet, position: Int)
+        fun onClickSettingBtn(holder: ItemHolder, view: View, data: Closet, position: Int)
     }
 
     inner class ItemHolder(itemView:View): RecyclerView.ViewHolder(itemView){
@@ -33,6 +34,9 @@ class ClosetListBlockAdapter(val closetList:ArrayList<Closet>):
             }
             iv_sharebtn.setOnClickListener {
                 itemClickListener?.onClickShareBtn(this, it, closetList[adapterPosition], adapterPosition)
+            }
+            iv_settingbtn.setOnClickListener {
+                itemClickListener?.onClickSettingBtn(this, it, closetList[adapterPosition], adapterPosition)
             }
         }
     }

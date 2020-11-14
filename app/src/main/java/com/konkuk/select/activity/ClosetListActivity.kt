@@ -33,6 +33,10 @@ class ClosetListActivity : AppCompatActivity() {
         settingToolBar()
         settingAdapter()
         settingOnClickListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
         getClosetData()
     }
 
@@ -70,6 +74,13 @@ class ClosetListActivity : AppCompatActivity() {
                     position: Int
                 ) {
                     sendShareLink(data)
+                }
+
+                override fun onClickSettingBtn(holder: ClosetListBlockAdapter.ItemHolder, view: View, data: Closet, position: Int) {
+                    var nextIntent = Intent(this@ClosetListActivity, EditClosetActivity::class.java)
+                    nextIntent.putExtra(CLOSET_ID_MESSAGE, data.id)
+                    nextIntent.putExtra(CLOSET_NAME_MESSAGE, data.name)
+                    startActivity(nextIntent)
                 }
             }
     }
