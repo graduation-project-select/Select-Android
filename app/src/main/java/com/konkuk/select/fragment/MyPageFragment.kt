@@ -1,40 +1,25 @@
 package com.konkuk.select.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.konkuk.select.R
-import com.konkuk.select.activity.LoginActivty
-import com.konkuk.select.network.Fbase
-import com.konkuk.select.storage.SharedPrefManager
 import kotlinx.android.synthetic.main.fragment_my_page.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MyPageFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MyPageFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,38 +29,84 @@ class MyPageFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_my_page, container, false)
     }
 
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        tv_signOutBtn.setOnClickListener {
-            signOut()
+        val bottomSheetBehavior: BottomSheetBehavior<*> = BottomSheetBehavior.from<View>(contentLayout)
+        bottomSheetBehavior.isHideable = false
+
+//        var backLayout = ll.findViewById<ConstraintLayout>(R.id.back_layout)
+//        backLayout.viewTreeObserver.addOnGlobalLayoutListener {
+//            bottomSheetBehavior.peekHeight = (backLayout.height - (mytag1.y + mytag1.height+ mytag1.marginBottom)).toInt()
+//            content_body.minimumHeight = bottomSheetBehavior.peekHeight - content_header.height
+//        } // TODO 계속  backLayout null 오류;;
+
+        // viewPager
+        // The pager adapter, which provides the pages to the view pager widget.
+        val pagerAdapter = ScreenSlidePagerAdapter(this)
+        viewPager.adapter = pagerAdapter
+        viewPager.isUserInputEnabled = false
+
+
+        btn_feed.setOnClickListener {
+            viewPager.currentItem = 0
+            setHeaderTextColor()
+        }
+        btn_codi.setOnClickListener {
+            viewPager.currentItem = 1
+            setHeaderTextColor()
+        }
+        btn_calendar.setOnClickListener {
+            viewPager.currentItem = 2
+            setHeaderTextColor()
+        }
+
+        viewPager.addOnLayoutChangeListener { view, i, i2, i3, i4, i5, i6, i7, i8 ->
+            setHeaderTextColor()
         }
     }
 
-    fun signOut(){
-        Fbase.auth.signOut()
-        SharedPrefManager.getInstance(tv_signOutBtn.context).clear()
-        startActivity(Intent(activity, LoginActivty::class.java))
-    }
-
-
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MyPageFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MyPageFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    fun setHeaderTextColor() {
+        when(viewPager.currentItem){
+            0 -> {
+                btn_feed.setTextColor(ContextCompat.getColor(btn_feed.context, R.color.colorPrimary))
+                btn_codi.setTextColor(ContextCompat.getColor(btn_codi.context, R.color.colorText))
+                btn_calendar.setTextColor(ContextCompat.getColor(btn_calendar.context, R.color.colorText))
             }
+            1 -> {
+                btn_feed.setTextColor(ContextCompat.getColor(btn_feed.context, R.color.colorText))
+                btn_codi.setTextColor(ContextCompat.getColor(btn_codi.context, R.color.colorPrimary))
+                btn_calendar.setTextColor(ContextCompat.getColor(btn_calendar.context, R.color.colorText))
+            }
+            2 -> {
+                btn_feed.setTextColor(ContextCompat.getColor(btn_feed.context, R.color.colorText))
+                btn_codi.setTextColor(ContextCompat.getColor(btn_codi.context, R.color.colorText))
+                btn_calendar.setTextColor(ContextCompat.getColor(btn_calendar.context, R.color.colorPrimary))
+            }
+        }
     }
+
+
+
+//    fun signOut(){
+//        Fbase.auth.signOut()
+//        SharedPrefManager.getInstance(tv_signOutBtn.context).clear()
+//        startActivity(Intent(activity, LoginActivty::class.java))
+//    }
+
+    private inner class ScreenSlidePagerAdapter(fa: Fragment) : FragmentStateAdapter(fa) {
+        override fun getItemCount(): Int = 3
+
+        override fun createFragment(position: Int): Fragment {
+            return when(position) {
+                0 -> MypageFeedFragment()
+                1 -> MypageCodiFragment()
+                2 -> MypageCalendarFragment()
+                else->MypageFeedFragment()
+            }
+        }
+
+
+    }
+
 }

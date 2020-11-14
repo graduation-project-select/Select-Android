@@ -140,14 +140,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initMyPageToolbar() {
-        toolbar.left_iv.setImageResource(R.drawable.closet_btn)
-        toolbar.left_iv.setOnClickListener {
-            Toast.makeText(this, "click", Toast.LENGTH_SHORT).show()
-        }
+        toolbar.left_iv.visibility = View.INVISIBLE
+        toolbar.title_tv.text = "셀렉"
         toolbar.right_tv.visibility = View.GONE
-        toolbar.right_iv.setImageResource(R.drawable.alarm)
+        toolbar.right_iv.setImageResource(R.drawable.ic_settings_24px)
         toolbar.right_iv.setOnClickListener {
-            moveToNotification()
+            Toast.makeText(this, "회원정보 수정", Toast.LENGTH_SHORT).show()
         }
     }
 

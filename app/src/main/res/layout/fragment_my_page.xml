@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,19 +8,164 @@
     android:layout_height="match_parent"
     tools:context=".fragment.MyPageFragment">
 
-    <TextView
-        android:id="@+id/tv_signOutBtn"
-        android:layout_width="100dp"
-        android:layout_height="40dp"
-        android:text="로그아웃"
-        android:textColor="#fff"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:background="@drawable/border_more_round"
-        android:backgroundTint="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/temp_mypage_bg"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!--This the interface sitting behind the backdrop and shown when it is collapsed-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/back_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_padding">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_profileImg"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:cardCornerRadius="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_profileImg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/kakao_default_profile_image" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tv_userNickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="syoung125"
+            android:textColor="#FFF"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="@+id/cv_profileImg"
+            app:layout_constraintTop_toBottomOf="@+id/cv_profileImg" />
+
+        <Button
+            android:id="@+id/followers_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="8dp"
+            android:text="팔로워 28"
+            android:textColor="#FFF"
+            android:textSize="14sp"
+            app:cornerRadius="20dp"
+            app:layout_constraintStart_toStartOf="@+id/tv_userNickname"
+            app:layout_constraintTop_toBottomOf="@+id/tv_userNickname" />
+
+        <Button
+            android:id="@+id/following_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:paddingHorizontal="8dp"
+            android:text="팔로잉 40"
+            android:textColor="#FFF"
+            android:textSize="14sp"
+            app:cornerRadius="20dp"
+            app:layout_constraintStart_toEndOf="@id/followers_btn"
+            app:layout_constraintTop_toTopOf="@id/followers_btn" />
+
+        <TextView
+            android:id="@+id/mytag1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="# 미니멀"
+            android:textColor="#fff"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="@+id/followers_btn"
+            app:layout_constraintTop_toBottomOf="@+id/followers_btn" />
+
+        <TextView
+            android:id="@+id/mytag2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="# 심플"
+            android:textColor="#fff"
+            app:layout_constraintStart_toEndOf="@+id/mytag1"
+            app:layout_constraintTop_toTopOf="@+id/mytag1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <!--This is the backdrop's content with a BottomSheetBehaviour applied to it-->
+    <LinearLayout
+        android:id="@+id/contentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:behavior_peekHeight="310dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <!-- The backdrop's header -->
+        <LinearLayout
+            android:id="@+id/content_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:padding="16dp"
+            android:background="@drawable/ic_list_header_background"
+            android:elevation="4dp">
+
+            <TextView
+                android:id="@+id/btn_feed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="패션스타그램"/>
+
+            <TextView
+                android:id="@+id/btn_codi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:text="셀렉"/>
+
+            <TextView
+                android:id="@+id/btn_calendar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:text="데일리"/>
+
+        </LinearLayout>
+
+        <!-- The body of the backdrop's content.-->
+        <LinearLayout
+            android:id="@+id/content_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorBackGround">
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+<!--        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+<!--            android:id="@+id/swiperefresh"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@color/colorBackGround">-->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="여기에 컨텐츠!"/>-->
+<!--            &lt;!&ndash;The content's body goes here&ndash;&gt;-->
+<!--        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+
+    </LinearLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

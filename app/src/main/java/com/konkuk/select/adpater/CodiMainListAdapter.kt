@@ -18,7 +18,7 @@ import com.konkuk.select.activity.DetailCodiActivity
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
 
-class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>):RecyclerView.Adapter<CodiMainListAdapter.ListHolder>() {
+class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>, var public:Boolean = false):RecyclerView.Adapter<CodiMainListAdapter.ListHolder>() {
 
     var codiMainListItemAdapterArray: ArrayList<CodiMainListItemAdapter> = arrayListOf()
     var codiListArray: ArrayList<ArrayList<Codi>> = arrayListOf()
@@ -68,18 +68,21 @@ class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>):Recyc
 
     private fun getCodiListByTag(tagRef: DocumentReference, index:Int) {
         tagRef.get().addOnSuccessListener {
-            Fbase.CODI_REF
+            var codi_ref = Fbase.CODI_REF
                 .whereArrayContains("tags", tagRef)
                 .whereEqualTo("uid", Fbase.uid)
-                .orderBy("date", Query.Direction.DESCENDING)
+
+            if(public) codi_ref.whereEqualTo("public", true)
+
+            codi_ref.orderBy("date", Query.Direction.DESCENDING)
                 .get().addOnSuccessListener { documents ->
-                    codiListArray[index].clear()
-                    for (document in documents) {
-                        val codiObj = Fbase.getCodi(document)
-                        codiListArray[index].add(codiObj)
-                    }
-                    codiMainListItemAdapterArray[index].notifyDataSetChanged()
+                codiListArray[index].clear()
+                for (document in documents) {
+                    val codiObj = Fbase.getCodi(document)
+                    codiListArray[index].add(codiObj)
                 }
+                codiMainListItemAdapterArray[index].notifyDataSetChanged()
+            }
         }
     }
 }
