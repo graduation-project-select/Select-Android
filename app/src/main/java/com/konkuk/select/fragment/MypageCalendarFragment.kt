@@ -53,8 +53,9 @@ class MypageCalendarFragment : Fragment() {
                 Log.d("달력에 해당하는 옷", "${it.documents}")
                 if(it.documents.isEmpty()){
                     Toast.makeText(activity, "등록된 코디가 없습니다.", Toast.LENGTH_SHORT).show()
+                }else{
+                    showCodiDialog(getCodi(it.documents[0]))
                 }
-                showCodiDialog(getCodi(it.documents[0]))
             }
     }
 
