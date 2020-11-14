@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.konkuk.select.R
 import com.konkuk.select.fragment.*
+import com.konkuk.select.network.Fbase
+import com.konkuk.select.storage.SharedPrefManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
@@ -80,6 +82,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initClosetMenuToolbar(){
+        toolbar.left_iv.visibility = View.VISIBLE
         toolbar.left_iv.setImageResource(R.drawable.closet_btn)
         toolbar.left_iv.setOnClickListener {
             startActivity(Intent(this, ClosetListActivity::class.java))
@@ -100,6 +103,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initCodiMenuToolbar(){
+        toolbar.left_iv.visibility = View.VISIBLE
         toolbar.left_iv.setImageResource(R.drawable.hashtag)
         toolbar.left_iv.setOnClickListener {
             startActivity(Intent(this, CodiTagListActivity::class.java))
@@ -120,10 +124,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initCommunityToolbar(){
-        toolbar.left_iv.setImageResource(R.drawable.closet_btn)
-        toolbar.left_iv.setOnClickListener {
-            Toast.makeText(this, "click", Toast.LENGTH_SHORT).show()
-        }
+        toolbar.left_iv.visibility = View.INVISIBLE
         toolbar.right_tv.visibility = View.GONE
         toolbar.right_iv.setImageResource(R.drawable.alarm)
         toolbar.right_iv.setOnClickListener {
@@ -145,8 +146,15 @@ class MainActivity : AppCompatActivity() {
         toolbar.right_tv.visibility = View.GONE
         toolbar.right_iv.setImageResource(R.drawable.ic_settings_24px)
         toolbar.right_iv.setOnClickListener {
-            Toast.makeText(this, "회원정보 수정", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "회원정보 수정 -> 임시로 로그아웃", Toast.LENGTH_SHORT).show()
+            signOut()
         }
+    }
+
+    fun signOut(){
+        Fbase.auth.signOut()
+        SharedPrefManager.getInstance(this).clear()
+        startActivity(Intent(this, LoginActivty::class.java))
     }
 
     private fun moveToNotification(){

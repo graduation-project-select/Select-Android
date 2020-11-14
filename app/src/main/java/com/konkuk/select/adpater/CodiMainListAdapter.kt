@@ -12,11 +12,14 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.konkuk.select.R
 import com.konkuk.select.activity.DetailCodiActivity
 import com.konkuk.select.model.Codi
 import com.konkuk.select.network.Fbase
+import com.konkuk.select.network.Fbase.CODI_REF
+import com.konkuk.select.network.Fbase.USERS_REF
 
 class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>, var public:Boolean = false):RecyclerView.Adapter<CodiMainListAdapter.ListHolder>() {
 
@@ -68,7 +71,7 @@ class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>, var p
 
     private fun getCodiListByTag(tagRef: DocumentReference, index:Int) {
         tagRef.get().addOnSuccessListener {
-            var codi_ref = Fbase.CODI_REF
+            var codi_ref = CODI_REF
                 .whereArrayContains("tags", tagRef)
                 .whereEqualTo("uid", Fbase.uid)
 
@@ -76,13 +79,28 @@ class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>, var p
 
             codi_ref.orderBy("timestamp", Query.Direction.DESCENDING)
                 .get().addOnSuccessListener { documents ->
-                codiListArray[index].clear()
-                for (document in documents) {
-                    val codiObj = Fbase.getCodi(document)
-                    codiListArray[index].add(codiObj)
+                    // 비어있으면 유저 코디태그 삭제
+                    if(documents.isEmpty){
+                        deleteUserCodiTag(tagRef)
+                    }
+
+                    codiListArray[index].clear()
+                    for (document in documents) {
+                        val codiObj = Fbase.getCodi(document)
+                        codiListArray[index].add(codiObj)
+                    }
+                    codiMainListItemAdapterArray[index].notifyDataSetChanged()
                 }
-                codiMainListItemAdapterArray[index].notifyDataSetChanged()
-            }
+        }
+    }
+
+    fun deleteUserCodiTag(tagRef:DocumentReference){
+        Fbase.uid?.let {
+            USERS_REF.document(it)
+                .update("codiTagList", FieldValue.arrayRemove(tagRef))
+                .addOnSuccessListener {
+                    Log.v("delete codi empty tag", "${tagRef.id}")
+                }
         }
     }
 }

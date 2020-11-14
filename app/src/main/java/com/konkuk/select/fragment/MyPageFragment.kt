@@ -87,13 +87,6 @@ class MyPageFragment : Fragment() {
     }
 
 
-
-//    fun signOut(){
-//        Fbase.auth.signOut()
-//        SharedPrefManager.getInstance(tv_signOutBtn.context).clear()
-//        startActivity(Intent(activity, LoginActivty::class.java))
-//    }
-
     private inner class ScreenSlidePagerAdapter(fa: Fragment) : FragmentStateAdapter(fa) {
         override fun getItemCount(): Int = 3
 
