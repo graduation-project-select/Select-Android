@@ -5,11 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".fragment.MypageCalendarFragment">
 
-    <TextView
+    <CalendarView
+        android:id="@+id/cv_calendar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="calendar" />
-
-
-
+        android:layout_height="wrap_content"/>
 </FrameLayout>

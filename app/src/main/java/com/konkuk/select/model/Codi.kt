@@ -9,7 +9,10 @@ data class Codi(
     val tags:ArrayList<DocumentReference>,
     val itemsIds:ArrayList<String>,
     val public:Boolean,
-    val date: Timestamp,
+    val timestamp: Long,
+    val year: Int,
+    val month: Int,
+    val date: Int,
     val imgUri:String,
     val uid: String
 ): Serializable

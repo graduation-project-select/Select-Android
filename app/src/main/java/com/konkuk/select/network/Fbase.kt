@@ -81,7 +81,10 @@ object Fbase {
             tags = document.get("tags") as ArrayList<DocumentReference>,
             itemsIds = itemsIdsArray.toCollection(ArrayList<String>()),
             public = codiObj["public"] as Boolean,
-            date = document.get("date") as Timestamp,
+            timestamp = document["timestamp"] as Long,
+            year = (document["year"] as Long).toInt(),
+            month = (document["month"] as Long).toInt(),
+            date = (document["date"] as Long).toInt(),
             imgUri = codiObj["imgUri"] as String,
             uid = codiObj["uid"] as String
         )

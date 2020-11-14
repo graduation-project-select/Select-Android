@@ -73,7 +73,7 @@ class CodiFragment : Fragment() {
     private fun getLatestCodiList(){
         Fbase.CODI_REF
             .whereEqualTo("uid", Fbase.uid)
-            .orderBy("date", Query.Direction.DESCENDING)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .get().addOnSuccessListener { documents ->
                 latestCodiList.clear()
                 for ((index, document) in documents.withIndex()) {

@@ -2,11 +2,13 @@ package com.konkuk.select.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.konkuk.select.R
@@ -18,6 +20,8 @@ import com.konkuk.select.network.Fbase.CODI_REF
 import kotlinx.android.synthetic.main.activity_detail_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DetailCodiActivity : AppCompatActivity() {
 
@@ -79,6 +83,32 @@ class DetailCodiActivity : AppCompatActivity() {
                 finishAffinity()
             }
         }
+
+        // Edit
+        var builder = MaterialDatePicker.Builder.datePicker()
+        builder.setTitleText("날짜를 선택하세요")
+        var materialDatePicker = builder.build()
+        materialDatePicker.addOnPositiveButtonClickListener {timestamp ->
+            val calendarObj = Calendar.getInstance()
+            calendarObj.time = Date(timestamp)
+            var year = calendarObj.get(Calendar.YEAR)
+            var month = calendarObj.get(Calendar.MONTH) + 1
+            var date = calendarObj.get(Calendar.DATE)
+            lastWearDate.text = "$year.$month.$date"
+
+            CODI_REF.document(codiId)
+                .update(mapOf(
+                    "timestamp" to timestamp,
+                    "year" to year,
+                    "month" to month,
+                    "date" to date
+                )).addOnSuccessListener {
+                    Toast.makeText(this, "변경된 날짜: $year.$month.$date", Toast.LENGTH_SHORT).show()
+                }
+        }
+        lastWearDate.setOnClickListener {
+            materialDatePicker.show(supportFragmentManager, "DATE_PICKER")
+        }
     }
 
     private fun getDataFromIntent() {
@@ -87,13 +117,13 @@ class DetailCodiActivity : AppCompatActivity() {
             Fbase.CODI_REF.document(codiId)
                 .get().addOnSuccessListener { document ->
                     codiObj  = Fbase.getCodi(document)
-                    initView(codiObj.tags, codiObj.imgUri, codiObj.date)
+                    initView(codiObj.tags, codiObj.imgUri, codiObj.year, codiObj.month, codiObj.date)
                     getClothesListById(codiObj.itemsIds)
                 }
         }
     }
 
-    fun initView(tags: ArrayList<DocumentReference>, imgUri: String, date: Timestamp){
+    fun initView(tags: ArrayList<DocumentReference>, imgUri: String, year:Int, month:Int, date:Int){
         // 태그
         var tagString = ""
         for(tag in tags){
@@ -107,8 +137,7 @@ class DetailCodiActivity : AppCompatActivity() {
             .load(imgUri)
             .into(codiDetailImg)
         // 날짜
-        val dateStr: String = SimpleDateFormat("yyyy.MM.dd").format(date.toDate())
-        lastWearDate.text = dateStr
+        lastWearDate.text = "$year.$month.$date"
     }
 
     fun getClothesListById(itemsIds: ArrayList<String>){

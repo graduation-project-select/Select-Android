@@ -74,7 +74,7 @@ class CodiMainListAdapter(val codiTagRefList:ArrayList<DocumentReference>, var p
 
             if(public) codi_ref.whereEqualTo("public", true)
 
-            codi_ref.orderBy("date", Query.Direction.DESCENDING)
+            codi_ref.orderBy("timestamp", Query.Direction.DESCENDING)
                 .get().addOnSuccessListener { documents ->
                 codiListArray[index].clear()
                 for (document in documents) {

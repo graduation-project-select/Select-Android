@@ -23,6 +23,8 @@ import com.konkuk.select.network.Fbase
 import com.konkuk.select.utils.KeyboardVisibilityUtils
 import kotlinx.android.synthetic.main.activity_add_codi_register.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AddCodiRegisterActivity : AppCompatActivity() {
@@ -162,7 +164,10 @@ class AddCodiRegisterActivity : AppCompatActivity() {
         val tags: ArrayList<DocumentReference>,
         val itemsIds: ArrayList<String>,
         val public: Boolean,
-        val date: Timestamp,
+        val timestamp: Long,
+        val year: Int,
+        val month: Int,
+        var date: Int,
         val imgUri: String,
         val uid: String
     )
@@ -200,11 +205,19 @@ class AddCodiRegisterActivity : AppCompatActivity() {
                     )
                     Fbase.CODI_SUGGESTION_REF.add(codiSuggestionObj)
                 } else {
+                    val today = Calendar.getInstance()
+                    var timestamp = today.time.time
+                    var year = today.get(Calendar.YEAR)
+                    var month = today.get(Calendar.MONTH) + 1
+                    var date = today.get(Calendar.DATE)
                     val codiObj = CodiRequest(
                         tags = checkTagRefArray,
                         itemsIds = codiClothesIdList,
                         public = open_switch.isChecked,
-                        date = Timestamp.now(),
+                        timestamp = timestamp,
+                        year = year,
+                        month = month,
+                        date = date,
                         imgUri = imgUri,
                         uid = Fbase.auth.uid.toString()
                     )
