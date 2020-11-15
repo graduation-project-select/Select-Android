@@ -42,7 +42,10 @@ class ImageMoveUtils() {
                 if (v.x > width && v.y > height) {
                     v.x = width
                     v.y = height
-                } else if (v.x < 0 && v.y > height) {
+                }
+                /*
+                경계선 밖으로 나가지 못하게 하는 코드인데 필요없어보임
+                else if (v.x < 0 && v.y > height) {
                     v.x = 0f
                     v.y = height
                 } else if (v.x > width && v.y < 0) {
@@ -68,6 +71,7 @@ class ImageMoveUtils() {
                         v.y = height
                     }
                 }
+                */
             } else if (mode == ZOOM) {    // 핀치줌 중이면, 이미지의 거리를 계산해서 확대를 한다.
                 newDist = spacing(event)
                 if (newDist - oldDist > 30) {  // zoom in

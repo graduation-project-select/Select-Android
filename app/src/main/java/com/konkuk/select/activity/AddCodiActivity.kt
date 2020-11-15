@@ -240,7 +240,7 @@ class AddCodiActivity : AppCompatActivity() {
                         }
 
                         var addImgView = ImageView(this@AddCodiActivity)
-                        addImgView.layoutParams = ConstraintLayout.LayoutParams(450, 450)
+                        addImgView.layoutParams = ConstraintLayout.LayoutParams(600, 600)
 
                         Glide.with(this@AddCodiActivity)
                             .load(data.imgUri)
@@ -271,7 +271,7 @@ class AddCodiActivity : AppCompatActivity() {
                     } else {
                         codiClothesList.add(data)
                         var addImgView = ImageView(this@AddCodiActivity)
-                        addImgView.layoutParams = ConstraintLayout.LayoutParams(450, 450)
+                        addImgView.layoutParams = ConstraintLayout.LayoutParams(600, 600)
 
                         Glide.with(this@AddCodiActivity)
                             .load(data.imgUri)

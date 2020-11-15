@@ -121,10 +121,13 @@ class AddClothesActivity : AppCompatActivity(),
                             colorRGB[0] = it.R
                             colorRGB[1] = it.G
                             colorRGB[2] = it.B
-                            imageByteArray = Base64.decode(it.encodedImage, 0)
-                            Log.d(TAG, "imageByteArray: $imageByteArray")
                             initClothesPropView()
-                            imageByteArray?.let { setClothesImage(it) }
+                            Log.d(TAG, "it.encodedImage: $it.encodedImage")
+                            if(it.encodedImage != ""){
+                                imageByteArray = Base64.decode(it.encodedImage, 0)
+                                imageByteArray?.let { setClothesImage(it) }
+                            }
+                            Log.d(TAG, "imageByteArray: $imageByteArray")
                         } else {
                             Log.e(TAG, "success: False")
                             onFailureGetClothesProps()
