@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity() {
         toolbar.left_iv.visibility = View.INVISIBLE
         toolbar.title_tv.text = "셀렉"
         toolbar.right_tv.visibility = View.GONE
-        toolbar.right_iv.setImageResource(R.drawable.ic_settings_24px)
+        toolbar.right_iv.setImageResource(R.drawable.setting_btn)
         toolbar.right_iv.setOnClickListener {
             startActivity(Intent(this, EditProfileActivity::class.java))
         }
