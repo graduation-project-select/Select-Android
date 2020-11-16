@@ -27,54 +27,28 @@ class ImageMoveUtils() {
     var mode: Int = NONE
 
     fun TouchProcess(v: View?, event: MotionEvent?) {
+        Log.e("event oldDist", oldDist.toString())
+        Log.e("event newDist", newDist.toString())
+
         width = ((v?.parent as ViewGroup).width - v.width).toFloat()
         height = ((v?.parent as ViewGroup).height - v.height).toFloat()
         val act = event!!.action
         when (act and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> if (InObject(event.x, event.y)) { //손가락 터치 위치가 이미지 안에 있으면 DragMode가 시작된다.
-                oldXvalue = event.x
-                oldYvalue = event.y
+                oldXvalue = v.x - event.rawX
+                oldYvalue = v.y - event.rawY
                 mode = DRAG
             }
             MotionEvent.ACTION_MOVE -> if (mode == DRAG) {   // 드래그 중이면, 이미지의 X,Y값을 변환시키면서 위치 이동.
-                v.x = event.rawX - oldXvalue
-                v.y = event.rawY - (oldYvalue + v.height / 2)
-                if (v.x > width && v.y > height) {
-                    v.x = width
-                    v.y = height
-                }
-                /*
-                경계선 밖으로 나가지 못하게 하는 코드인데 필요없어보임
-                else if (v.x < 0 && v.y > height) {
-                    v.x = 0f
-                    v.y = height
-                } else if (v.x > width && v.y < 0) {
-                    v.x = width
-                    v.y = 0f
-                } else if (v.x < 0 && v.y < 0) {
-                    v.x = 0f
-                    v.y = 0f
-                } else if (v.x < 0 || v.x > width) {
-                    if (v.x < 0) {
-                        v.x = 0f
-                        v.y = event.rawY - oldYvalue - v.height
-                    } else {
-                        v.x = width.toFloat()
-                        v.y = event.rawY - oldYvalue - v.height
-                    }
-                } else if (v.y < 0 || v.y > height) {
-                    if (v.y < 0) {
-                        v.x = event.rawX - oldXvalue
-                        v.y = 0f
-                    } else {
-                        v.x = event.rawX - oldXvalue
-                        v.y = height
-                    }
-                }
-                */
+                v.animate()
+                    .x(event.rawX + oldXvalue)
+                    .y(event.rawY + oldYvalue)
+                    .setDuration(0)
+                    .start()
             } else if (mode == ZOOM) {    // 핀치줌 중이면, 이미지의 거리를 계산해서 확대를 한다.
                 newDist = spacing(event)
-                if (newDist - oldDist > 30) {  // zoom in
+                Log.e("event newDist update", newDist.toString())
+                if (newDist > oldDist) {  // zoom in
                     Log.d("event", "zoom in")
                     val scale: Float = sqrt((newDist - oldDist) * (newDist - oldDist) / (height * height + width * width))
                     v.scaleX = v.scaleX * scale
@@ -82,7 +56,7 @@ class ImageMoveUtils() {
                     v.x = v.x * scale
                     v.y = v.y * scale
                     oldDist = newDist
-                } else if (oldDist - newDist > 30) {  // zoom out
+                } else if (oldDist > newDist) {  // zoom out
                     Log.d("event", "zoom out")
                     var scale: Float = sqrt((newDist - oldDist) * (newDist - oldDist) / (height * height + width * width))
                     v.scaleX = v.scaleX / scale

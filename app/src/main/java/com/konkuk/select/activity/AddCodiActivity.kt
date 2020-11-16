@@ -1,5 +1,6 @@
 package com.konkuk.select.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -12,7 +13,6 @@ import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -201,6 +201,7 @@ class AddCodiActivity : AppCompatActivity() {
 
         codiBottomClothesLinearAdapter.itemClickListener =
             object : CodiBottomClothesLinearAdapter.OnItemClickListener {
+                @SuppressLint("ClickableViewAccessibility")
                 override fun OnClickItem(
                     holder: CodiBottomClothesLinearAdapter.ItemHolder,
                     view: View,
@@ -249,23 +250,21 @@ class AddCodiActivity : AppCompatActivity() {
                         addImgView.imageMatrix = ZoomUtils.matrix
 
                         codi_canvas.addView(addImgView)
-
-                        var MU = ImageMoveUtils()
                         addImgView.setOnTouchListener(ZoomUtils)
 
-//                        addImgView.setOnTouchListener(object : View.OnTouchListener {
-//                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-//                                MU.TouchProcess(v, event)
-//                                v?.bringToFront()
-//                                return true
-//                            }
-//                        })
+//                        var MU = ImageMoveUtils()
+//                        addImgView.setOnTouchListener { v, event ->
+//                            MU.TouchProcess(v, event)
+//                            v?.bringToFront()
+//                            true
+//                        }
                     }
                 }
             }
 
         codiBottomRecommendationAdapter.itemClickListener =
             object : CodiBottomRecommendationAdapter.OnItemClickListener {
+                @SuppressLint("ClickableViewAccessibility")
                 override fun OnClickItem(
                     holder: CodiBottomRecommendationAdapter.ItemHolder,
                     view: View,
@@ -294,15 +293,13 @@ class AddCodiActivity : AppCompatActivity() {
                         addImgView.imageMatrix = ZoomUtils.matrix
 
                         codi_canvas.addView(addImgView)
-                        var MU = ImageMoveUtils()
                         addImgView.setOnTouchListener(ZoomUtils)
-//                        addImgView.setOnTouchListener(object : View.OnTouchListener {
-//                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-//                                MU.TouchProcess(v, event)
-//                                v?.bringToFront()
-//                                return true
-//                            }
-//                        })
+//                        var MU = ImageMoveUtils()
+//                        addImgView.setOnTouchListener { v, event ->
+//                            MU.TouchProcess(v, event)
+//                            v?.bringToFront()
+//                            true
+//                        }
                     }
                 }
             }
