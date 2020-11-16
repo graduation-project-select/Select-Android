@@ -1,25 +1,22 @@
 package com.konkuk.select.activity
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.github.chrisbanes.photoview.PhotoView
 import com.konkuk.select.R
 import com.konkuk.select.adpater.CodiBottomCategoryAdapter
 import com.konkuk.select.adpater.CodiBottomClothesLinearAdapter
@@ -28,15 +25,12 @@ import com.konkuk.select.model.Clothes
 import com.konkuk.select.network.Fbase
 import com.konkuk.select.utils.ImageMoveUtils
 import com.konkuk.select.utils.StaticValues
+import com.konkuk.select.utils.ZoomUtils
 import kotlinx.android.synthetic.main.activity_add_codi.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.*
 import kotlinx.android.synthetic.main.toolbar_codi_bottom.view.*
-import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 
 
 class AddCodiActivity : AppCompatActivity() {
@@ -240,20 +234,32 @@ class AddCodiActivity : AppCompatActivity() {
                         }
 
                         var addImgView = ImageView(this@AddCodiActivity)
-                        addImgView.layoutParams = ConstraintLayout.LayoutParams(600, 600)
+                        var img_view_width = ConstraintLayout.LayoutParams.MATCH_PARENT
+                        addImgView.layoutParams = ConstraintLayout.LayoutParams(img_view_width, img_view_width)
 
                         Glide.with(this@AddCodiActivity)
                             .load(data.imgUri)
                             .into(addImgView)
+
+                        // initZoomUtils
+                        ZoomUtils.matrix = Matrix()     // 초기화
+                        ZoomUtils.savedMatrix = Matrix()     // 초기화
+                        ZoomUtils.matrix.setScale(0.5f, 0.5f)
+                        addImgView.scaleType = ImageView.ScaleType.MATRIX;
+                        addImgView.imageMatrix = ZoomUtils.matrix
+
                         codi_canvas.addView(addImgView)
+
                         var MU = ImageMoveUtils()
-                        addImgView.setOnTouchListener(object : View.OnTouchListener {
-                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                                MU.TouchProcess(v, event)
-                                v?.bringToFront()
-                                return true
-                            }
-                        })
+                        addImgView.setOnTouchListener(ZoomUtils)
+
+//                        addImgView.setOnTouchListener(object : View.OnTouchListener {
+//                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+//                                MU.TouchProcess(v, event)
+//                                v?.bringToFront()
+//                                return true
+//                            }
+//                        })
                     }
                 }
             }
@@ -271,20 +277,32 @@ class AddCodiActivity : AppCompatActivity() {
                     } else {
                         codiClothesList.add(data)
                         var addImgView = ImageView(this@AddCodiActivity)
-                        addImgView.layoutParams = ConstraintLayout.LayoutParams(600, 600)
+
+                        var img_view_width = ConstraintLayout.LayoutParams.MATCH_PARENT
+                        addImgView.layoutParams = ConstraintLayout.LayoutParams(img_view_width, img_view_width)
+                        addImgView.imageMatrix = ZoomUtils.matrix
 
                         Glide.with(this@AddCodiActivity)
                             .load(data.imgUri)
                             .into(addImgView)
+
+                        // initZoomUtils
+                        ZoomUtils.matrix = Matrix()     // 초기화
+                        ZoomUtils.savedMatrix = Matrix()     // 초기화
+                        ZoomUtils.matrix.setScale(0.5f, 0.5f)
+                        addImgView.scaleType = ImageView.ScaleType.MATRIX;
+                        addImgView.imageMatrix = ZoomUtils.matrix
+
                         codi_canvas.addView(addImgView)
                         var MU = ImageMoveUtils()
-                        addImgView.setOnTouchListener(object : View.OnTouchListener {
-                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                                MU.TouchProcess(v, event)
-                                v?.bringToFront()
-                                return true
-                            }
-                        })
+                        addImgView.setOnTouchListener(ZoomUtils)
+//                        addImgView.setOnTouchListener(object : View.OnTouchListener {
+//                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+//                                MU.TouchProcess(v, event)
+//                                v?.bringToFront()
+//                                return true
+//                            }
+//                        })
                     }
                 }
             }
